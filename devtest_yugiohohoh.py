@@ -26,12 +26,17 @@ guard = scale(load_image("images\\stickman.png"), (100, 200))
 vignette = scale(load_image("images\\vignette.png"), (RES[0] * 2.5, RES[1]))
 
 select = load_image("images\\select_circle_dot.png")
+opponent_select = load_image("images\\select_circle_dot.png")
 
 for x in range(select.get_width()):
     for y in range(select.get_height()):
         if select.get_at((x, y)) == (0, 0, 0):  # Check for black with full alpha
             select.set_at((x, y), (255, 255, 255))  # Change to white
 
+for x in range(opponent_select.get_width()):
+    for y in range(opponent_select.get_height()):
+        if opponent_select.get_at((x, y)) == (0, 0, 0):  # Check for black with full alpha
+            opponent_select.set_at((x, y), (255, 0, 0))  # Change to white
 
 def render_card():
     my_pivot = (150, RES[1] - 150)
@@ -48,8 +53,9 @@ def render_card():
 
 
 def render_member(pos: tuple[float, float], opponent: bool = False, isPlayer: bool = False):
-    _player = player if opponent else pg.transform.flip(player, True, False) # LOCAL
-    _guard = guard if not opponent else pg.transform.flip(guard, True, False) # LOCAL
+    _player = player if opponent else pg.transform.flip(player, True, False)
+    _guard = guard if not opponent else pg.transform.flip(guard, True, False)
+    _select = select if not opponent else opponent_select
 
     if isPlayer:
         member_rect = _player.get_rect(midbottom = pos)
@@ -57,17 +63,29 @@ def render_member(pos: tuple[float, float], opponent: bool = False, isPlayer: bo
     else:
         member_rect = _guard.get_rect(midbottom = pos)
         screen.blit(_guard, member_rect)
+ 
+    _select = pg.transform.rotate(_select, pg.time.get_ticks() / 15)
+    select_dim = (_select.get_width(), _select.get_height() * 0.4)
+    _select = pg.transform.scale(_select, select_dim)
+    select_rect = _select.get_rect(center = member_rect.midbottom)
 
-    if not opponent:
-        select_spin = pg.transform.rotate(select, pg.time.get_ticks() / 10)
-        select_dim = (select_spin.get_width(), select_spin.get_height() * 0.4)
-        select_spin = pg.transform.scale(select_spin, select_dim)
-        select_rect = select_spin.get_rect(center = member_rect.midbottom)
+    screen.blit(_select, select_rect)
 
-        screen.blit(select_spin, select_rect)
+
+class TextEngine:
+    def __init__(self):
+        self.game_font = pg.font.Font('Comic.ttf', 20)
+
+    def write(self, txt: str, pos):
+        img = self.game_font.render(txt, True, (255, 255, 255))
+        rect = img.get_rect(topleft = pos)
+        screen.blit(img, rect)
+
+defFont = TextEngine()
 
 
 while True:
+    mspf = clock.tick(30)
     for e in pg.event.get():
         if e.type == pg.QUIT:
             pg.quit()
@@ -92,8 +110,8 @@ while True:
     vignette_rect = vignette.get_rect(center = (RES[0] // 2, RES[1] // 2))
     screen.blit(vignette, vignette_rect)
 
+    defFont.write(f"MSPF: {mspf}", (20, 20))
     pg.display.update()
-    clock.tick(30)
 
 # import pygame as pg
 
