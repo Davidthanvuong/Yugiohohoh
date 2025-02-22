@@ -1,5 +1,4 @@
 import pygame as pg
-from pygame import gfxdraw
 
 RES = (1600, 1000)
 
