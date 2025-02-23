@@ -1,4 +1,4 @@
-from .assets import *
+from .settings import *
 
 # class Card:
 #     pass

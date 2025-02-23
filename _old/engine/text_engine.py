@@ -1,5 +1,5 @@
 from pygame import font
-from .assets import screen
+from .settings import screen
 
 class TextEngine:
     def __init__(self):

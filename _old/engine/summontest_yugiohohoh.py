@@ -7,7 +7,7 @@ fpstext = ""
 
 while True:
     tick += 1
-    total += clock.tick(30)
+    total += clock.tick(240)
     for e in pg.event.get():
         if e.type == pg.QUIT:
             pg.quit()
