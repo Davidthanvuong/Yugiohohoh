@@ -23,7 +23,7 @@ def create_glTexture(img: Imager):
 def do_clear(_):
     glClear(GL_COLOR_BUFFER_BIT)
 
-def do_render(_, img: Imager, parent: vec):
+def do_render(_, img, parent: vec):
     
     # Chưa generate thì mới tạo
     if img.shared.gl_texture is None: 
@@ -59,4 +59,4 @@ def do_render(_, img: Imager, parent: vec):
     glPopMatrix()
 
 def do_write(_, _2, text: str, pos: vec):
-    pass
+    print(text)

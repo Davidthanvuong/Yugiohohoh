@@ -1,4 +1,4 @@
-from ..engine.gameobject import *
+from ..go_importer import *
 from time import time as get_time
 
 class FPSCounter(GameObject):
@@ -11,8 +11,10 @@ class FPSCounter(GameObject):
         self.frame += 1
         curr = get_time()
         if curr - self.last_time >= 0.5:
-            fps = self.frame / (curr - self.last_time)
-            self.fps_text = f"FPS: {fps:.2f}"
+            dt = (curr - self.last_time)
+            fps = self.frame / dt
+            mspf = 1000 / fps
+            self.fps_text = f"FPS: {int(fps)}\nMSPF: {mspf:.2f} ms"
             self.last_time = curr
             self.frame = 0
         

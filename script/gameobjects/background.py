@@ -1,4 +1,4 @@
-from ..engine.gameobject import *
+from ..go_importer import *
 
 class Background(GameObject):
     def __init__(self):

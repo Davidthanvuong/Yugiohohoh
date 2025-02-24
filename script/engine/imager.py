@@ -1,7 +1,12 @@
 from .settings import *
+from .gameobject import GameObject
 import pygame as pg
 
 class ImageCache:
+    '''Comment here'''
+    
+    db: dict[int, 'ImageCache'] = {}
+    
     def __init__(self, texture: pg.Surface):
         self.texture = texture
         self.gl_texture = None
@@ -13,31 +18,26 @@ class ImageCache:
                 if self.texture.get_at((x, y)) == a:
                     self.texture.set_at((x, y), b)
 
-db: dict[int, ImageCache] = {}
+    @staticmethod
+    def load_cache(path: str) -> 'ImageCache':
+        '''Cố gắng Load texture và OpenGL texture từ bộ nhớ'''
+        poly = hash(path)
+        if poly not in ImageCache.db:
+            img = pg.image.load(f"image\\{path}").convert_alpha()
+            ImageCache.db[poly] = ImageCache(img)
 
-def load_cache(path: str) -> ImageCache:
-    '''Cố gắng Load texture và OpenGL texture từ bộ nhớ'''
-    poly = hash(path)
-    if poly not in db:
-        img = pg.image.load(f"image\\{path}").convert_alpha()
-        db[poly] = ImageCache(img)
-
-    return db[poly]
+        return ImageCache.db[poly]
 
 
-class Imager:
+class Imager(GameObject):
     '''Wrapper cho thằng pygame.Surface\n
     Thêm tính năng lưu hash, cân mọi pivot, tối ưu cho OpenGL'''
 
-    def __init__(self, path: str, pos: vec = vec(0, 0), size: vec = vec(0, 0), 
-                    scale: vec = vec(1, 1), post_scale: vec = vec(1, 1), rotation: float = 0.0, pivot: vec = vec(0.5, 0.5)):
-        self.shared = load_cache(path)
-        self.pos = pos
-        self.post_scale = post_scale
-        self.scale = scale
-        self.rotation = rotation
-        self.pivot = pivot
+    def __init__(self, path: str, size = vec(0, 0), **kwargs):
+        super().__init__(**kwargs)
+        self.shared = ImageCache.load_cache(path)
 
+        # Mặc định sang kích thước của ảnh
         if size != vec(0, 0):
             self.size = size
         else:

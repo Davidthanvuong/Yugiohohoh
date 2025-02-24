@@ -1,7 +1,6 @@
 import pygame as pg
 
 from .settings import *
-from .imager import Imager
 from enum import Enum
 from importlib.util import find_spec
 
@@ -39,7 +38,7 @@ def refresh_display():
     pg.display.flip()
     do_clear(screen)
 
-def render(img: Imager, parent: vec = vec(0, 0)):
+def render(img, parent: vec = vec(0, 0)):
     do_render(screen, img, parent)
 
 def write(text: str, pos: vec = vec(0, 0)):

@@ -15,7 +15,7 @@ def do_render(screen: pg.Surface, img: Imager, parent: vec):
     pos_root = img.pos + parent
     
     sf_scale = scale_by_pixel(sf, img.size, img.scale)
-    sf_rot = pg.transform.rotate(sf_scale, -img.rotation)
+    sf_rot = pg.transform.rotate(sf_scale, -img.spin)
     sf_pscale = scale_by_pixel(sf_rot, vec(sf_rot.get_size()), img.post_scale)
 
     uv_root = (sf_pscale.get_width() * img.scale.x * img.post_scale.x * -img.pivot.x, 
