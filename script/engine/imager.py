@@ -1,5 +1,5 @@
 from .settings import *
-from .gameobject import GameObject
+from .gameobject import *
 import pygame as pg
 
 class ImageCache:
@@ -33,9 +33,9 @@ class Imager(GameObject):
     '''Wrapper cho thằng pygame.Surface\n
     Thêm tính năng lưu hash, cân mọi pivot, tối ưu cho OpenGL'''
 
-    def __init__(self, path: str, size = vec(0, 0), **kwargs):
+    def __init__(self, path: str = "", size = vec(0, 0), sf: Optional[pg.Surface] = None, **kwargs):
         super().__init__(**kwargs)
-        self.shared = ImageCache.load_cache(path)
+        self.shared = ImageCache(sf) if sf != None else ImageCache.load_cache(path)
 
         # Mặc định sang kích thước của ảnh
         if size != vec(0, 0):

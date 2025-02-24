@@ -33,7 +33,12 @@ class GOManager:
         # Post processing
         self.layer_add(101, FPSCounter())
 
+    # interpolate
     def obj_update(self):
         for layer in self.layers:
             for obj in layer:
                 obj.update()
+
+    # 20 frame
+    def obj_logicupdate(self):
+        pass

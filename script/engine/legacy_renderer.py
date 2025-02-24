@@ -14,16 +14,16 @@ def do_render(screen: pg.Surface, img: Imager, parent: vec):
 
     pos_root = img.pos + parent
     
-    sf_scale = scale_by_pixel(sf, img.size, img.scale)
-    sf_rot = pg.transform.rotate(sf_scale, -img.spin)
-    sf_pscale = scale_by_pixel(sf_rot, vec(sf_rot.get_size()), img.post_scale)
+    _sf = scale_by_pixel(sf, img.size, img.scale)
+    if img.spin != 0:               _sf = pg.transform.rotate(_sf, -img.spin)
+    if img.post_scale != vec(1, 1): _sf = scale_by_pixel(_sf, vec(_sf.get_size()), img.post_scale)
 
-    uv_root = (sf_pscale.get_width() * img.scale.x * img.post_scale.x * -img.pivot.x, 
-               sf_pscale.get_height() * img.scale.x * img.post_scale.x * -img.pivot.y)
+    uv_root = (_sf.get_width() * img.scale.x * img.post_scale.x * -img.pivot.x, 
+               _sf.get_height() * img.scale.x * img.post_scale.x * -img.pivot.y)
 
-    rect = sf_pscale.get_rect(topleft = pos_root + uv_root)
-    screen.blit(sf_pscale, rect)
+    rect = _sf.get_rect(topleft = pos_root + uv_root)
+    screen.blit(_sf, rect)
 
-def do_write(screen: pg.Surface, fonter: pg.Font, text: str, pos: vec):
-    img = fonter.render(text, True, (255, 255, 255))
-    screen.blit(img, pos)
+# def do_write(screen: pg.Surface, fonter: pg.font.Font, text: str, pos: vec):
+#     img = fonter.render(text, True, (255, 255, 255))
+#     screen.blit(img, pos)
