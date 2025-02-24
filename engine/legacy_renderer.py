@@ -1,6 +1,5 @@
-import pygame as pg
-from .imager import Imager 
-from .settings import *
+from importer.pygame import *
+from .transform import Imager 
 
 def scale_by_pixel(sf: pg.Surface, size: vec, scale: vec) -> pg.Surface:
     pixel_size = (size.x * scale.x, size.y * scale.y)
@@ -16,7 +15,7 @@ def do_render(screen: pg.Surface, img: Imager, parent: vec):
     
     _sf = scale_by_pixel(sf, img.size, img.scale)
     if img.spin != 0:               _sf = pg.transform.rotate(_sf, -img.spin)
-    if img.post_scale != vec(1, 1): _sf = scale_by_pixel(_sf, vec(_sf.get_size()), img.post_scale)
+    if img.post_scale != vec(ONE): _sf = scale_by_pixel(_sf, vec(_sf.get_size()), img.post_scale)
 
     uv_root = (_sf.get_width() * img.scale.x * img.post_scale.x * -img.pivot.x, 
                _sf.get_height() * img.scale.x * img.post_scale.x * -img.pivot.y)

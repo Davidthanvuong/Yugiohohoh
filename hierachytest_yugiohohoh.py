@@ -1,18 +1,21 @@
-from script import *
+import pygame as pg
+from settings import *
+from manager.objectman import ObjectManager
+from engine.abstract_renderer import refresh_display
 
 # Cái này khỏi phải giải thích
 class Game:
     def __init__(self):
-        pg.display.set_caption("Interactive Test: Yugiohohoh @ 24/02/2025. Session 12:08")
+        pg.display.set_caption("Hierarchy Test: Yugiohohoh @ 24/02/2025")
         self.clock = pg.time.Clock()
-        self.goman = GOManager()
-        self.goman.load_mainGame()
+        self.objman = ObjectManager()
+        self.objman.load_mainGame()
 
     def bootload(self):
         pass
 
     def run_game(self):
-        self.goman.obj_update()
+        self.objman.obj_update()
         refresh_display()
         self.clock.tick(TARGET_FPS)
 

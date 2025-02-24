@@ -1,6 +1,6 @@
-from ..go_importer import *
+from importer.gobj import *
 
-class Background(GameObject):
+class Background(Transform):
     def __init__(self):
         super().__init__()
         self.image = Imager("fs_woodfloor_seemless.jpg", 

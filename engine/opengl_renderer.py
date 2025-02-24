@@ -1,6 +1,5 @@
-import pygame as pg
-from .imager import Imager
-from .settings import *
+from importer.pygame import *
+from .transform import Imager
 from OpenGL.GL import * # type: ignore (Whatever, I want to import all)
 
 glEnable(GL_TEXTURE_2D)
@@ -9,9 +8,12 @@ glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 glOrtho(0, NATIVE[0], NATIVE[1], 0, -1, 1)
 
 def create_glTexture(img: Imager):
+    '''Chuyển texture của Pygame sang texture của OpenGL'''
+    # Thật sự là .png --> Pygame --> OpenGL. :sob:
     texture = glGenTextures(1)
     raw_size = img.shared.texture.get_size()
     img_data = pg.image.tobytes(img.shared.texture, "RGBA", True)
+    # Một vài phép thuật xong gán vô ImageCache cái gl_texture
     glBindTexture(GL_TEXTURE_2D, texture)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
@@ -20,11 +22,11 @@ def create_glTexture(img: Imager):
     img.shared.gl_texture = texture
     return texture
 
-def do_clear(_):
+def do_clear(_):#
     glClear(GL_COLOR_BUFFER_BIT)
 
 def do_render(_, img: Imager, parent: vec):
-    
+    '''Render bằng Imager quốc dân'''
     # Chưa generate thì mới tạo
     if img.shared.gl_texture is None: 
         create_glTexture(img)
@@ -33,6 +35,7 @@ def do_render(_, img: Imager, parent: vec):
     # wpos: vị trí trên màn hình
     # uv 0-1: tham số các đỉnh
     pos_root = img.pos + parent
+    
     uv_root = (img.size.x * -img.pivot.x, img.size.y * -img.pivot.y)
     uv_x = (uv_root[0], uv_root[0] + img.size.x)
     uv_y = (uv_root[1], uv_root[1] + img.size.y)

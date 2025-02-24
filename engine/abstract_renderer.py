@@ -1,6 +1,4 @@
-import pygame as pg
-
-from .settings import *
+from importer.pygame import *
 from enum import Enum
 from importlib.util import find_spec
 
