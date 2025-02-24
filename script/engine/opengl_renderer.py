@@ -1,5 +1,5 @@
 import pygame as pg
-from .imager import *
+from .imager import Imager
 from .settings import *
 from OpenGL.GL import * # type: ignore (Whatever, I want to import all)
 
@@ -43,7 +43,7 @@ def do_render(_, img: Imager, parent: vec):
     # Nên phải hậu xử lí (post_scale) trước tiền xử lí (scale) 
     # Phần rotation thì ngược chiều do bị lật lại đúng r
     glScalef(img.post_scale.x, img.post_scale.y, 0)
-    glRotatef(img.rotation, 0, 0, 1)
+    glRotatef(img.spin, 0, 0, 1)
     glScalef(img.scale.x, img.scale.y, 0)
 
     glBindTexture(GL_TEXTURE_2D, texture)
@@ -58,5 +58,5 @@ def do_render(_, img: Imager, parent: vec):
     glEnd()
     glPopMatrix()
 
-def do_write(_, _2, text: str, pos: vec):
-    pass
+# def do_write(_, fonter: pg.font.Font, text: str, pos: vec):
+#     img = fonter.render(text, True, (255, 255, 255))

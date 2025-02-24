@@ -1,4 +1,4 @@
-from ..engine.gameobject import *
+from ..go_importer import *
 
 class Card(GameObject):
 	paths = {
@@ -13,7 +13,7 @@ class Card(GameObject):
 		self.image = Imager(
 			Card.paths[self.role], 
 			size=vec(200, 300), 
-			rotation=-5,
+			spin=-5,
 			pivot=vec(0, 0)
 		)
 

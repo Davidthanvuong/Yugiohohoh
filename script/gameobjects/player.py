@@ -1,4 +1,4 @@
-from ..engine.gameobject import *
+from ..go_importer import *
 
 class Player(GameObject):
     def __init__(self, pos = vec(CENTER)):
@@ -15,7 +15,7 @@ class Player(GameObject):
             self.velY = -40
 
         self.pos[1] += self.velY
-        self.selector.rotation += 5
+        self.selector.spin += 5
 
         render(self.human, self.pos)
         render(self.selector, self.pos)
