@@ -20,5 +20,6 @@ class Game:
 if __name__ == '__main__':
     g = Game()
     g.bootload()
+    print("Hello, world!~~~")
 
     while RUNNING: g.run_game()
