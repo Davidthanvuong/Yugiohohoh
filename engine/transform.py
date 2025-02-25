@@ -41,6 +41,8 @@ class Transform():
     #             pos = vec(NATIVE[0] * pivot[0], NATIVE[1] * pivot[1])
     #             pivots[names[i*3 + j]] = Transform(pos=pos, pivot=pivot)
 
+
+    # Hàm global đang bị bug. Không dùng
     def global_spin(self) -> float:
         '''Tham số toàn cầu (readonly) của góc xoay vật'''
         spin = self.spin
