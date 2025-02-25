@@ -7,7 +7,7 @@ class Player(Transform):
             pivot=vec(0.5, 1))
         self.selector = Transform(
             imgpath="select_circle_dot.png",
-            parent=self,
+            parent=self, pivot=vec(HALF),
             post_scale=vec(1, 0.4))
         self.velY = 0
         self.selector.shared.replace_color((0, 0, 0), (255, 255, 255))

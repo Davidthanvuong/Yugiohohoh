@@ -5,26 +5,25 @@ import math
 class Transform():
     '''Hỗ trợ trong việc xử lí vị trí, tính chất của ảnh và các vật con (childrens)'''
     
-    def __init__(self, pos = vec(0, 0), scale = vec(ONE), post_scale = vec(ONE), 
-                 spin = 0.0, pivot = vec(HALF), parent: No['Transform'] = None,
-                 imgpath: str = "", imgsize = vec(ZERO), **kwargs):
+    def __init__(self, pos: No[vec] = None, scale: No[vec] = None, post_scale: No[vec] = None, 
+                 spin = 0.0, pivot: No[vec] = None, parent: No['Transform'] = None,
+                 imgpath: str = "", imgsize: No[vec] = None):
         
-        self.pos = pos
-        self.scale = scale
-        self.post_scale = post_scale
+        self.pos = pos if pos else vec(ZERO)
+        self.scale = scale if scale else vec(ONE)
+        self.post_scale = post_scale if post_scale else vec(ONE)
         self.spin = spin
-        self.pivot = pivot
-        self.parent = parent
+        self.pivot = pivot if pivot else vec(ZERO)
+        self.parent = parent 
+        self.mark_for_delete = False
 
         if imgpath == "": # Không dùng ảnh thì để ảnh rỗng :penguin:
               self.shared = ImageCache() 
         else: self.shared = ImageCache.fetch(imgpath)
         
-        if imgsize != vec(ZERO): # Mặc định sang kích thước của ảnh
+        if imgsize != None: # Mặc định sang kích thước của ảnh
               self.imgsize = imgsize
         else: self.imgsize = vec(self.shared.texture.get_size())
-
-        super().__init__(**kwargs)
 
     # @staticmethod
     # def setupPivot():
@@ -58,19 +57,19 @@ class Transform():
     
     def global_pos(self) -> vec:
         '''Tham số toàn cầu (readonly) của vị trí vật'''
-        pos = self.pos
-        if self.parent:
+        pos = self.pos.copy()
+        if self.parent != None:
             parent_pos = self.parent.global_pos()
-            parent_scale = self.parent.global_scale()
+            #parent_scale = self.parent.global_scale()
             #parent_rot = math.radians(self.parent.global_spin())
 
             # Scale vị trí dựa trên kích thước và góc xoay của vật chủ
-            local_offset = vec( self.pos.x * parent_scale.x,
-                                self.pos.y * parent_scale.y)
+            #local_offset = vec( self.pos.x * parent_scale.x,
+            #                    self.pos.y * parent_scale.y)
             
-            rotated_offset = local_offset.rotate(self.parent.global_spin())
+            #rotated_offset = local_offset.rotate(self.parent.global_spin())
 
-            return parent_pos + rotated_offset
+            pos += parent_pos# + rotated_offset
         return pos
     
     @abstractmethod

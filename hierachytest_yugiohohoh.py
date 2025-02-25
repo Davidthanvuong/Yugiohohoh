@@ -11,26 +11,19 @@ class Game:
         self.objman = ObjectManager()
         self.objman.load_mainGame()
 
-    def bootload(self):
-        self.objman.load_loadingScene()
-
     def run_game(self):
-        self.objman.obj_update()
-        refresh_display()
-        self.clock.tick(TARGET_FPS)
+        while RUNNING:
+            self.objman.obj_update()
+            refresh_display()
+            self.clock.tick(TARGET_FPS)
 
 
 if __name__ == '__main__':
-    game = Game()
-    game.bootload()
-
-    while RUNNING: game.run_game()
+    Game().run_game()
 
 
 # 25/02 Focus:
 # All
-# - Ideas for Summons
-# DONE Group syncing (Python, libs, Github & push pull)
 
 # Davich
 # - QUICK Realtime adjust RENDERSCALE and flexible window?

@@ -8,5 +8,5 @@ ONE = (1, 1)
 
 TARGET_FPS = 60
 RUNNING = True
-I_DONT_LIKE_OPENGL = False
+I_DONT_LIKE_OPENGL = True
 FONT_PATH = "Comic.ttf"
