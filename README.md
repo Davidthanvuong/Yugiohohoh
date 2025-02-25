@@ -1,12 +1,12 @@
 # Yugiohohoh
 ## Tổng quan
----
 Tên tiếng Việt: Yu-gi-ồ-ố-ô\
 Game bài nhưng bạn làm bao cát cho đám đệ bạn triệu hồi\
 Giờ đây bạn có thể đi hội đồng, _hoặc là bị hội đồng_\
 
 Game được design đơn giản lúc ban đầu nhưng khi phát triển, \
 thêm bao nhiêu loại thẻ bài vô cũng được
+
 #### Game có vài lối chơi được design cho
 - Mấy thằng spam mỗi 1 con meta
 - Cứ buff cho bản thân để đi solo
@@ -27,21 +27,13 @@ thêm bao nhiêu loại thẻ bài vô cũng được
 - Ghép ảnh realistic + chi tiết hư vô để làm absolute cinema
 
 ## Installation & Edit game
----
-Game được phát triển trên Python 3.11 _(lười update)_ dùng Pygame\
-Bạn có thể cài thêm PyOpenGL, PyOpenGL_accelerate để game chạy nhanh hơn (rất nhiều)
-
-> [!note] Bật OpenGL
-> Bạn có thể bật thư viện OpenGL tại: script/engine/settings.py\
-> Chỉnh I_DONT_LIKE_OPENGL sang False\
-> Bật mà không cài (cơ chế an toàn) sẽ không có chuyện gì thay đổi hết\
+Game được phát triển trên Pygame bằng Python 3.13
+Bạn có thể cài thêm PyOpenGL, PyOpenGL_accelerate để game chạy nhanh hơn
 
 Hiện tại chưa có manual dành cho developer hay những người hac\*\*\*...*edit* dạo
 
 ## Roadmap
----
 #### \[1] Proof of Concept
-- [x] Single-file
 - [x] OOP + Custom Game engine
 - [x] OpenGL Render engine
 - [ ] Tương tác với vật (GameObject)
@@ -52,8 +44,6 @@ Hiện tại chưa có manual dành cho developer hay những người hac\*\*\*
 #### ...
 
 ## Objectives hiện tại
----
-(Muốn ẩn danh/đổi tên nhớ nói)
 - [ ] **Itsrandomizable + DuckMinh**: Một đống mấy thằng đệ (summon) để test. Skill + hệ + description luôn
-- [ ] **QuanDNA**: Kéo, thả, click/hover/idle vật. Thanh máu?
+- [ ] **QuanDNA**: Kéo, thả, tương tác với object
 - [ ] **Davich**: Chuyển đổi giữa scene. Combat system
