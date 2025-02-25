@@ -34,7 +34,7 @@ def do_render(_, img: Transform):
 
     # wpos: vị trí trên màn hình
     # uv 0-1: tham số các đỉnh
-    pos_root = img.pos
+    pos_root = img.global_pos()
     
     uv_root = (img.imgsize.x * -img.pivot.x, img.imgsize.y * -img.pivot.y)
     uv_x = (uv_root[0], uv_root[0] + img.imgsize.x)
