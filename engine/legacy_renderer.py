@@ -1,5 +1,5 @@
 from importer.pygame import *
-from .transform import Imager 
+from .transform import Transform 
 
 def scale_by_pixel(sf: pg.Surface, size: vec, scale: vec) -> pg.Surface:
     pixel_size = (size.x * scale.x, size.y * scale.y)
@@ -8,10 +8,10 @@ def scale_by_pixel(sf: pg.Surface, size: vec, scale: vec) -> pg.Surface:
 def do_clear(screen: pg.Surface):
     screen.fill((0, 0, 0))
 
-def do_render(screen: pg.Surface, img: Imager, parent: vec):
+def do_render(screen: pg.Surface, img: Transform):
     sf = img.shared.texture
 
-    pos_root = img.pos + parent
+    pos_root = img.pos
     
     _sf = scale_by_pixel(sf, img.size, img.scale)
     if img.spin != 0:               _sf = pg.transform.rotate(_sf, -img.spin)

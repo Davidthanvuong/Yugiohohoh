@@ -2,10 +2,14 @@ from importer.gobj import *
 
 class Player(Transform):
     def __init__(self, pos = vec(CENTER)):
-        super().__init__(pos)
+        super().__init__(pos, 
+            imgpath="summon\\eldenring.png",
+            pivot=vec(0.5, 1))
+        self.selector = Transform(
+            imgpath="select_circle_dot.png",
+            parent=self,
+            post_scale=vec(1, 0.4))
         self.velY = 0
-        self.human = Imager("summon\\eldenring.png", pivot=vec(0.5, 1))
-        self.selector = Imager("select_circle_dot.png", post_scale=vec(1, 0.4))
         self.selector.shared.replace_color((0, 0, 0), (255, 255, 255))
 
     def update(self):
@@ -17,8 +21,8 @@ class Player(Transform):
         self.pos[1] += self.velY
         self.selector.spin += 5
 
-        render(self.human, self.pos)
-        render(self.selector, self.pos)
+        render(self)
+        render(self.selector)
 
     def input_handler(self):
         for e in pg.event.get():

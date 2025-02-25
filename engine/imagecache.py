@@ -1,4 +1,5 @@
 from importer.pygame import *
+from typing import Union
 
 tempTexture = pg.Surface((0, 0))
 
@@ -6,17 +7,21 @@ class ImageCache:
     '''Load & lưu Texture động (dynamically) vào bộ nhớ, khi nào cần lấy ra'''
     db: dict[int, 'ImageCache'] = {}
     
-    def __init__(self, texture: pg.Surface = tempTexture):
-        self.texture = texture
+    def __init__(self, path: Union[str, pg.Surface, None] = None):#path: str = "", texture: pg.Surface = tempTexture):
+        if isinstance(path, pg.Surface):
+            self.texture = path
+        elif isinstance(path, str):
+            self.texture = pg.image.load(f"images\\{path}").convert_alpha()
+        else:
+            self.texture = tempTexture
         self.gl_texture = None
 
     @staticmethod
     def fetch(path: str) -> 'ImageCache':
-        '''Cố gắng Load texture và OpenGL texture từ bộ nhớ'''
+        '''Cố gắng Load texture và OpenGL texture từ bộ nhớ, không có thì tạo cái mới'''
         poly = hash(path)
         if poly not in ImageCache.db:
-            img = pg.image.load(f"images\\{path}").convert_alpha()
-            ImageCache.db[poly] = ImageCache(img)
+            ImageCache.db[poly] = ImageCache(path)
 
         return ImageCache.db[poly]
     

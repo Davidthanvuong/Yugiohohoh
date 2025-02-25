@@ -1,5 +1,5 @@
 from importer.pygame import *
-from .transform import Imager
+from .transform import Transform
 from OpenGL.GL import * # type: ignore (Whatever, I want to import all)
 
 glEnable(GL_TEXTURE_2D)
@@ -7,7 +7,7 @@ glEnable(GL_BLEND)
 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 glOrtho(0, NATIVE[0], NATIVE[1], 0, -1, 1)
 
-def create_glTexture(img: Imager):
+def create_glTexture(img: Transform):
     '''Chuyển texture của Pygame sang texture của OpenGL'''
     # Thật sự là .png --> Pygame --> OpenGL. :sob:
     texture = glGenTextures(1)
@@ -25,8 +25,8 @@ def create_glTexture(img: Imager):
 def do_clear(_):#
     glClear(GL_COLOR_BUFFER_BIT)
 
-def do_render(_, img: Imager, parent: vec):
-    '''Render bằng Imager quốc dân'''
+def do_render(_, img: Transform):
+    '''Render bằng Transform quốc dân'''
     # Chưa generate thì mới tạo
     if img.shared.gl_texture is None: 
         create_glTexture(img)
@@ -34,7 +34,7 @@ def do_render(_, img: Imager, parent: vec):
 
     # wpos: vị trí trên màn hình
     # uv 0-1: tham số các đỉnh
-    pos_root = img.pos + parent
+    pos_root = img.pos
     
     uv_root = (img.size.x * -img.pivot.x, img.size.y * -img.pivot.y)
     uv_x = (uv_root[0], uv_root[0] + img.size.x)

@@ -35,5 +35,5 @@ def refresh_display():
     pg.display.flip()
     do_clear(screen)
 
-def render(img, parent: vec = vec(0, 0)):
-    do_render(screen, img, parent)
+def render(img):
+    do_render(screen, img)
