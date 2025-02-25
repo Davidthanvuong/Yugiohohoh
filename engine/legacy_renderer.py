@@ -13,7 +13,7 @@ def do_render(screen: pg.Surface, img: Transform):
 
     pos_root = img.pos
     
-    _sf = scale_by_pixel(sf, img.size, img.scale)
+    _sf = scale_by_pixel(sf, img.imgsize, img.scale)
     if img.spin != 0:               _sf = pg.transform.rotate(_sf, -img.spin)
     if img.post_scale != vec(ONE): _sf = scale_by_pixel(_sf, vec(_sf.get_size()), img.post_scale)
 
