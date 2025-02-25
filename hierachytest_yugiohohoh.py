@@ -32,10 +32,10 @@ if __name__ == '__main__':
 # - Ideas for Summons
 
 # Davich
-# - Split update to logic_update (top down), render_update (down up)
-# Then commit to github
 # - QUICK Document important code and make examples for Summon
 # - QUICK Scene Loader -- Array of Scene (renamed from GOMan)
+# - Split update to logic_update (top down), render_update (down up)
+# Then commit to github
 # - QUICK Game --> Editor mode --> Transform test scene
 
 

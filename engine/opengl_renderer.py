@@ -36,9 +36,9 @@ def do_render(_, img: Transform):
     # uv 0-1: tham số các đỉnh
     pos_root = img.pos
     
-    uv_root = (img.size.x * -img.pivot.x, img.size.y * -img.pivot.y)
-    uv_x = (uv_root[0], uv_root[0] + img.size.x)
-    uv_y = (uv_root[1], uv_root[1] + img.size.y)
+    uv_root = (img.imgsize.x * -img.pivot.x, img.imgsize.y * -img.pivot.y)
+    uv_x = (uv_root[0], uv_root[0] + img.imgsize.x)
+    uv_y = (uv_root[1], uv_root[1] + img.imgsize.y)
 
     glPushMatrix()
     glTranslatef(pos_root[0], pos_root[1], 0)

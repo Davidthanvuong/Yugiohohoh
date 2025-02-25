@@ -10,21 +10,16 @@ class IClickable():
         self.host = host
         self.clickable = False
         self.draggable = False # Cho phép kéo thả
-        self.init = False
-        
-    def after_init(self):
         self.white = Transform(
             imgpath="white.png", 
-            imgsize=self.host.size, 
+            imgsize=self.host.imgsize, 
             pivot=self.host.pivot)
 
-    def iclickable_update(self):
+    def update(self):
         '''Cập nhật của interface sẽ kiểm xem chuột\n
         hiện đang làm gì hitbox vật hiện theo dõi (host)'''
-        if not self.init:
-            self.after_init()
-            self.init = True
         render(self.white)
+        
         #TASK: QuanDNA
             
 

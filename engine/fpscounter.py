@@ -4,9 +4,10 @@ from time import time as get_time
 
 class FPSCounter(Transform):
     def __init__(self):
+        super().__init__(pos=vec(800, 800))
         self.last_time = get_time()
         self.frame = 0
-        self.textr = Textwriter()
+        self.textw = Textwriter()
         self.fps_text = ""
 
     def update(self):
@@ -20,4 +21,5 @@ class FPSCounter(Transform):
             self.last_time = curr
             self.frame = 0
         
-        self.textr.write(self.fps_text)
+        print(self.pos)
+        self.textw.write(self.fps_text)

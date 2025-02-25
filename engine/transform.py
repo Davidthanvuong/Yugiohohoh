@@ -7,7 +7,7 @@ class Transform():
     
     def __init__(self, pos = vec(0, 0), scale = vec(ONE), post_scale = vec(ONE), 
                  spin = 0.0, pivot = vec(HALF), parent: No['Transform'] = None,
-                 imgpath: str = "", imgsize = vec(ZERO)):
+                 imgpath: str = "", imgsize = vec(ZERO), **kwargs):
         self.pos = pos
         self.scale = scale
         self.post_scale = post_scale
@@ -15,13 +15,15 @@ class Transform():
         self.pivot = pivot
         self.parent = parent
 
-        if imgpath == "": # Không dùng ảnh
+        if imgpath == "": # Không dùng ảnh thì để ảnh rỗng :penguin:
               self.shared = ImageCache() 
         else: self.shared = ImageCache.fetch(imgpath)
         
         if imgsize != vec(ZERO): # Mặc định sang kích thước của ảnh
-              self.size = imgsize
-        else: self.size = vec(self.shared.texture.get_size())
+              self.imgsize = imgsize
+        else: self.imgsize = vec(self.shared.texture.get_size())
+
+        super().__init__(**kwargs)
 
     @staticmethod
     def setupPivot():

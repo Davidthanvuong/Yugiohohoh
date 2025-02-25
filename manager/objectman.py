@@ -6,6 +6,7 @@ from objects import *
 class ObjectManager:
     def __init__(self):
         self.layers = [[] for _ in range(102)]
+        Transform.setupPivot()
 
     def layer_add(self, layer: int, go: Transform):
         self.layers[layer].append(go)

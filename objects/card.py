@@ -1,6 +1,6 @@
 from importer.gobj import *
 
-class Card(Transform):
+class Card(Transform, IClickable):
 	paths = {
 		'back': "card_back.png",
 		'empty': "card_empty.png",
@@ -11,9 +11,9 @@ class Card(Transform):
 		super().__init__(
 			imgpath=Card.paths[self.role], 
 			imgsize=vec(200, 300), spin=-5, 
-			pos=pos, **kwargs)
-		
+			pos=pos, host=self, **kwargs)
 
 	def update(self):
-		#self.iclickable_update()
 		render(self)
+		
+    
