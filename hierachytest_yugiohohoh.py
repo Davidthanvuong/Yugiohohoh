@@ -12,7 +12,7 @@ class Game:
         self.objman.load_mainGame()
 
     def bootload(self):
-        pass
+        self.objman.load_loadingScene()
 
     def run_game(self):
         self.objman.obj_update()
@@ -21,11 +21,11 @@ class Game:
 
 
 if __name__ == '__main__':
-    g = Game()
-    g.bootload()
-    print('hello')
+    game = Game()
+    game.bootload()
 
-    while RUNNING: g.run_game()
+    while RUNNING: game.run_game()
+
 
 # 25/02 Focus:
 # All
@@ -33,11 +33,14 @@ if __name__ == '__main__':
 # - Ideas for Summons
 
 # Davich
+# - QUICK Realtime adjust RENDERSCALE and flexible window?
+# - QUICK Load screen threading
 # - QUICK Document important code and make examples for Summon
 # - QUICK Scene Loader -- Array of Scene (renamed from GOMan)
 # - Split update to logic_update (top down), render_update (down up)
 # Then commit to github
 # - QUICK Game --> Editor mode --> Transform test scene
+# WORKING Transform rendering & DONE Parent stacking
 
 
 # DONE QUICK Split, no more second Inheritant. All are binded to a parent (engine/)
@@ -48,8 +51,7 @@ if __name__ == '__main__':
 
 # HazzyQuan
 # - QUICK Loading screen scene (Insert loading scene on bootload)
-# - Transform & Parent stacking
-# - Draggable objects
+# WORKING Draggable objects
 # - Card picking and dragging test
 # - Health bar (2 images: outline, and fill)
 # - Health on Summon
