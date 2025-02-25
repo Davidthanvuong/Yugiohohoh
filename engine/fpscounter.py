@@ -4,7 +4,7 @@ from time import time as get_time
 
 class FPSCounter(Transform):
     def __init__(self):
-        super().__init__(parent=Transform.pivots['topright'])
+        super().__init__()
         self.last_time = get_time()
         self.frame = 0
         self.textw = Textwriter()

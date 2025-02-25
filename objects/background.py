@@ -4,7 +4,7 @@ class Background(Transform):
     def __init__(self):
         super().__init__(
             imgpath="fs_woodfloor_seemless.jpg", 
-            imgsize=vec(NATIVE), pivot=vec(0, 0)
+            imgsize=vec(NATIVE), pivot=vec(ZERO)
         )
 
     def update(self):

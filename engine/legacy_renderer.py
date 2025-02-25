@@ -8,6 +8,9 @@ def scale_by_pixel(sf: pg.Surface, size: vec, scale: vec) -> pg.Surface:
 def do_clear(screen: pg.Surface):
     screen.fill((0, 0, 0))
 
+def do_displayChange(x, y):
+    pass
+
 def do_render(screen: pg.Surface, img: Transform):
     sf = img.shared.texture
 

@@ -25,6 +25,10 @@ def create_glTexture(img: Transform):
 def do_clear(_):#
     glClear(GL_COLOR_BUFFER_BIT)
 
+def do_displayChange(x, y):
+    pass
+    #glOrtho(0, x, y, 0, -1, 1)
+
 def do_render(_, img: Transform):
     '''Render bằng Transform quốc dân'''
     # Chưa generate thì mới tạo
@@ -39,13 +43,14 @@ def do_render(_, img: Transform):
     uv_root = (img.imgsize.x * -img.pivot.x, img.imgsize.y * -img.pivot.y)
     uv_x = (uv_root[0], uv_root[0] + img.imgsize.x)
     uv_y = (uv_root[1], uv_root[1] + img.imgsize.y)
+    scale = img.post_scale
 
     glPushMatrix()
     glTranslatef(pos_root[0], pos_root[1], 0)
     # Bằng một lí do gì thì thứ tự của OpenGL nó ngược so với Legacy. 
     # Nên phải hậu xử lí (post_scale) trước tiền xử lí (scale) 
     # Phần rotation thì ngược chiều do bị lật lại đúng r
-    glScalef(img.post_scale.x, img.post_scale.y, 0)
+    glScalef(scale.x, scale.y, 0)
     glRotatef(img.spin, 0, 0, 1)
     glScalef(img.scale.x, img.scale.y, 0)
 

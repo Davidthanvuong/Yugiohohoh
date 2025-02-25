@@ -7,7 +7,7 @@ import time
 class ObjectManager:
     def __init__(self):
         self.scenes = [[[] for _ in range(102)]]
-        Transform.setupPivot()
+        #Transform.setupPivot()
 
     def add(self, layer: int, go: Transform, scene: int = 0):
         self.scenes[scene][layer].append(go)

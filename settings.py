@@ -1,10 +1,11 @@
+from pygame import Vector2 as vec
+
 NATIVE = (1600, 1000)
 CENTER = (800, 500)
 ZERO = (0, 0)
 HALF = (0.5, 0.5)
 ONE = (1, 1)
 
-RENDERSCALE = 1
 TARGET_FPS = 60
 RUNNING = True
 I_DONT_LIKE_OPENGL = False

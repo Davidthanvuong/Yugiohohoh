@@ -29,8 +29,8 @@ if __name__ == '__main__':
 
 # 25/02 Focus:
 # All
-# - Group syncing (Python, libs, Github & push pull)
 # - Ideas for Summons
+# DONE Group syncing (Python, libs, Github & push pull)
 
 # Davich
 # - QUICK Realtime adjust RENDERSCALE and flexible window?
@@ -51,11 +51,12 @@ if __name__ == '__main__':
 
 # HazzyQuan
 # - QUICK Loading screen scene (Insert loading scene on bootload)
-# WORKING Draggable objects
 # - Card picking and dragging test
 # - Health bar (2 images: outline, and fill)
 # - Health on Summon
 # - Textwriter (font, text, pivot?)
+
+# FINISHED Draggable objects
 
 # Itsrandomizable
 # - Summons modelling & skills, attacks,...

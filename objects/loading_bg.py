@@ -4,7 +4,7 @@ class LoadingBackground(Transform):
     def __init__(self):
         super().__init__(
             imgpath="loading.jpg", 
-            imgsize=vec(NATIVE), pivot=vec(0, 0)
+            imgsize=vec(NATIVE), pos=vec(CENTER)
         )
 
     def update(self):

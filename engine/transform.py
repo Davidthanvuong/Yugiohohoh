@@ -4,7 +4,6 @@ import math
 
 class Transform():
     '''Hỗ trợ trong việc xử lí vị trí, tính chất của ảnh và các vật con (childrens)'''
-    pivots: dict[str, 'Transform'] = {}
     
     def __init__(self, pos = vec(0, 0), scale = vec(ONE), post_scale = vec(ONE), 
                  spin = 0.0, pivot = vec(HALF), parent: No['Transform'] = None,
@@ -27,19 +26,20 @@ class Transform():
 
         super().__init__(**kwargs)
 
-    @staticmethod
-    def setupPivot():
-        '''Khởi tạo 9 góc tọa độ trong màn hình để hỗ trợ scaling'''
-        names = [
-            'topleft', 'midtop', 'topright',
-            'midleft', 'center', 'midright',
-            'bottomleft', 'midbottom', 'bottomright'
-        ]
-        for i in range(0, 3):
-            for j in range(0, 3):
-                pivot = vec(0.5 * i, 0.5 * j)
-                pos = vec(NATIVE[0] * pivot[0], NATIVE[1] * pivot[1])
-                Transform.pivots[names[i*3 + j]] = Transform(pos=pos, pivot=pivot)
+    # @staticmethod
+    # def setupPivot():
+    #     global pivots
+    #     '''Khởi tạo 9 góc tọa độ trong màn hình để hỗ trợ scaling'''
+    #     names = [
+    #         'topleft', 'midtop', 'topright',
+    #         'midleft', 'center', 'midright',
+    #         'bottomleft', 'midbottom', 'bottomright'
+    #     ]
+    #     for i in range(0, 3):
+    #         for j in range(0, 3):
+    #             pivot = vec(0.5 * i, 0.5 * j)
+    #             pos = vec(NATIVE[0] * pivot[0], NATIVE[1] * pivot[1])
+    #             pivots[names[i*3 + j]] = Transform(pos=pos, pivot=pivot)
 
     def global_spin(self) -> float:
         '''Tham số toàn cầu (readonly) của góc xoay vật'''
@@ -78,3 +78,5 @@ class Transform():
 
     @abstractmethod
     def on_debugging(self): pass
+
+#pivots: dict[str, 'Transform'] = {}

@@ -1,5 +1,5 @@
-from importer.pygame import *
 from enum import Enum
+from importer.pygame import *
 from importlib.util import find_spec
 
 class RenderMode(Enum):
@@ -21,14 +21,13 @@ else:
 print(f"Rendering in: {RENDER.name}")
 
 pg.init()
-screen_flags = (pg.DOUBLEBUF | pg.OPENGL) if RENDER == RenderMode.OPENGL else 0
-screen = pg.display.set_mode(NATIVE, screen_flags)
+render_flags = (pg.DOUBLEBUF | pg.OPENGL) if RENDER == RenderMode.OPENGL else 0
+screen = pg.display.set_mode(NATIVE, render_flags)
 
 if RENDER == RenderMode.OPENGL:
     from .opengl_renderer import do_render, do_clear
 else:
     from .legacy_renderer import do_render, do_clear
-
 # Thằng l này phải được chạy sau khi pygame.init
 
 def refresh_display():
