@@ -1,10 +1,13 @@
-from .gameobjects import *
+from importer.gobj import *
+from engine.fpscounter import *
 
-class GOManager:
+from objects import *
+
+class ObjectManager:
     def __init__(self):
         self.layers = [[] for _ in range(102)]
 
-    def layer_add(self, layer: int, go: GameObject):
+    def layer_add(self, layer: int, go: Transform):
         self.layers[layer].append(go)
 
     def load_mainGame(self):
@@ -21,13 +24,12 @@ class GOManager:
         # UI
         for i in range(10):
             pos = vec(100 + i * 50, NATIVE[1] - 150)
-            card = Card(pos)
+            card = Card(pos, pivot=vec(ZERO))
             self.layer_add(2, card)
 
         for i in range(10):
             pos = vec(NATIVE[0] - i * 50, 150)
-            card = Card(pos, True)
-            card.image.pivot = vec(1, 1)
+            card = Card(pos, True, pivot=vec(ONE))
             self.layer_add(100, card)
         
         # Post processing

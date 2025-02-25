@@ -1,2 +1,1 @@
-update()
-        refresh_display
+o
