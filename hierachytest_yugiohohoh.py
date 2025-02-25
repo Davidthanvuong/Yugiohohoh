@@ -23,6 +23,7 @@ class Game:
 if __name__ == '__main__':
     g = Game()
     g.bootload()
+    print('hello')
 
     while RUNNING: g.run_game()
 
