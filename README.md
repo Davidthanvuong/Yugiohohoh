@@ -3,6 +3,7 @@
 Tên tiếng Việt: Yu-gi-ồ-ố-ô\
 Game bài nhưng bạn làm bao cát cho đám đệ bạn triệu hồi\
 Giờ đây bạn có thể đi hội đồng, _hoặc là bị hội đồng_\
+Phát triển trên PyTNK Game engine
 
 Game được design đơn giản lúc ban đầu nhưng khi phát triển, \
 thêm bao nhiêu loại thẻ bài vô cũng được
@@ -33,15 +34,7 @@ Bạn có thể cài thêm PyOpenGL, PyOpenGL_accelerate để game chạy nhanh
 Hiện tại chưa có manual dành cho developer hay những người hac\*\*\*...*edit* dạo
 
 ## Roadmap
-#### \[1] Proof of Concept
-- [x] OOP + Custom Game engine
-- [x] OpenGL Render engine
-- [ ] Tương tác với vật (GameObject)
-- [ ] Combat system
-- [ ] Scene Manager & switch
-- [ ] ...
-
-#### ...
+![Roadmap](https://github.com/Davidthanvuong/Yugiohohoh/blob/main/timeline.png)
 
 ## Objectives hiện tại
 - [ ] **Itsrandomizable + DuckMinh**: Một đống mấy thằng đệ (summon) để test. Skill + hệ + description luôn
