@@ -36,6 +36,9 @@ Hiện tại chưa có manual dành cho developer hay những người hac\*\*\*
 ## Roadmap
 ![Roadmap](https://github.com/Davidthanvuong/Yugiohohoh/blob/main/timeline.png)
 
+![Task cho Quân](https://github.com/Davidthanvuong/Yugiohohoh/blob/main/gigigig.png)
+
+
 ## Objectives hiện tại
 - [ ] **Itsrandomizable + DuckMinh**: Một đống mấy thằng đệ (summon) để test. Skill + hệ + description luôn
 - [ ] **QuanDNA**: Kéo, thả, tương tác với object
