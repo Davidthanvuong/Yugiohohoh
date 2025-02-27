@@ -1,11 +1,8 @@
 # Yugiohohoh
-## Tổng quan
+### Tổng quan
 Tên tiếng Việt: Yu-gi-ồ-ố-ô\
 Game bài nhưng bạn làm bao cát cho đám đệ bạn triệu hồi\
-Giờ đây bạn có thể đi hội đồng, _hoặc là bị hội đồng_\
-
-Game được design đơn giản lúc ban đầu nhưng khi phát triển, \
-thêm bao nhiêu loại thẻ bài vô cũng được
+Giờ đây bạn có thể đi hội đồng, **_hoặc là bị hội đồng_**\
 
 #### Game có vài lối chơi được design cho
 - Mấy thằng spam mỗi 1 con meta
@@ -22,28 +19,19 @@ thêm bao nhiêu loại thẻ bài vô cũng được
 - Khi bạn phá đảo một phần của game, thì bạn có thể thu thập vài lá bài nhảm/OP
 (Mấy lá lúc Designer cook 🔥🔥🔥)
 
-#### Graphics
-- Microsoft Paint đủ chỉ tiêu ✅✅✅💯
-- Ghép ảnh realistic + chi tiết hư vô để làm absolute cinema
-
-## Installation & Edit game
+### Installation & Edit game
 Game được phát triển trên Pygame bằng Python 3.13
-Bạn có thể cài thêm PyOpenGL, PyOpenGL_accelerate để game chạy nhanh hơn
+Có thể thêm vài thư viện để game chạy nhanh hơn (Optional):
+- PyOpenGL, PyOpenGL_accelerate
 
 Hiện tại chưa có manual dành cho developer hay những người hac\*\*\*...*edit* dạo
 
-## Roadmap
-#### \[1] Proof of Concept
-- [x] OOP + Custom Game engine
-- [x] OpenGL Render engine
-- [ ] Tương tác với vật (GameObject)
-- [ ] Combat system
-- [ ] Scene Manager & switch
-- [ ] ...
+### Roadmap
+![Roadmap](https://github.com/Davidthanvuong/Yugiohohoh/blob/main/timeline.png)
 
-#### ...
+![Task cho Quân](https://github.com/Davidthanvuong/Yugiohohoh/blob/main/gigigig.png)
 
-## Objectives hiện tại
-- [ ] **Itsrandomizable + DuckMinh**: Một đống mấy thằng đệ (summon) để test. Skill + hệ + description luôn
-- [ ] **QuanDNA**: Kéo, thả, tương tác với object
-- [ ] **Davich**: Chuyển đổi giữa scene. Combat system
+### Roles
+Davichtvg: Phát triển PyTNK Game engine
+HazzyPTNK: Phát triển chức năng game
+VDM + ItsRandomizable: Phát triển thẻ bài
