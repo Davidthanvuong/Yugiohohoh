@@ -2,7 +2,11 @@
 ### Tổng quan
 Tên tiếng Việt: Yu-gi-ồ-ố-ô\
 Game bài nhưng bạn làm bao cát cho đám đệ bạn triệu hồi\
-Giờ đây bạn có thể đi hội đồng, **_hoặc là bị hội đồng_**\
+Giờ đây bạn có thể đi hội đồng, _hoặc là bị hội đồng_\
+Phát triển trên PyTNK Game engine
+
+Game được design đơn giản lúc ban đầu nhưng khi phát triển, \
+thêm bao nhiêu loại thẻ bài vô cũng được
 
 #### Game có vài lối chơi được design cho
 - Mấy thằng spam mỗi 1 con meta
@@ -26,12 +30,13 @@ Có thể thêm vài thư viện để game chạy nhanh hơn (Optional):
 
 Hiện tại chưa có manual dành cho developer hay những người hac\*\*\*...*edit* dạo
 
-### Roadmap
+## Roadmap
 ![Roadmap](https://github.com/Davidthanvuong/Yugiohohoh/blob/main/timeline.png)
 
 ![Task cho Quân](https://github.com/Davidthanvuong/Yugiohohoh/blob/main/gigigig.png)
 
-### Roles
-Davichtvg: Phát triển PyTNK Game engine
-HazzyPTNK: Phát triển chức năng game
-VDM + ItsRandomizable: Phát triển thẻ bài
+
+## Objectives hiện tại
+- [ ] **Itsrandomizable + DuckMinh**: Một đống mấy thằng đệ (summon) để test. Skill + hệ + description luôn
+- [ ] **QuanDNA**: Kéo, thả, tương tác với object
+- [ ] **Davich**: Chuyển đổi giữa scene. Combat system

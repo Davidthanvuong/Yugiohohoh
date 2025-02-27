@@ -1,4 +1,4 @@
-from importer.pygame import *
+from importer.pg import *
 from .transform import Transform
 from .abstract_renderer import render
 import math
@@ -48,3 +48,44 @@ class IClickable():
     def on_stopClick(self): pass
     def on_hovering(self): pass
     def on_clicking(self): pass
+
+_dragging_card = None
+
+def Cardmove(card, event):
+    # Hàm xử lý kéo thả card bằng chuột.
+    # :param card: Đối tượng card, cần có các thuộc tính:
+    #              - pos (Vector2)
+    #              - imgsize (Vector2)
+    #              - pivot (Vector2)
+    #              - dragging (bool)
+    #              - offset (Vector2)
+    #              và các phương thức:
+    #              - is_mouse_inside(mouse)
+    #              - on_startClick(), on_stopClick(), on_clicking()
+    # :param event: Sự kiện từ Pygame
+    global _dragging_card
+
+    if event.type == pg.MOUSEBUTTONDOWN:
+        if event.button == 1:  # left mouse
+            mouse = pg.Vector2(event.pos)
+            if card.is_mouse_inside(mouse) and _dragging_card is None:
+                _dragging_card = card
+                card.dragging = True
+                card.offset = card.pos - mouse
+                card.on_startClick()
+
+    elif event.type == pg.MOUSEBUTTONUP:
+        if event.button == 1 and card.dragging:
+            card.dragging = False
+            _dragging_card = None
+            card.on_stopClick()
+
+    elif event.type == pg.MOUSEMOTION:
+        if card.dragging:
+            mouse = pg.Vector2(event.pos)
+            card.pos = mouse + card.offset
+            card.on_clicking()
+#  ở đây thì chạy hàm thì m 
+# for event in pg.event.get():
+#     Cardmove(my_card, event)
+
