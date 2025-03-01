@@ -1,2 +1,2 @@
-from os import environ
-environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
+import os
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'

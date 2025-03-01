@@ -1,47 +1,69 @@
-# Chỉnh cài đặt trong settings.py
-# Trong edit mode bấm shift để di chuyển vị trí global
+from pytnk.header_pygame import *
+from pytnk.world import World
+import time
 
-from pytnk.header_objects import *
-from pytnk.scene import Scene
+def new_world_spinning() -> Transform:
+    world_tf = Transform("World")
+    dist = 200
+    World(attach=world_tf)
+    for y in range(0, NATIVE[1] - 50, dist):
+        for x in range(50, NATIVE[0] - 50, dist):
+            card = Transform(parent=world_tf, pos=(x, y), pivot=(0, 0))
+            Image(attach=card, path="card_back.png", size=(70, 100))
+            #IClickable(attach=card, clickable=True)
+            #Text(attach=card, text="Hello")
+    return world_tf
 
-# Scene cho việc edit sẽ được tạo ở đây
-def create_new_editor_scene():
-    pass
+def new_world_inspector() -> Transform:
+    world_tf = Transform("World", pos=(0, 0))
 
-# Scene thí nghiệm ở đây
-def create_new_scene():
-    cube1 = scene.add("Cube1", Translite(pos=(50, 100), pivot=(0, 0), rot=260))
-    scene.add("Cube2", Translite(pos=(250, 150), rot=10, parent=cube1))
-    scene.add("Cube3", Translite(pos=(350, 250), rot=50, parent=cube1))
-    scene.add("Cube4", Translite(pos=(450, 150), rot=140, parent=cube1))
+    if True or not Transform.exist_prefab("Datafield"):
+        print("Not exist")
+        field = Transform("Datafield", parent=world_tf, pos=(100, 22), pivot=(0, 1), 
+                            hitbox=(100, 22), simple=True)
+        Image(attach=field, path="white.png", size=(100, 22), standalone=True)
+        Text(attach=field, text="69.42", color=colormap['dark'])
+        DataField(attach=field)
+        field.save()
+        world_tf.childrens.remove(field)
 
-    for obj in scene.objects.values():
-        obj.hitbox = vec(70, 100)
-        Image("card_back.png", imgsize=(70, 100), tf=obj)
-        ExampleButton("Example button, hello!", clickable=True, tf=obj)
-        IRectEditor(tf=obj)
+    for y in range(200, NATIVE[1] - 200, 28):
+        f = Transform.prefab("Datafield")
+        world_tf.own(f)
+        f.pos = vec(200, y)
+
+    return world_tf
+
+def new_world_empty() -> Transform:
+    world_tf = Transform("World")
+    World(attach=world_tf)
+    return world_tf
 
 
 if __name__ == '__main__':
-    print("HELLO")
-    clock = pg.time.Clock()
+    last_time = time.time()
+    frame = 0
 
-    scene = Scene()
-    #scene.try_load("pickleball.pkl")
-    create_new_scene()
-    #scene.save("pickleball.pkl")
+    if not Transform.exist_prefab("World"): 
+        world_tf = new_world_inspector()
+    else:
+        world_tf = Transform.prefab("World")
+        raise Exception("GAY")
 
-    while RUNNING:
-        for e in pg.event.get():
-            if e.type == pg.QUIT:
-                RUNNING = False
+    world = World(attach=world_tf)
+    world_tf.pos = vec(0, 0)
+    world_tf.global_pos = vec(0, 0)
 
-        screen.fill((60, 60, 60))
-        update_mouse()
-        scene.update()
+    while World.RUNNING:
+        world_tf.logic_update()
+        world_tf.click_update()
+        world_tf.render_update()
 
+        delta = time.time() - last_time
+        frame += 1
+        #print(f"Response: {delta*1000:.2f}ms, FPS: {1/delta:.0f}")
+        world.windowHandler()
+        last_time = time.time()
 
-        pg.display.update()
-        clock.tick(60)
-
+    #world_tf.save()
     pg.quit()

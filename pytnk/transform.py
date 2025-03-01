@@ -1,176 +1,135 @@
-from .header_objects import *
-from typing import TypeVar, Union, cast
-from dataclasses import dataclass
+from .header_pygame import *
+from typing import TypeVar, cast
+from random import randint as rint
+import pickle, os
+from copy import deepcopy
 
-T = TypeVar("T", bound="Interface")
+T = TypeVar("T", bound="Component")
 
-@dataclass
-class MouseInfo:
-    pos: vec
-    clicked: bool
-    host: No['Interface']
+class Transform:
+    '''Class quốc dân'''
+    storage: dict[str, 'Transform'] = {}
 
-mouse = MouseInfo(vec(1, 0), False, None)
-
-
-def update_mouse():
-    '''Cập nhật chuột duy nhất, lưu lại host cũ khi còn tồn tại hay đang đè'''
-    global mouse
-
-    host = mouse.host if mouse.host else None # Lỡ bay màu thì hủy
-    mouse.pos = vec(pg.mouse.get_pos())
-    mouse.clicked = pg.mouse.get_pressed()[0]
-    mouse.host = host
-
-
-
-class Translite:
-    '''Phiên bản nhẹ kí của Transform'''
-
-    # Info của chuột, xóa khi gặp 1 vật tương tác đc
-
-    def __init__(self, pos: tff = CENTER, rot: float = 0, scale: tff = ONE, pivot: tff = HALF, 
-                 hitbox: tff = (64, 64), parent: No['Translite'] = None):
-        print(pos, scale)
+    def __init__(self, name: str = "", pos: tff = CENTER, rot = 0.0, scale: tff = ONE, pivot: tff = HALF, enable = True,
+                 hitbox: tff = ZERO, parent: No['Transform'] = None, simple = False):
+        self.name = name if name != "" else f"Object {rint(0, 2**60)}"
         self.pos = vec(pos)
         self.rot = rot
         self.scale = vec(scale)
         self.pivot = vec(pivot)
         self.parent = parent
         self.hitbox = vec(hitbox)
-        self.coms: dict[type['Interface'], 'Interface'] = {}
+        if parent: parent.own(self)
+        
+        self.childrens: list['Transform'] = []
+        self.coms: dict[type['Component'], 'Component'] = {}
+
+        self.simple = simple
+        self.enable = enable
+
+        self.global_pos = vec(pos)
+        self.global_rot = rot
+        self.global_scale = vec(scale)
+
 
     def get(self, com: type[T]) -> T:
         return cast(T, self.coms[com])
+    
 
-    def click_update(self):
+    def own(self, tf: 'Transform'):
+        self.childrens.append(tf)
+
+
+    def logic_update(self):
+        if not self.enable: return
         for com in self.coms.values():
+            com.logic_update()
+        self.update_global()
+
+        for child in self.childrens:
+            child.logic_update()
+
+
+    def click_update(self): # Click update / Hitbox update trên cùng trước
+        if not self.enable: return
+        for com in reversed(self.coms.values()):
             com.click_update()
 
+        for child in reversed(self.childrens):
+            child.click_update()
+
+
     def render_update(self):
+        if not self.enable: return
         for com in self.coms.values():
             com.render_update()
 
-
-class Interface:
-    '''Class để chạy các chức năng từ vật (Translite)'''
-
-    def __init__(self, tf: Translite):
-        self.tf = tf
-        tf.coms[self.__class__.mro()[0]] = self
-        #for base in reversed(self.__class__.mro())
-
-    @abstractmethod
-    def click_update(self): pass
-
-    @abstractmethod
-    def render_update(self): pass
+        for child in self.childrens:
+            child.render_update()
 
 
-class IClickable(Interface):
-    '''Click'''
-    def __init__(self, clickable=True, draggable=False, **kwargs):
-        super().__init__(**kwargs)
-
-        self.clickable = clickable
-        self.draggable = draggable # Cho phép kéo thả
-        self.hovering = False
-        self.clicking = False
-
-    def try_getMouse(self):
-        '''Thử lấy chuột trong hitbox'''
-        if mouse.host and mouse.host is not self:
-            return False
-    
-        box = self.tf.hitbox.elementwise() * self.tf.scale
-        a = box.elementwise() * -self.tf.pivot
-        b = a + box
-        rel = (mouse.pos - self.tf.pos).rotate(-self.tf.rot)
-
-        return (a.x <= rel.x <= b.x) and \
-               (a.y <= rel.y <= b.y)
-
-    def click_update(self):
-        if self.try_getMouse():
-            if not self.hovering:
-                mouse.host = self # Đánh dấu vật đã dùng chuột
-                self.on_startHover()
-                self.hovering = True
-            
-            if not self.clickable:
-                return
-            if mouse.clicked:
-                if not self.clicking:
-                    self.on_startClick()
-                    self.clicking = True
-                self.on_clicking()
-            elif self.clicking:
-                self.on_stopClick()
-                self.clicking = False
-
-            self.on_hovering()
-        elif self.hovering:
-            self.on_stopHover()
-            mouse.host = None
-            self.hovering = False
-
-    # Bắt buộc inheritance phải có
-    @abstractmethod
-    def render_update(self): pass
-
-    # Hàm rỗng nhưng không abstract để cho inheritance
-    def on_startHover(self): pass
-    def on_startClick(self): pass
-    def on_stopHover(self): pass
-    def on_stopClick(self): pass
-    def on_hovering(self): pass
-    def on_clicking(self): pass
-
-
-
-tempTexture = pg.Surface((0, 0))
-
-class ImageCache:
-    '''Load & lưu Texture động (dynamically) vào bộ nhớ, khi nào cần lấy ra'''
-    db: dict[int, 'ImageCache'] = {}
-    
-    def __init__(self, path: Union[str, pg.Surface, None] = None):#path: str = "", texture: pg.Surface = tempTexture):
-        if isinstance(path, pg.Surface):
-            self.texture = path
-        elif isinstance(path, str):
-            self.texture = pg.image.load(f"assets\\images\\{path}").convert_alpha()
+    def update_global(self):
+        '''Cập nhật tính chất global của vật (chỉ chạy mỗi frame)'''
+        if not self.parent:
+            self.global_pos = self.pos
+            if not self.simple:
+                self.global_rot = self.rot
+                self.global_scale = self.scale
+        elif self.simple:
+            self.global_pos = self.pos + self.parent.global_pos
+            print("Children", self.parent.global_pos)
         else:
-            self.texture = tempTexture
-        self.gl_texture = None
+            self.global_rot = self.rot + self.parent.global_rot
+            self.global_scale = self.scale.elementwise() * self.parent.global_scale
+
+            rel = (self.pos.elementwise() * self.parent.global_scale).rotate_rad(self.parent.global_rot)
+            self.global_pos = self.parent.global_pos + rel
+
 
     @staticmethod
-    def fetch(path: str) -> 'ImageCache':
-        '''Cố gắng Load texture và OpenGL texture từ bộ nhớ, không có thì tạo cái mới'''
-        poly = hash(path)
-        if poly not in ImageCache.db:
-            ImageCache.db[poly] = ImageCache(path)
+    def exist_prefab(name: str, store = True) -> bool:
+        if store and Transform.storage.get(name):
+            return True
+ 
+        path = f"assets\\prefabs\\{name}"
+        return os.path.exists(path)
+    
 
-        return ImageCache.db[poly]
+    @staticmethod
+    def prefab(name: str, store = True) -> 'Transform':
+        if store:
+            obj = Transform.storage.get(name)
+            if obj: return deepcopy(obj)
+ 
+        path = f"assets\\prefabs\\{name}"
+        if os.path.exists(path):
+            with open(path, "rb") as f:
+                obj = pickle.load(f)
+                if store: Transform.storage[name] = obj
+                return deepcopy(obj)
+        raise Exception(f"Did not find {path}")
 
 
-class Image(Interface):
-    '''Ảnh'''
+    def save(self, name: str = ""):
+        path = f"assets\\prefabs\\{name if name != '' else self.name}"
+        self.parent = None
+        
+        os.makedirs("assets\\prefabs\\", exist_ok=True)
+        with open(path, "wb") as f:
+            pickle.dump(self, f)
+        
+        print(f"Saved {path}")
 
-    def __init__(self, imgpath: str, imgsize: No[tff] = None, **kwargs):
-        super().__init__(**kwargs)
-        self.shared = ImageCache.fetch(imgpath)
-        self.imgsize = vec(imgsize if imgsize else self.shared.texture.get_size())
 
-    def click_update(self):
-        pass
 
-    def render_update(self):
-        self.direct_render(self.shared.texture, self.imgsize, self.tf.pivot)
+class Component:
+    '''Class để chạy các chức năng từ vật (Transform)'''
 
-    def direct_render(self, texture: pg.Surface, size: vec, pivot: vec, offset = vec(ZERO)):
-        img = pg.transform.scale(texture, size.elementwise() * self.tf.scale)
-        if self.tf.rot != 0: img = pg.transform.rotate(img, -self.tf.rot)
+    def __init__(self, attach: Transform):
+        self.tf = attach
+        attach.coms[self.__class__.mro()[0]] = self
+        # Component được gán theo tên trên cùng
 
-        topleft = (size + offset).elementwise() * (self.tf.scale.elementwise() * (HALF - pivot))
-        rect = img.get_rect(center = self.tf.pos + topleft.rotate(self.tf.rot))
-        screen.blit(img, rect)
+    def logic_update(self): pass
+    def click_update(self): pass
+    def render_update(self): pass

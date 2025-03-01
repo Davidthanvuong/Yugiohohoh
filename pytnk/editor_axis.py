@@ -15,7 +15,7 @@ from .header_objects import *
 #     def render_update(self):
 #         pass
 
-class IRectEditor(Interface):
+class IRectEditor(Component):
     '''Interface cho di chuyển vật trong chế độ Editor'''
 
     def __init__(self, **kwargs):
@@ -40,7 +40,7 @@ class IRectEditor(Interface):
             self.dragArrow(4, colormap['relation'], vec(0, 0), 0, dest=self.tf.parent.pos,
                            relative=False, width=3, dotted=True)
 
-        pg.draw.circle(screen, colormap['pivot'], self.tf.pos, 4)
+        pg.draw.circle(dummy_screen, colormap['pivot'], self.tf.pos, 4)
 
     def click_update(self):
         pass        
@@ -103,7 +103,7 @@ class IRectEditor(Interface):
                 self.do_dragging(id, normal, freedom, relative)
                 if showAxis:
                     n2 = normal.rotate(self.tf.rot) if relative else normal
-                    pg.draw.line(screen, colormap['light'], 
+                    pg.draw.line(dummy_screen, colormap['light'], 
                                  self.tf.pos - n2 * 300, self.tf.pos + n2 * 300)
         else:
             color = idleColor
@@ -118,10 +118,10 @@ class IRectEditor(Interface):
             pos = self.tf.pos.copy()
             dir = (arrow[0] - self.tf.pos).normalize()
             for _ in range(0, int(length), 15):
-                pg.draw.line(screen, color, pos, pos + dir * 5, width)
+                pg.draw.line(dummy_screen, color, pos, pos + dir * 5, width)
                 pos += dir * 15
         else:
-            pg.draw.line(screen, color, self.tf.pos, arrow[0], width)
+            pg.draw.line(dummy_screen, color, self.tf.pos, arrow[0], width)
 
-        pg.draw.line(screen, color, arrow[0], arrow[1], width)
-        pg.draw.line(screen, color, arrow[0], arrow[2], width)
+        pg.draw.line(dummy_screen, color, arrow[0], arrow[1], width)
+        pg.draw.line(dummy_screen, color, arrow[0], arrow[2], width)

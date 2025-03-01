@@ -1,19 +1,14 @@
 from typing import Tuple
 
-NATIVE = (800, 500)
-CENTER = (400, 250)
-ZERO = (0, 0)
-HALF = (0.5, 0.5)
-ONE = (1, 1)
+ALLOW_DEVELOPER = True
+NATIVE = (1900, 1040)
 
 TARGET_FPS = 60
-RUNNING = True
+FONT_SIZE = 16
 USE_OPENGL = False
 
-DEVELOPER_MODE = True
-FONT_SIZE = 20
-
 colormap: dict[str, Tuple[int, int, int]] = {
+    'dark': (60, 60, 60),
     'gray': (100, 100, 100),
     'light': (180, 180, 180),
     'white': (255, 255, 255),
