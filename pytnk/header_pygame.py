@@ -4,6 +4,7 @@ from pygame.event import peek as pgpeek
 from typing import Optional as No
 from abc import abstractmethod
 from dataclasses import dataclass
+from enum import Enum
 from settings import *
 tff = tuple[float, float]
 
@@ -25,5 +26,5 @@ MOUSE = MouseInfo(vec(1, 0), False, None, None)
 from .abstract_renderer import render, write
 from .transform import Transform, Component
 from .image import Image, Text
-from .ui import IClickable
-from .editor_inspector import DataField
+from .ui import IClickable, FlexibleMenu
+from .editor_inspector import DataField, DataTask

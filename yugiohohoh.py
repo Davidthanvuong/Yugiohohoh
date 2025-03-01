@@ -19,17 +19,15 @@ def new_world_inspector() -> Transform:
 
     if True or not Transform.exist_prefab("Datafield"):
         print("Not exist")
-        field = Transform("Datafield", parent=world_tf, pos=(100, 22), pivot=(0, 1), 
+        field = Transform("Datafield", pos=(100, 22), pivot=(0, 1), 
                             hitbox=(100, 22), simple=True)
         Image(attach=field, path="white.png", size=(100, 22), standalone=True)
         Text(attach=field, text="69.42", color=colormap['dark'])
-        DataField(attach=field)
+        DataField(None, "int", attach=field)
         field.save()
-        world_tf.childrens.remove(field)
 
     for y in range(200, NATIVE[1] - 200, 28):
-        f = Transform.prefab("Datafield")
-        world_tf.own(f)
+        f = Transform.prefab("Datafield", world_tf)
         f.pos = vec(200, y)
 
     return world_tf
@@ -43,21 +41,14 @@ def new_world_empty() -> Transform:
 if __name__ == '__main__':
     last_time = time.time()
     frame = 0
-
-    if not Transform.exist_prefab("World"): 
-        world_tf = new_world_inspector()
-    else:
-        world_tf = Transform.prefab("World")
-        raise Exception("GAY")
-
+ 
+    world_tf = new_world_inspector()
     world = World(attach=world_tf)
-    world_tf.pos = vec(0, 0)
-    world_tf.global_pos = vec(0, 0)
 
     while World.RUNNING:
-        world_tf.logic_update()
-        world_tf.click_update()
-        world_tf.render_update()
+        world_tf.update_logic()
+        world_tf.update_click()
+        world_tf.update_render()
 
         delta = time.time() - last_time
         frame += 1

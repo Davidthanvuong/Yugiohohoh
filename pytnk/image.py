@@ -59,7 +59,7 @@ class Image(Component):
         else:
             self.cache = ImageCache.fetch(self.path, self.bullethell)
 
-    def render_update(self):
+    def update_render(self):
         render(self)
 
 
@@ -71,5 +71,5 @@ class Text(Image):
         self.text = text
         self.color = color
 
-    def render_update(self):
+    def update_render(self):
         render(self)

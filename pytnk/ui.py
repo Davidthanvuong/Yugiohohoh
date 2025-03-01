@@ -1,7 +1,7 @@
 from .header_pygame import *
 
 class IClickable(Component):
-    '''Click'''
+    '''Click quốc dân'''
     def __init__(self, hoverable=True, clickable=True, draggable=False, **kwargs):
         super().__init__(**kwargs)
 
@@ -28,7 +28,7 @@ class IClickable(Component):
         return (a.x <= rel.x <= b.x) and \
                (a.y <= rel.y <= b.y)
 
-    def click_update(self):
+    def update_click(self):
         #print(self.hoverable, self.clickable, self.draggable, self.hovering, self.clicking, self.wasFocus)
         if self.try_getMouse():
             if self.hoverable and not self.hovering:
@@ -59,7 +59,7 @@ class IClickable(Component):
             self.wasFocus = False
 
     # Hàm rỗng nhưng không abstract để cho inheritance
-    def logic_update(self): pass
+    def update_logic(self): pass
     def on_startHover(self): pass
     def on_startClick(self): pass
     def on_stopHover(self): pass
@@ -68,6 +68,47 @@ class IClickable(Component):
     def on_clicking(self): pass
     def on_stopFocus(self): pass # là sau khi click vô các object khác
 
+
+
+class FlexibleMenu(IClickable):
+    '''Bạn ghét canh giữa mọi thứ, chỉnh thủ công từng vị trí một ư? Đừng lo đã có *insert name*'''
+    
+    def __init__(self, space=10, activeFit=1.2, use_relativeFit=True, use_rightside=False, 
+                 foldable=True, reorderable=False, use_crowding=False, **kwargs):
+        super().__init__(clickable=foldable, draggable=reorderable, **kwargs)
+        self.space = space
+        self.activeFit = activeFit              # Khi chọn một vật, đẩy ra bao xa so với các items khác
+        self.use_relativeFit = use_relativeFit  # Kích thước tương đối theo size vật
+        self.use_crowding = use_crowding        # Thay vì scroll, đè tỉ lệ với nhau
+        self.use_rightSide = use_rightside      # Hướng di chuyển
+        self.active_id = -1
+
+    # todo: Foldable (soon), draggable (later)
+    def update_logic(self):
+        super().update_logic() # Check chuột
+        rawv, v = 0, 0
+        if self.use_rightSide:
+            for obj in self.tf.childrens:
+                rawv += obj.pos.x * obj.global_scale.x
+            
+            ratio = self.tf.hitbox.x / rawv if self.use_crowding else 1 # Tỉ lệ chật
+
+            for i, obj in enumerate(self.tf.childrens): # Đẩy xuống trục từ forward
+                obj.pos.x = v
+                delta = obj.global_scale.x * obj.hitbox.x
+                if self.active_id == i: delta *= self.activeFit
+                v += delta * ratio + self.space
+        else:
+            for obj in self.tf.childrens:
+                rawv += obj.pos.y * obj.global_scale.y
+
+            ratio = self.tf.hitbox.y / rawv if self.use_crowding else 1
+
+            for i, obj in enumerate(self.tf.childrens):
+                obj.pos.y = v
+                delta = obj.global_scale.y * obj.hitbox.y
+                if self.active_id == i: delta *= self.activeFit
+                v += delta * ratio + self.space
 
 
 # class ExampleButton(IClickable):

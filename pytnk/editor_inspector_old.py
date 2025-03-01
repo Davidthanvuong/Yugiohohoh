@@ -54,7 +54,7 @@ class DataBox(Component):
                 DataField(str(self.value), editable=isinstance(self.value, (int, float, str)))
             ]
 
-    def render_update(self):
+    def update_render(self):
         #render("databox.png")  # Background via abstraction layer
         for i, field in enumerate(self.fields):
             field.position = vec(self.tf.pos.x + 5 + i * (field.width + 5), self.tf.pos.y + 2)
@@ -100,7 +100,7 @@ class ToggleHeader(Component):
             self.data_boxes.append(DataBox(db_tf, self.com, attr, f"Edit {attr}"))
             y_offset += 30
 
-    def render_update(self):
+    def update_render(self):
         #render("components.png")  # Header background
         toggle_text = "[-] " if self.expanded else "[+] "
         header_text = toggle_text + self.name
@@ -109,14 +109,14 @@ class ToggleHeader(Component):
 
         if self.expanded:
             for db in self.data_boxes:
-                db.render_update()
+                db.update_render()
 
-    def click_update(self):
+    def update_click(self):
         if mouse.host and mouse.clicked:
             self.expanded = not self.expanded
         if self.expanded:
             for db in self.data_boxes:
-                db.click_update()
+                db.update_click()
 
 class InspectorFrame:
     def __init__(self, tf: Transform):

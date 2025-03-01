@@ -32,40 +32,32 @@ class Transform:
         self.global_scale = vec(scale)
 
 
-    def get(self, com: type[T]) -> T:
-        return cast(T, self.coms[com])
-    
-
-    def own(self, tf: 'Transform'):
-        self.childrens.append(tf)
-
-
-    def logic_update(self):
+    def update_logic(self):
         if not self.enable: return
         for com in self.coms.values():
-            com.logic_update()
+            com.update_logic()
         self.update_global()
 
         for child in self.childrens:
-            child.logic_update()
+            child.update_logic()
 
 
-    def click_update(self): # Click update / Hitbox update trên cùng trước
+    def update_click(self): # Click update / Hitbox update trên cùng trước
         if not self.enable: return
         for com in reversed(self.coms.values()):
-            com.click_update()
+            com.update_click()
 
         for child in reversed(self.childrens):
-            child.click_update()
+            child.update_click()
 
 
-    def render_update(self):
+    def update_render(self):
         if not self.enable: return
         for com in self.coms.values():
-            com.render_update()
+            com.update_render()
 
         for child in self.childrens:
-            child.render_update()
+            child.update_render()
 
 
     def update_global(self):
@@ -85,6 +77,25 @@ class Transform:
             rel = (self.pos.elementwise() * self.parent.global_scale).rotate_rad(self.parent.global_rot)
             self.global_pos = self.parent.global_pos + rel
 
+    
+    def get(self, com: type[T]) -> T:
+        return cast(T, self.coms[com])
+    
+
+    def try_get(self, com: type[T]) -> T | None:
+        t = self.coms.get(com)
+        return cast(T, t) if t else None
+    
+
+    def own(self, tf: 'Transform'):
+        self.childrens.append(tf)
+
+    
+    def required(self, com: type[T]) -> 'Component | None':
+        if not self.coms.get(com):
+            return com(attach=self)
+        return None
+    
 
     @staticmethod
     def exist_prefab(name: str, store = True) -> bool:
@@ -96,17 +107,22 @@ class Transform:
     
 
     @staticmethod
-    def prefab(name: str, store = True) -> 'Transform':
+    def prefab(name: str, parent: No['Transform'] = None, store = True) -> 'Transform':
         if store:
             obj = Transform.storage.get(name)
-            if obj: return deepcopy(obj)
+            if obj: 
+                deep = deepcopy(obj)
+                if parent: parent.own(deep)
+                return deep
  
         path = f"assets\\prefabs\\{name}"
         if os.path.exists(path):
-            with open(path, "rb") as f:
+            with open(path, "rb") as f: # Không đủ lặp lại để tạo hàm mới rút gọn
                 obj = pickle.load(f)
                 if store: Transform.storage[name] = obj
-                return deepcopy(obj)
+                deep = deepcopy(obj)
+                if parent: parent.own(deep)
+                return deep
         raise Exception(f"Did not find {path}")
 
 
@@ -130,6 +146,6 @@ class Component:
         attach.coms[self.__class__.mro()[0]] = self
         # Component được gán theo tên trên cùng
 
-    def logic_update(self): pass
-    def click_update(self): pass
-    def render_update(self): pass
+    def update_logic(self): pass
+    def update_click(self): pass
+    def update_render(self): pass
