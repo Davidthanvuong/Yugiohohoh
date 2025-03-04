@@ -12,6 +12,7 @@ class IClickable(Component):
         self.clicking = False
         self.wasFocus = False
 
+
     def try_getMouse(self):
         '''Thử lấy chuột trong hitbox bằng trick xoay'''
         if MOUSE.host and MOUSE.host is not self:
@@ -23,10 +24,11 @@ class IClickable(Component):
 
         rel = MOUSE.pos - self.tf.global_pos
         if not self.tf.simple:
-            rel.rotate_ip(-self.tf.rot)
+            rel.rotate_ip(-self.tf.angle)
 
         return (a.x <= rel.x <= b.x) and \
                (a.y <= rel.y <= b.y)
+
 
     def update_click(self):
         #print(self.hoverable, self.clickable, self.draggable, self.hovering, self.clicking, self.wasFocus)
@@ -58,6 +60,7 @@ class IClickable(Component):
             self.on_stopFocus()
             self.wasFocus = False
 
+
     # Hàm rỗng nhưng không abstract để cho inheritance
     def update_logic(self): pass
     def on_startHover(self): pass
@@ -83,32 +86,41 @@ class FlexibleMenu(IClickable):
         self.use_rightSide = use_rightside      # Hướng di chuyển
         self.active_id = -1
 
+
     # todo: Foldable (soon), draggable (later)
+    # Refactor sang solve_axis nhận vào các tham số một trục của tụi nó
     def update_logic(self):
         super().update_logic() # Check chuột
         rawv, v = 0, 0
         if self.use_rightSide:
             for obj in self.tf.childrens:
-                rawv += obj.pos.x * obj.global_scale.x
+                if obj.enable: rawv += obj.pos.x * obj.global_scale.x
             
             ratio = self.tf.hitbox.x / rawv if self.use_crowding else 1 # Tỉ lệ chật
 
             for i, obj in enumerate(self.tf.childrens): # Đẩy xuống trục từ forward
+                if not obj.enable: break 
                 obj.pos.x = v
                 delta = obj.global_scale.x * obj.hitbox.x
                 if self.active_id == i: delta *= self.activeFit
                 v += delta * ratio + self.space
         else:
             for obj in self.tf.childrens:
-                rawv += obj.pos.y * obj.global_scale.y
+                if obj.enable:  rawv += obj.pos.y * obj.global_scale.y
 
             ratio = self.tf.hitbox.y / rawv if self.use_crowding else 1
 
             for i, obj in enumerate(self.tf.childrens):
+                if not obj.enable: break 
                 obj.pos.y = v
                 delta = obj.global_scale.y * obj.hitbox.y
                 if self.active_id == i: delta *= self.activeFit
                 v += delta * ratio + self.space
+
+    def take_a_seat(self, tf: Transform, pos: vec):
+        '''Bình tĩnh, thả nó cái vị trí, nó tự insert vô đứa thứ mấy trong parent'''
+        pass
+
 
 
 # class ExampleButton(IClickable):

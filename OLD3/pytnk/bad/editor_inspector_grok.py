@@ -1,20 +1,8 @@
-import pygame as pg
-from typing import Optional as No
-from pygame import Vector2 as vec
+from header_objects import *
 
-
-# fonts = pg.font.get_fonts()
-# print('\n'.join(fonts))
-
-# exit()
-
-# Initialize pg and set up font
-pg.init()
-font = pg.font.SysFont("jetbrainsmonoregular", 16)
-
-# Load and scale the icon (replace "path/to/icon.png" with your icon file path)
-icon = pg.image.load("assets\\images\\cube.png")  # Update this path
+icon = pg.image.load("assets\\images\\white.png")  # Update this path
 icon = pg.transform.scale(icon, (16, 16))
+
 
 # DataField class for text fields
 class DataField:
@@ -27,7 +15,7 @@ class DataField:
 
     def draw(self, screen):
         if self.rect and self.editable:
-            pg.draw.rect(screen, (200, 200, 200), self.rect, 1)  # Gray outline
+            pg.draw.rect(screen, (200, 200, 200), self.rect, 1)  # Gray hitbox
             if self.active:
                 screen.fill((50, 50, 50), self.rect)  # Darker background when active
         text_surface = font.render(self.text, True, (255, 255, 255))
@@ -38,7 +26,10 @@ class DataField:
             return
         if e.type == pg.KEYDOWN:
             if e.key == pg.K_BACKSPACE:
-                self.text = self.text[:-1]
+                if e.key == pg.K_LCTRL:
+                    self.text = ""
+                else:
+                    self.text = self.text[:-1]
             elif e.key == pg.K_RETURN:
                 self.active = False
             elif e.unicode.isprintable():
@@ -60,7 +51,7 @@ class DataBox:
 
     def draw(self, screen):
         # Set positions
-        self.name_field.position = self.position + vec(20, 0)
+        self.name_field.position = self.position + vec(25, 0)
         self.value_field.position = self.position + vec(150, 0)
         # Set rect for value_field if editable
         if self.value_field.editable:
@@ -71,7 +62,7 @@ class DataBox:
         box_rect = pg.Rect(self.position[0], self.position[1], 250, 20)
         pg.draw.rect(screen, (100, 100, 100), box_rect, 1)
         # Draw icon
-        screen.blit(self.icon, (self.position[0] + 2, self.position[1] + 2))
+        screen.blit(self.icon, (self.position[0] + 5, self.position[1] + 2))
         # Draw fields
         self.name_field.draw(screen)
         self.value_field.draw(screen)
@@ -144,35 +135,36 @@ def draw_items(items, screen, x, y, indent=0, editable_fields=[], toggle_headers
                 y += 20
     return y
 
-# Example classes for testing
-class Transform:
-    def __init__(self):
-        self.x = 100
-        self.y = 200
+# # Example classes for testing
+# class Transform:
+#     def __init__(self):
+#         self.x = 100
+#         self.y = 200
 
-class Hitbox:
-    def __init__(self):
-        self.width = 50
-        self.height = 30
+# class Hitbox:
+#     def __init__(self):
+#         self.width = 50
+#         self.height = 30
 
-class GameObject:
-    def __init__(self):
-        self.name = "Player"
-        self.health = 100
-        self.components = [Transform(), Hitbox()]
+# class GameObject:
+#     def __init__(self):
+#         self.name = "Player"
+#         self.health = 100
+#         self.components = [Transform(), Hitbox()]
 
-# Main program
-screen = pg.display.set_mode((600, 400))
-pg.display.set_caption("Object Inspector")
-clock = pg.time.Clock()
+class Inspector(Transform):
+    def __init__(self, obj):
+        self.items = create_items(obj, icon)
+        self.active_item = None
+        self.editable_fields = []
+        self.toggle_headers = []
 
-obj = GameObject()
-items = create_items(obj, icon)
+    def logic_update(self):
+        
 
-running = True
-active_item = None
-editable_fields = []
-toggle_headers = []
+    def render_update(self):
+        draw_items(self.items, dummy_screen, 10, 10, 0, 
+                   self.editable_fields, self.toggle_headers)
 
 while running:
     for event in pg.event.get():
@@ -221,18 +213,5 @@ while running:
 
     # Draw everything
     screen.fill((0, 0, 0))
-    draw_items(items, screen, 10, 10, 0, editable_fields, toggle_headers)
     pg.display.flip()
-
-    for attr, data in obj.__dict__.items():
-        if isinstance(data, list):
-            print(f"~~~ {attr} ~~~")
-            for i in data:
-                if hasattr(i, '__dict__'):
-                    for attr2, data2 in i.__dict__.items():
-                        print(f"    {attr2}: {data2}")
-        else:
-            print(f"{attr}: {data}")
-    clock.tick(10)
-
-pg.quit()
+    clock.tick(60)

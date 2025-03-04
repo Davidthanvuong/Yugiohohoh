@@ -26,7 +26,6 @@ environ['SDL_VIDEO_WINDOW_POS'] = f"{(1920 - NATIVE[0]) // 2},{35}"
 render_flags = (pg.DOUBLEBUF | pg.OPENGL) if RENDER == RenderMode.OPENGL else 0
 screen = pg.display.set_mode(NATIVE, render_flags)
 
-writer = pg.font.SysFont("jetbrainsmononlsemibold", FONT_SIZE)
 
 if RENDER == RenderMode.LEGACY:
     def updateDisplay():
@@ -36,32 +35,29 @@ if RENDER == RenderMode.LEGACY:
 
     def render(img: 'Image'):
         tf, ct = img.tf, img.cache
-        grot = tf.global_rot
-        px_gscale = img.size.elementwise() * tf.scale
+        grot = tf.global_angle
+        px_gscale = img.size.elementwise() * tf.global_scale
 
-        if img.changed or not (ct.last_grot == grot and ct.last_px_gscale == px_gscale):
-            #print("Invalid, updated")
+        if img.changed or (not tf.simple and ct.last_grot == grot) or (ct.last_px_gscale != px_gscale):
             if img.__class__.__name__ == 'Text':
-                sf = writer.render(img.text, True, img.color) # type: ignore
-                px_gscale = vec(sf.get_size()).elementwise() * tf.scale
+                sf = img.writer.render(img.text, True, img.color) # type: ignore
+                img.size = px_gscale = vec(sf.get_size()).elementwise() * tf.global_scale
             else:
-                sf = ct.texture
+                sf = ct.native
             if px_gscale != vec(sf.get_size()): sf = pg.transform.scale(sf, px_gscale)
-            if grot != 0: sf = pg.transform.rotate(sf, -grot)
-            
+            if (not tf.simple) and grot != 0: sf = pg.transform.rotate(sf, -grot)
+
             ct.last_grot = grot
             ct.last_px_gscale = px_gscale
-            ct.topleft = px_gscale.elementwise() * (HALF - tf.pivot).rotate(grot)
-            ct.cached_texture = sf
+            ct.topleft = (px_gscale.elementwise() * (CENTER - tf.pivot)).rotate(grot) # Đừng bỏ dấu ngoặc ra
+            ct.native_cached = sf
             img.changed = False
         else:
-            sf = ct.cached_texture
+            sf = ct.native_cached
 
         rect = sf.get_rect(center = tf.global_pos + ct.topleft)
         screen.blit(sf, rect)
 
-    def write(txt: 'Text'):
-        pass
 
 elif RENDER == RenderMode.OPENGL:
     from .opengl_renderer import do_clear, do_render, do_direct_render
@@ -76,6 +72,3 @@ elif RENDER == RenderMode.OPENGL:
 
     def direct_render(sf: pg.Surface, size: vec, tf):
         do_direct_render(sf, size, tf)
-
-    def write(txt: 'Text'):
-        pass

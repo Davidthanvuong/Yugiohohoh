@@ -52,7 +52,7 @@ if __name__ == '__main__':
 # HazzyQuan
 # - QUICK Loading screen scene (Insert loading scene on bootload)
 # - Card picking and dragging test
-# - Health bar (2 images: outline, and fill)
+# - Health bar (2 images: hitbox, and fill)
 # - Health on Summon
 # - Textwriter (font, text, pivot?)
 

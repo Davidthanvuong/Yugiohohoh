@@ -1,39 +1,50 @@
-from .header_pygame import *
-from typing import TypeVar, cast
-from random import randint as rint
 import pickle, os
+from typing import TypeVar, cast, Any
+from random import randint as rint
 from copy import deepcopy
+from .header_pygame import *
+
 
 T = TypeVar("T", bound="Component")
+rootT = tuple['Transform', pg.Surface]
+
 
 class Transform:
     '''Class quốc dân'''
-    storage: dict[str, 'Transform'] = {}
+    prefabs: dict[str, 'Transform'] = {}
+    roots: dict[str, rootT] = {} # Maingame là mặc định
 
-    def __init__(self, name: str = "", pos: tff = CENTER, rot = 0.0, scale: tff = ONE, pivot: tff = HALF, enable = True,
-                 hitbox: tff = ZERO, parent: No['Transform'] = None, simple = False):
-        self.name = name if name != "" else f"Object {rint(0, 2**60)}"
+    def __init__(self, name: str = "", pos: tff = ZERO, pivot: tff = TOPLEFT, hitbox: tff = ZERO, parent: No['Transform'] = None,
+                 angle = 0.0, scale: tff = ONE, enabled = True, no_angle = False, rootname: str = ""):
+        self.name = name if name != "" else f"Object {id(self)}"
         self.pos = vec(pos)
-        self.rot = rot
+        self.angle = angle
         self.scale = vec(scale)
         self.pivot = vec(pivot)
         self.parent = parent
         self.hitbox = vec(hitbox)
-        if parent: parent.own(self)
+        
+        if parent: parent.adoptChildren(self)
+        if rootname == "" and parent and parent.root is not None:
+            self.rootname = parent.rootname
+            self.root = parent.root
+        else:
+            self.rootname = rootname
+            self.root = Transform.roots.get(rootname, (self, pg.Surface(ZERO)))
         
         self.childrens: list['Transform'] = []
         self.coms: dict[type['Component'], 'Component'] = {}
 
-        self.simple = simple
-        self.enable = enable
+        self.no_angle = no_angle # Tắt xoay
+        self.enabled = enabled
 
         self.global_pos = vec(pos)
-        self.global_rot = rot
+        self.global_angle = angle
         self.global_scale = vec(scale)
 
 
     def update_logic(self):
-        if not self.enable: return
+        if not self.enabled: return
         for com in self.coms.values():
             com.update_logic()
         self.update_global()
@@ -42,8 +53,8 @@ class Transform:
             child.update_logic()
 
 
-    def update_click(self): # Click update / Hitbox update trên cùng trước
-        if not self.enable: return
+    def update_click(self):
+        if not self.enabled: return
         for com in reversed(self.coms.values()):
             com.update_click()
 
@@ -52,7 +63,7 @@ class Transform:
 
 
     def update_render(self):
-        if not self.enable: return
+        if not self.enabled: return
         for com in self.coms.values():
             com.update_render()
 
@@ -61,45 +72,57 @@ class Transform:
 
 
     def update_global(self):
-        '''Cập nhật tính chất global của vật (chỉ chạy mỗi frame)'''
+        '''Cập nhật tính chất global của vật (chạy mỗi frame sau logic)'''
         if not self.parent:
+            self.global_scale = self.scale
+            self.global_angle = self.angle
             self.global_pos = self.pos
-            if not self.simple:
-                self.global_rot = self.rot
-                self.global_scale = self.scale
-        elif self.simple:
-            self.global_pos = self.pos + self.parent.global_pos
-            print("Children", self.parent.global_pos)
         else:
-            self.global_rot = self.rot + self.parent.global_rot
             self.global_scale = self.scale.elementwise() * self.parent.global_scale
-
-            rel = (self.pos.elementwise() * self.parent.global_scale).rotate_rad(self.parent.global_rot)
+            self.global_angle = self.angle + self.parent.global_angle
+            rel = self.pos.elementwise() * self.parent.global_scale
+            if not self.no_angle:
+                rel.rotate_ip(self.parent.global_angle)
+            
             self.global_pos = self.parent.global_pos + rel
 
+
+    def collidepoint(self, pos: vec): #todo
+        pass
+
+
+    def collidetf(self, tf: 'Transform'):
+        pass
+
+
+    # def addComponent(self, com: type[T]) -> T:
+    #     '''Tạo component clean nhất, nhớ start'''
+    #     obj = com(self)
+    #     self.coms[com] = obj
+    #     return obj
+
     
-    def get(self, com: type[T]) -> T:
+    def getComponent(self, com: type[T]) -> T:
+        '''Lấy component đúng cách'''
         return cast(T, self.coms[com])
     
 
-    def try_get(self, com: type[T]) -> T | None:
+    def tryComponent(self, com: type[T]) -> T | None:
+        '''Bạn sợ à?'''
         t = self.coms.get(com)
         return cast(T, t) if t else None
     
 
-    def own(self, tf: 'Transform'):
+    def adoptChildren(self, tf: 'Transform'):
+        '''Nhận nuôi transform, kết nối parent <---> children'''
         self.childrens.append(tf)
-
-    
-    def required(self, com: type[T]) -> 'Component | None':
-        if not self.coms.get(com):
-            return com(attach=self)
-        return None
-    
+        tf.parent = self
+        
 
     @staticmethod
-    def exist_prefab(name: str, store = True) -> bool:
-        if store and Transform.storage.get(name):
+    def existPrefab(name: str, store = True) -> bool:
+        '''Thử xem tồn tại hay không, thường dùng trong việc generate prefab'''
+        if store and Transform.prefabs.get(name):
             return True
  
         path = f"assets\\prefabs\\{name}"
@@ -107,45 +130,87 @@ class Transform:
     
 
     @staticmethod
-    def prefab(name: str, parent: No['Transform'] = None, store = True) -> 'Transform':
-        if store:
-            obj = Transform.storage.get(name)
-            if obj: 
-                deep = deepcopy(obj)
-                if parent: parent.own(deep)
-                return deep
+    def getPrefab(name: str, parent: No['Transform'] = None, pos: No[vec] = None, store = True) -> 'Transform':
+        '''Chép hoàn toàn prefab từ bộ nhớ (store), không có thì thử mở'''
+        obj = Transform.prefabs.get(name) if store else None
  
         path = f"assets\\prefabs\\{name}"
-        if os.path.exists(path):
-            with open(path, "rb") as f: # Không đủ lặp lại để tạo hàm mới rút gọn
+        if not obj and os.path.exists(path):
+            with open(path, "rb") as f:
                 obj = pickle.load(f)
-                if store: Transform.storage[name] = obj
-                deep = deepcopy(obj)
-                if parent: parent.own(deep)
-                return deep
-        raise Exception(f"Did not find {path}")
+                if store: Transform.prefabs[name] = obj
+
+        #assert obj is None
+        deep = deepcopy(cast('Transform', obj))
+        if parent: parent.adoptChildren(deep)
+        if pos: deep.pos = pos
+        deep.name += f" ({id(deep)})"
+        print(f"Tạo thành công {deep.name}")
+        return deep
 
 
-    def save(self, name: str = ""):
+    def saveSelf(self, name: str = "", delete = False):
+        '''Lưu prefab vào assets/prefab'''
         path = f"assets\\prefabs\\{name if name != '' else self.name}"
+        old_parent = self.parent # Không lưu parent ngoài
+        if self.parent:
+            self.parent.childrens.remove(self)
         self.parent = None
         
         os.makedirs("assets\\prefabs\\", exist_ok=True)
         with open(path, "wb") as f:
             pickle.dump(self, f)
         
+        if not delete: self.parent = old_parent # Let GC cook
         print(f"Saved {path}")
 
 
 
-class Component:
+    def __getstate__(self):
+        '''Lưu vật đến pickle'''
+        state = self.__dict__.copy()
+        state.pop("root", None)        # Không thể serialize con trỏ
+        return state
+    
+
+    def __setstate__(self, state):
+        '''Đọc vật từ pickle'''
+        self.__dict__.update(state)
+        
+        if (self.rootname == "") and (self.parent) and (self.parent.root is not None):
+            self.rootname = self.parent.rootname
+            self.root = self.parent.root
+        else:
+            self.rootname = self.rootname
+            self.root = Transform.roots.get(self.rootname, (self, pg.Surface(ZERO)))
+
+
+
+class Component:    
     '''Class để chạy các chức năng từ vật (Transform)'''
 
-    def __init__(self, attach: Transform):
-        self.tf = attach
-        attach.coms[self.__class__.mro()[0]] = self
-        # Component được gán theo tên trên cùng
+    def __init__(self, bind: 'Transform'):
+        self.tf = bind
+        bind.coms[self.__class__.mro()[0]] = self # mro đầu tên là đời con xa nhất
+    # @classmethod
+    # def get_defaultKeys(cls) -> dict[str, Any]:
+    #     """Lấy từ MRO các `Component`"""
+    #     keys = {}
+    #     for base in reversed(cls.__mro__):
+    #         keys.update({
+    #             key: value for key, value in base.__dict__.items()
+    #             # Loại các static (ghi in) và hàm ra, còn lại trôm hết
+    #             if (not key[0].isupper()) and (not callable(value))
+    #         })
+    #     return keys
 
+
+    # def __init__(self, tf: 'Transform'):
+    #     self.tf = tf
+    #     for key, value in self.get_defaultKeys().items():
+    #         setattr(self, key, value)
+
+    # def __call__(self, **kwargs): pass
     def update_logic(self): pass
     def update_click(self): pass
     def update_render(self): pass

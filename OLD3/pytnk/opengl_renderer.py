@@ -3,7 +3,7 @@ from OpenGL.GL import * # type: ignore (Whatever, I want to import all)
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from .transform_old import Transform, Image
+    from .transform import Transform, Image
 
 glEnable(GL_TEXTURE_2D)
 glEnable(GL_BLEND)
@@ -29,9 +29,9 @@ def do_clear():
 
 
 def do_render(img: 'Image'):
-    if not img.cache.gl_texture:
-        img.cache.gl_texture = create_glTexture(img.cache.texture)
-    do_direct_render(img.cache.gl_texture, img.size, img.tf, False)
+    if not img.cache.gl_native:
+        img.cache.gl_native = create_glTexture(img.cache.native)
+    do_direct_render(img.cache.gl_native, img.size, img.tf, False)
 
 def do_direct_render(sf, size: vec, tf: 'Transform', direct=True):
     if direct: 
@@ -50,7 +50,7 @@ def do_direct_render(sf, size: vec, tf: 'Transform', direct=True):
     # Nên phải hậu xử lí (post_scale) trước tiền xử lí (scale) 
     # Phần rotation thì ngược chiều do bị lật lại đúng r
     glScalef(tf.scale.x, tf.scale.y, 0)
-    glRotatef(tf.rot, 0, 0, 1)
+    glRotatef(tf.angle, 0, 0, 1)
 
     glBindTexture(GL_TEXTURE_2D, sf)
     glBegin(GL_QUADS)

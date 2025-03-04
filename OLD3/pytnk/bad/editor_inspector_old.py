@@ -37,7 +37,7 @@ class DataBox(Component):
         self.com = com
         self.value = getattr(com, attr_name)
         self.comment: str = comment
-        self.outline_color: tuple[int, int, int] = (100, 100, 100)
+        self.hitbox_color: tuple[int, int, int] = (100, 100, 100)
         self.hovering: bool = False
         self.clicking: bool = False
         self.hover_start_time: float | None = None
@@ -67,11 +67,11 @@ class DataBox(Component):
             dummy_screen.blit(hint_surface, hint_rect.topleft)
 
     def on_startHover(self):
-        self.outline_color = (0, 200, 255)
+        self.hitbox_color = (0, 200, 255)
         self.hover_start_time = time()
 
     def on_stopHover(self):
-        self.outline_color = (100, 100, 100)
+        self.hitbox_color = (100, 100, 100)
         self.hover_start_time = None
         self.show_hint = False
 

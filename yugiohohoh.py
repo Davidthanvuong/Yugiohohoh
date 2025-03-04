@@ -1,60 +1,29 @@
 from pytnk.header_pygame import *
-from pytnk.world import World
-import time
-
-def new_world_spinning() -> Transform:
-    world_tf = Transform("World")
-    dist = 200
-    World(attach=world_tf)
-    for y in range(0, NATIVE[1] - 50, dist):
-        for x in range(50, NATIVE[0] - 50, dist):
-            card = Transform(parent=world_tf, pos=(x, y), pivot=(0, 0))
-            Image(attach=card, path="card_back.png", size=(70, 100))
-            #IClickable(attach=card, clickable=True)
-            #Text(attach=card, text="Hello")
-    return world_tf
-
-def new_world_inspector() -> Transform:
-    world_tf = Transform("World", pos=(0, 0))
-
-    if True or not Transform.exist_prefab("Datafield"):
-        print("Not exist")
-        field = Transform("Datafield", pos=(100, 22), pivot=(0, 1), 
-                            hitbox=(100, 22), simple=True)
-        Image(attach=field, path="white.png", size=(100, 22), standalone=True)
-        Text(attach=field, text="69.42", color=colormap['dark'])
-        DataField(None, "int", attach=field)
-        field.save()
-
-    for y in range(200, NATIVE[1] - 200, 28):
-        f = Transform.prefab("Datafield", world_tf)
-        f.pos = vec(200, y)
-
-    return world_tf
-
-def new_world_empty() -> Transform:
-    world_tf = Transform("World")
-    World(attach=world_tf)
-    return world_tf
-
+import math
 
 if __name__ == '__main__':
-    last_time = time.time()
-    frame = 0
- 
-    world_tf = new_world_inspector()
-    world = World(attach=world_tf)
+    pg.init()
+    screen = Game()
+    go = screen.tf
+    Maingame()
+    if ALLOW_DEVELOPER:
+        load_editors()
 
-    while World.RUNNING:
-        world_tf.update_logic()
-        world_tf.update_click()
-        world_tf.update_render()
+    # Chữa cháy demo (do Engine đang làm)
+    deck_tf = Transform('Card Deck', pos=(200, Window.native[1]-200), hitbox=(600, 200), pivot=(0, 0.5), parent=Game.maingameTf, rootname='Maingame')
+    Image(bind=deck_tf, path="white.png", fit=True, standalone=True)
+    FlexArray(interactable=False, bind=deck_tf, axis='x', use_crowding=True)
 
-        delta = time.time() - last_time
-        frame += 1
-        #print(f"Response: {delta*1000:.2f}ms, FPS: {1/delta:.0f}")
-        world.windowHandler()
-        last_time = time.time()
+    deck = CardDeck(bind=deck_tf)
+    for i in range(10):
+        Transform.getPrefab('Card', parent=deck_tf)
 
-    #world_tf.save()
+    while Window.running:
+
+        go.update_logic()   # Cập nhật từng components object
+        go.update_click()   # Theo đúng trình tự load
+        go.update_render()
+
+        screen.windowHandler()  # Xong mới update và handle màn hình
+
     pg.quit()
