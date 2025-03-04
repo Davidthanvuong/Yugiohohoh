@@ -34,6 +34,7 @@ class CardDeck(Component):
         if True or not Transform.existPrefab('Card'):
             card = Transform('Card', ZERO, CENTER, (200, 300), angle=-5, parent=self.tf)
             Image(bind=card, path="card_empty.png", standalone=True)
+            Text(bind=card, text="10", preset='jetbrains_massive')
             Card(bind=card)
             #Text(bind=card, text="10")
 

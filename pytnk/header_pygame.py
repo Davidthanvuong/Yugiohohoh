@@ -17,7 +17,7 @@ from .transform import Transform, Component
 from .game import MouseInfo, mouse, Game
 from .iclickable import IClickable
 from .flexarray import FlexArray
-from .image import Image, Text
+from .image import Image, Text, SharedImage
 from .inputfield import InputField
 from .maingame import Maingame
 from .editor import InspectorMenu, HierarchyMenu, AssetsMenu, load_editors

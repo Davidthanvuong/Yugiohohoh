@@ -12,11 +12,11 @@ strTable = floatTable.copy()
 strTable.extend(range(pg.K_a, pg.K_z + 1))
 strTable.append(pg.K_SPACE)
 
-tabletable: dict[str, list[int]] = { # :)))
-    "int":      intTable,
-    "float":  floatTable,
-    "str":      strTable,
-    "Component": strTable
+tabletable: dict[type, list[int]] = { # :)))
+    int:      intTable,
+    float:  floatTable,
+    str:      strTable,
+    Component: strTable
 }
 
 class InputField(IClickable):
@@ -31,7 +31,7 @@ class InputField(IClickable):
         self.pressed = pg.key.get_pressed()
         self.prevKeys = self.pressed
         self.tick = pg.time.get_ticks()
-        self.textChanged = False
+        self.text_updated = False
         self.valid = True
 
         #self.caret = self.tf.childrens[0]
@@ -40,16 +40,16 @@ class InputField(IClickable):
         self.task = task
         self.valueType = type(value)
         self.oldValue = value
-        self.keymap = tabletable.get(self.valueType.__name__, noTable)
-        self.editable = self.keymap is noTable
+        self.keymap = tabletable.get(self.valueType, noTable)
+        self.editable = self.keymap is not noTable
         self.fieldId = fieldId
+        print(self.editable, value, self.valueType, self.keymap)
 
 
     def update_click(self):
         super().update_click()
         self.textChanged = False
         if not self.editable or not self.wasFocus: return
-
         
         self.tick = pg.time.get_ticks()
         self.pressed = pg.key.get_pressed()

@@ -115,7 +115,9 @@ class Text(Renderer):
     '''Ghi chữ có tiện ích ở đây'''
     fonts: Final[dict[str, pg.font.Font]] = {
         'comic': pg.font.Font("assets\\Comic.ttf", 14),
-        'jetbrains_big': pg.font.Font("assets\\jetbrains_semibold.ttf", 30)
+        'jetbrain': pg.font.Font("assets\\Comic.ttf", 14),
+        'jetbrains_big': pg.font.Font("assets\\jetbrains_semibold.ttf", 30),
+        'jetbrains_massive': pg.font.Font("assets\\jetbrains_semibold.ttf", 60)
     }
 
     def __init__(self, text: str = "", color = colormap['white'],
@@ -149,13 +151,13 @@ class Text(Renderer):
 
         isDifferentRect = (not tf.no_angle and (self.last_grot != grot)) or (self.last_gscale != gscale)
         if isDifferentRect or (hash(self.text) != self.cache_id):
-            print(f"{self.tf.name}'s text changed: {self.last_grot}!={grot} {self.last_gscale}!={gscale} {hash(self.text)}!={self.cache_id}")
+            #print(f"{self.tf.name}'s text changed: {self.last_grot}!={grot} {self.last_gscale}!={gscale} {hash(self.text)}!={self.cache_id}")
             sf = self.writer.render(self.text, True, self.color)
             self.last_gscale = gscale
             self.pixels = vec(sf.get_size()).elementwise() * gscale
 
-            if gscale != vec(ONE): sf = pg.transform.scale(sf, self.pixels)
             if (not tf.no_angle) and grot != 0: sf = pg.transform.rotate(sf, -grot)
+            if gscale != vec(ONE): sf = pg.transform.scale(sf, self.pixels)
 
             # Lưu cache lại một đống tham số đánh dấu và dữ liệu
             self.last_grot = grot

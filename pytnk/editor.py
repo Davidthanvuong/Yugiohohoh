@@ -47,23 +47,26 @@ class InspectorMenu(Component):
         txt = Transform('Text', hitbox=(size[0], 50), parent=tf)
         Text(bind=txt, text="Inspector", preset='jetbrains_big')
 
+
         # Chữa cháy start cũ do start mới clean hơn mà chưa kịp implement
         if True or not Transform.existPrefab('Input Field'):
-            ipf = Transform('Input Field', ZERO, ZERO, (50, 22), parent=tf)
+            ipf = Transform('Input Field', ZERO, ZERO, (100, 22), parent=tf)
             Image(bind=ipf, path="white.png", fit=True, standalone=True)
             Text(bind=ipf, text="69420", color=(0, 0, 0))
-            InputField(bind=ipf, value="Hello")
+            InputField(bind=ipf, value=69420)
 
             ipf.saveSelf(delete=True)
 
 
         if True or not Transform.existPrefab('Type Field'):
-            df = Transform('Type Field', ZERO, ZERO, (size[0] - 100, 22), parent=tf)
+            df = Transform('Type Field', ZERO, ZERO, (size[0], 22), parent=tf)
             Image(bind=df, path="white.png", fit=True, standalone=True)
-            Text(bind=df, text='Data', color=(0, 0, 0))
             #ComponentField(bind=df)
-            FlexArray(bind=df, includeSelf=True, use_crowding=True, axis='x')
-            for i in range(2):
+            FlexArray(interactable=False, bind=df, use_crowding=True, axis='x')
+
+            tt = Transform('Text', ZERO, ZERO, (150, 22), parent=df)
+            Text(bind=tt, text='Data example', color=(0, 0, 0))
+            for i in range(3):
                 Transform.getPrefab('Input Field', parent=df)
 
             df.saveSelf(delete=True)
