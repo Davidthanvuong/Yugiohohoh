@@ -1,5 +1,5 @@
 from pytnk.header_pygame import *
-from pytnk.world import World
+from pytnk.world import Window
 
 #   _   _        _  _                                  _      _  _ 
 #  | | | |      | || |                                | |    | || |
@@ -12,7 +12,7 @@ from pytnk.world import World
 if __name__ == '__main__': 
     world = Transform("World")
     Image(attach=world, path="woodfloor.jpg", size=NATIVE)
-    com_world = World(attach=world)
+    com_world = Window(attach=world)
 
     if True or not Transform.exist_prefab("DataField"):
         tf = Transform("DataField", pivot=(0, 0.5), 
@@ -43,7 +43,7 @@ if __name__ == '__main__':
     Transform.getPrefab("ToggleHeader", editor, vec(800, 100))
     #editor.enable = False
 
-    while World.RUNNING:
+    while Window.RUNNING:
         world.update_logic()
 
         # for obj in world:
@@ -55,7 +55,7 @@ if __name__ == '__main__':
         editor.update_logic()
         editor.update_click()
         editor.update_render()
-        com_world.windowHandler()
+        com_world.outputHandle()
 
     #world_tf.save()
     pg.quit()

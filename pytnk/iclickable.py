@@ -1,31 +1,30 @@
 from .header_pygame import *
 
 class IClickable(Component):
-    '''Click quốc dân'''
+    '''Hỗ trợ click'''
 
     def __init__(self, hoverable=True, clickable=True, draggable=False, **kwargs):
         super().__init__(**kwargs)
 
         self.hoverable = hoverable
         self.clickable = clickable
-        self.draggable = draggable # todo: Cho phép kéo thả
+        self.draggable = draggable # todo: Cho phép kéo thả (builtin)
+
         self.hovering = False
         self.clicking = False
         self.wasFocus = False
+        self.clickDelta = vec(ZERO)
 
 
-    def try_getMouse(self):
+    def is_mouseInHitbox(self):
         '''Thử lấy chuột trong hitbox bằng trick xoay'''
-        if mouse.host and mouse.host is not self:
-            return False
-    
-        box = self.tf.hitbox.elementwise() * self.tf.global_scale
-        a = box.elementwise() * -self.tf.pivot
+        box = self.go.hitbox.elementwise() * self.go.global_scale
+        a = box.elementwise() * -self.go.pivot
         b = a + box
 
-        rel = mouse.pos - self.tf.global_pos
-        if not self.tf.no_angle:
-            rel.rotate_ip(-self.tf.angle)
+        rel = Mouse.pos - self.go.global_pos
+        if not self.go.simple:
+            rel.rotate_ip(-self.go.rot)
 
         return (a.x <= rel.x <= b.x) and \
                (a.y <= rel.y <= b.y)
@@ -33,31 +32,40 @@ class IClickable(Component):
 
     def update_click(self):
         #print(self.hoverable, self.clickable, self.draggable, self.hovering, self.clicking, self.wasFocus)
-        if self.hoverable and self.try_getMouse():
-            if not self.hovering:
-                mouse.host = self # Đánh dấu vật đã dùng chuột
+        canFocus = (not Mouse.click) or (Mouse.click is self)
+        if self.hoverable and self.is_mouseInHitbox() and canFocus:
+            if not self.hovering and not Mouse.hover: # Nếu đang hover và chưa bị lấylấy
+                Mouse.hover = self # Đánh dấu vật đã dùng chuột
                 self.hovering = True
                 self.on_startHover()
             
-            if self.clickable and mouse.clicked:
+            if self.clickable and Mouse.clicked: # Đã kiểm click hay chưa trong try_getMouse
                 if not self.clicking:
-                    mouse.host = self
-                    mouse.lastFocus = self
+                    Mouse.click = self
+                    Mouse.focus = self
                     self.clicking = True
-                    self.wasFocus = self
+                    self.wasFocus = True
                     self.on_startClick()
+                    if self.draggable:
+                        self.on_startDrag()
+
                 self.on_clicking()
+                if self.draggable:
+                    self.on_dragging()
+
             elif self.clicking:
                 self.clicking = False
                 self.on_stopClick()
 
             self.on_hovering()
+            
         elif self.hovering:
             self.on_stopHover()
-            mouse.host = None
+            # x Mouse.hover = None | Chuột đã bị lấy, đừng reset Mouse.hover
             self.hovering = False
 
-        if self.wasFocus and mouse.lastFocus is not self:
+        if (self.wasFocus) and not (Mouse.focus is self):
+            # Lúc tập trung, ngưng khi không phải bản thân 
             self.on_stopFocus()
             self.wasFocus = False
 
@@ -70,3 +78,9 @@ class IClickable(Component):
     def on_hovering(self): pass
     def on_clicking(self): pass
     def on_stopFocus(self): pass # là sau khi click vô các object khác
+
+    def on_startDrag(self):
+        self.clickDelta = Mouse.pos.elementwise() * self.go.scene.go.global_scale + self.go.scene.go.global_pos
+
+    def on_dragging(self):
+        self.go.pos = Mouse.pos.elementwise() * self.go.scene.go.global_scale - self.go.scene.go.global_pos + self.clickDelta

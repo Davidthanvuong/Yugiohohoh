@@ -35,14 +35,14 @@ class InspectorMenu(Component):
         tf = Transform('Inspector',
                 pos=(Window.native[0] - size[0], 0), 
                 hitbox=size, 
-                parent=Game.inst.tf, 
+                parent=Window.Inst.tf, 
                 enabled=False, 
                 rootname='Inspector')
-        tf.root = Transform.roots['Inspector'] = (tf, pg.Surface(tf.hitbox, pg.SRCALPHA))
+        tf.root = Transform.Roots['Inspector'] = (tf, pg.Surface(tf.hitbox, pg.SRCALPHA))
         img = Image(bind=tf, path="white.png", fit=True, standalone=True)
         FlexArray(interactable=False, bind=tf)
         img.cache.texture.fill(colormap['dark'])
-        Game.editorsTf.append(tf)
+        Window.editorsTf.append(tf)
 
         txt = Transform('Text', hitbox=(size[0], 50), parent=tf)
         Text(bind=txt, text="Inspector", preset='jetbrains_big')
@@ -100,15 +100,15 @@ class HierarchyMenu(Component):
         HierarchyMenu.inst = self
         size = (mg_pos.x, Window.native[1])
 
-        tf = Transform('Hierarchy', (0, 0), (0, 0), size, Game.inst.tf, enabled=False)
-        tf.root = Transform.roots['Hierarchy'] = (tf, pg.Surface(tf.hitbox, pg.SRCALPHA))
+        tf = Transform('Hierarchy', (0, 0), (0, 0), size, Window.Inst.tf, enabled=False)
+        tf.root = Transform.Roots['Hierarchy'] = (tf, pg.Surface(tf.hitbox, pg.SRCALPHA))
         img = Image(bind=tf, path="white.png", fit=True, standalone=True)
         img.cache.texture.fill(colormap['dark'])
 
         txt = Transform('Text', hitbox=(size[0], 50), parent=tf)
         Text(bind=txt, text="Hierarchy", preset='jetbrains_big')
 
-        Game.editorsTf.append(tf)
+        Window.editorsTf.append(tf)
 
         super().__init__(bind=tf, **kwargs)
 
@@ -122,14 +122,14 @@ class AssetsMenu(Component):
         AssetsMenu.inst = self
         size = (mg_size.x, Window.native[1] - mg_size.y)
 
-        tf = Transform('Assets', (mg_pos.x, mg_pos.y + mg_size.y), (0, 0), size, Game.inst.tf, enabled=False)
-        tf.root = Transform.roots['Assets'] = (tf, pg.Surface(tf.hitbox, pg.SRCALPHA))
+        tf = Transform('Assets', (mg_pos.x, mg_pos.y + mg_size.y), (0, 0), size, Window.Inst.tf, enabled=False)
+        tf.root = Transform.Roots['Assets'] = (tf, pg.Surface(tf.hitbox, pg.SRCALPHA))
         img = Image(bind=tf, path="white.png", fit=True, standalone=True)
         img.cache.texture.fill(colormap['dark'])
 
         txt = Transform('Text', hitbox=(size[0], 50), parent=tf)
         Text(bind=txt, text="Assetslib", preset='jetbrains_big')
 
-        Game.editorsTf.append(tf)
+        Window.editorsTf.append(tf)
 
         super().__init__(bind=tf, **kwargs)

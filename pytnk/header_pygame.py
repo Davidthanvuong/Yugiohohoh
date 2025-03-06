@@ -1,28 +1,33 @@
-from pygame import Vector2 as vec
+# Standalone
 from pygame.event import peek as pgpeek
-from dataclasses import dataclass
-from typing import Optional as No
 from abc import abstractmethod
+from dataclasses import dataclass
 from enum import Enum
-from .config import *
+from random import randint as rint
+from random import choice
+from .data import *
 
-tff = tuple[float, float]
-
-ALLOW_DEVELOPER = True
-TOPLEFT = ZERO = (0, 0)
-CENTER = (0.5, 0.5)
-ONE = (1, 1)
-
-from .transform import Transform, Component
-from .game import MouseInfo, mouse, Game
+# Engine
+from .event import Event
+from .window import Scene, Window, Scope
+from .gameobject import Component, GameObject#, Transform
+from .image import Image, Text, FontPreset, SharedImage
+from .menu import Menu
 from .iclickable import IClickable
 from .flexarray import FlexArray
-from .image import Image, Text, SharedImage
-from .inputfield import InputField
-from .maingame import Maingame
-from .editor import InspectorMenu, HierarchyMenu, AssetsMenu, load_editors
+from .editors.menus import MaingameMenu, InspectorMenu, HierarchyMenu, AssetsMenu
 
-from assets.scripts.card import Card, CardDeck
+# Assets
+from assets.scripts import *
+
+# Afterload
+from .sceneloader import SceneLoader
+
+
+#from .inputfield import InputField
+#from .editor import InspectorMenu, HierarchyMenu, AssetsMenu, load_editors
+
+#from assets.scripts.card import Card, CardDeck
 
 #from .maingame import Maingame
 # from .abstract_renderer import render

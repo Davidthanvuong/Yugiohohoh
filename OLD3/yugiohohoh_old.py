@@ -2,7 +2,7 @@
 # Trong edit mode bấm shift để di chuyển vị trí global
 
 from pytnk.header_objects import *
-from pytnk.world import World
+from pytnk.world import Window
 from pytnk.object_editor import loadAssetsList, createObject, inspectObj
 #from pytnk.editor_inspector import InspectorFrame
 import time
@@ -41,7 +41,7 @@ if __name__ == '__main__':
     clock = pg.time.Clock()
     editor_rect = pg.Rect(NATIVE[0] // 2, 0, NATIVE[0] // 2, NATIVE[1])
 
-    scene = World("pickleball")
+    scene = Window("pickleball")
     #scene = SceneManager.try_load("pickleball.pkl")
     create_new_scene()
     #insp = InspectorFrame(scene.objects["Cube1"])
