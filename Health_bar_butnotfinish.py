@@ -14,10 +14,10 @@ health_bar_image = pg.image.load('assets/images/hp.png')
 bar_x, bar_y = 100, 100
 health_bar_rect = health_bar_image.get_rect(topleft=(bar_x, bar_y))
 
-offset_x = 10
-offset_y = 40
-inner_w = 100
-inner_h = 10
+offset_x = 267
+offset_y = 200
+inner_w = 106
+inner_h = 11
 
 health_rect = pg.Rect(
     health_bar_rect.x + offset_x,
