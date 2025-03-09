@@ -8,14 +8,6 @@ Phát triển trên PyTNK Game engine
 Game được design đơn giản lúc ban đầu nhưng khi phát triển, \
 thêm bao nhiêu loại thẻ bài vô cũng được
 
-#### Game có vài lối chơi được design cho
-- Mấy thằng spam mỗi 1 con meta
-- Cứ buff cho bản thân để đi solo
-- Dân Pokemon đi train lính
-- Average Bullet hell enjoyer 🗿🗿🗿 
-- Mấy ông thích chơi speedrun (có mode riêng)
-- Maximum Vip pro cao thủ thần bài (có mode riêng)
-
 #### Cơ chế game (Đừng có quá gò bó hoặc phức tạp)
 - Đi sưu tầm thẻ, khá lá freedom trong việc thêm lính hay skill nào vô cũng đc
 - Bạn không ở đó và đứng nhìn tụi nó đi ngu trong tuyệt vọng, mà lao vào đấm luôn thằng địch
@@ -25,8 +17,6 @@ thêm bao nhiêu loại thẻ bài vô cũng được
 
 ### Installation & Edit game
 Game được phát triển trên Pygame bằng Python 3.13
-Có thể thêm vài thư viện để game chạy nhanh hơn (Optional):
-- PyOpenGL, PyOpenGL_accelerate
 
 Hiện tại chưa có manual dành cho developer hay những người hac\*\*\*...*edit* dạo
 
@@ -36,7 +26,7 @@ Hiện tại chưa có manual dành cho developer hay những người hac\*\*\*
 ![Task cho Quân](https://github.com/Davidthanvuong/Yugiohohoh/blob/main/gigigig.png)
 
 
-## Objectives hiện tại
-- [ ] **Itsrandomizable + DuckMinh**: Một đống mấy thằng đệ (summon) để test. Skill + hệ + description luôn
-- [ ] **QuanDNA**: Kéo, thả, tương tác với object
-- [ ] **Davich**: Chuyển đổi giữa scene. Combat system
+## Objectives hiện tại (đã update hôm 09/03)
+- [ ] VDM + Itsrandomizable: Thêm chức năng & đồ họa cho monsters
+- [ ] HarryQuan: Code chạy animation
+- [ ] Davich: Kéo thả tấn công
