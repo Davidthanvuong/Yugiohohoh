@@ -1,72 +1,110 @@
-from .header_pygame import *
+from .engine import *
 
 class IClickable(Component):
-    '''Click quốc dân'''
-
-    def __init__(self, hoverable=True, clickable=True, draggable=False, **kwargs):
-        super().__init__(**kwargs)
-
+    '''Base class cho việc xử lí chuột'''
+    def __init__(self, hoverable=True, clickable=True, draggable=False):
         self.hoverable = hoverable
         self.clickable = clickable
-        self.draggable = draggable # todo: Cho phép kéo thả
+        self.draggable = draggable
+
         self.hovering = False
         self.clicking = False
+        self.dragging = False
         self.wasFocus = False
+        self.clickDelta = vec(0, 0)
 
-
-    def try_getMouse(self):
+    def is_mouseInHitbox(self):
         '''Thử lấy chuột trong hitbox bằng trick xoay'''
-        if mouse.host and mouse.host is not self:
-            return False
-    
-        box = self.tf.hitbox.elementwise() * self.tf.global_scale
-        a = box.elementwise() * -self.tf.pivot
-        b = a + box
+        size = self.transf.l_hitboxSize
+        topleft = size.elementwise() * (- self.transf.pivot)
+        bottomright = topleft + size
 
-        rel = mouse.pos - self.tf.global_pos
-        if not self.tf.no_angle:
-            rel.rotate_ip(-self.tf.angle)
+        rel = Mouse.pos - self.transf.g_pos
+        if not self.transf.straight:
+            rel.rotate_ip(-self.transf.rot)
 
-        return (a.x <= rel.x <= b.x) and \
-               (a.y <= rel.y <= b.y)
-
+        #print(topleft.x, rel.x, bottomright.x, "and", topleft.y, rel.y, bottomright.y)
+        return (topleft.x <= rel.x <= bottomright.x) and \
+               (topleft.y <= rel.y <= bottomright.y)
 
     def update_click(self):
-        #print(self.hoverable, self.clickable, self.draggable, self.hovering, self.clicking, self.wasFocus)
-        if self.hoverable and self.try_getMouse():
+        # Hover None lúc đầu, thằng nào lấy trước thằng đó thắng
+        inHitbox = self.is_mouseInHitbox()
+        canHover = self.dragging or (self.hoverable and not Mouse.hoverHost and inHitbox)
+        if canHover:
             if not self.hovering:
-                mouse.host = self # Đánh dấu vật đã dùng chuột
                 self.hovering = True
                 self.on_startHover()
-            
-            if self.clickable and mouse.clicked:
-                if not self.clicking:
-                    mouse.host = self
-                    mouse.lastFocus = self
-                    self.clicking = True
-                    self.wasFocus = self
-                    self.on_startClick()
-                self.on_clicking()
-            elif self.clicking:
-                self.clicking = False
-                self.on_stopClick()
-
+            Mouse.hoverHost = self
             self.on_hovering()
         elif self.hovering:
-            self.on_stopHover()
-            mouse.host = None
             self.hovering = False
+            self.on_stopHover()
 
-        if self.wasFocus and mouse.lastFocus is not self:
-            self.on_stopFocus()
+        # Thập cẩm: Click, drag, focus
+        canClick = self.dragging or (self.clickable and not Mouse.clickHost and inHitbox)
+        if canClick and Mouse.clicked:
+            if not self.clicking:
+                self.clicking = True
+                self.wasFocus = True
+                self.on_startClick()
+                if self.draggable:
+                    self.dragging = True
+                    self.on_startDrag()
+            Mouse.clickHost = self
+            self.on_clicking()
+            if self.draggable:
+                self.on_dragging()
+        elif self.clicking:
+            self.clicking = False
+            self.on_stopClick()
+            if self.dragging:
+                self.dragging = False
+                self.on_stopDrag()
+
+        if self.wasFocus and not self.clicking and Mouse.lastHost is not self:
             self.wasFocus = False
+            self.on_stopFocus()
+        
+        # if canClick and Mouse.clicked:
+        #     Mouse.clickHost = ref(self.go)
+        #     Mouse.focusHost = Mouse.clickHost
 
+        # if Mouse.clickHost and Mouse.clickHost() == self.go:
+        #     if not self.clicking:
+        #         self.clicking = True
+        #         self.on_startClick()
+        #         if self.draggable:
+        #             self.on_startDrag()
+        #     self.on_clicking()
+        #     if self.draggable:
+        #         self.on_dragging()
+        # else:
+        #     if self.clicking:
+        #         self.clicking = False
+        #         self.on_stopClick()
 
-    # Hàm rỗng nhưng không abstract để cho inheritance
-    def on_startHover(self): pass
-    def on_startClick(self): pass
-    def on_stopHover(self): pass
-    def on_stopClick(self): pass
-    def on_hovering(self): pass
-    def on_clicking(self): pass
-    def on_stopFocus(self): pass # là sau khi click vô các object khác
+        # # Focus logic: Retain focus until another object is clicked
+        # prev_wasFocus = self.wasFocus
+        # self.wasFocus = (Mouse.focusHost and Mouse.focusHost() == self.go)
+        # if prev_wasFocus and not self.wasFocus:
+        #     self.on_stopFocus()
+
+    def on_startHover(self):    pass#print('start hover')
+    def on_hovering(self):      pass#print('hovering')
+    def on_stopHover(self):     pass#print('stop hover')
+    def on_startClick(self):    pass#print('start click')
+    def on_clicking(self):      pass#print('clicking')
+    def on_stopClick(self):     pass#print('stop click')
+    def on_stopFocus(self):     pass#print('stop focus')
+    def on_stopDrag(self):      pass#print('stop focus')
+
+    def on_startDrag(self):
+        # print('start drag')
+        # TODO: Handle in-place rotation, parent moving,...
+        self.clickDelta = self.transf.g_pos - Mouse.pos
+
+    def on_dragging(self):
+        #print('dragging')
+        #print(self.transf.parent.go.name)
+        self.transf.pos = Mouse.pos + self.clickDelta

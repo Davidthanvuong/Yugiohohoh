@@ -1,39 +1,35 @@
-from pytnk.header_pygame import *
-import random, os
+from pytnk.engine import *
 
 
-def deadline_demo():
-    '''Chữa cháy demo (do Engine đang làm mà thầy kêu review)'''
+#   _   _        _  _                                  _      _  _ 
+#  | | | |      | || |                                | |    | || |
+#  | |_| |  ___ | || |  ___     __      __ ___   _ __ | |  __| || |
+#  |  _  | / _ \| || | / _ \    \ \ /\ / // _ \ | '__|| | / _` || |
+#  | | | ||  __/| || || (_) |_   \ V  V /| (_) || |   | || (_| ||_|
+#  \_| |_/ \___||_||_| \___/( )   \_/\_/  \___/ |_|   |_| \__,_|(_)
+#                           |/                                     
+#
+########## Dành cho developer ##########
+#
+#   Thả card xuống phía dưới để undo việc triệu hồi
+#   Hiện tại chưa có cách đặt đúng quái / bảng triệu hồi của đối phương
+#   Intro vẫn chưa được thống nhất, có ý tưởng nhớ nói (Pytnk.load_intro())
+#
+#   Bug thành chức năng đi: Lá spell cho phép bóc lá của đối phương (nhưng không được nhìn)
+#
+########################################
 
-    deck_tf = Transform('Card Deck', pos=(200, Window.native[1]-200), hitbox=(800, 200), pivot=(0, 0.5), parent=Game.maingameTf, rootname='Maingame')
-    #Image(bind=deck_tf, path="white.png", fit=True, standalone=True)
-    FlexArray(interactable=False, bind=deck_tf, axis='x', use_crowding=True)
-
-    deck = CardDeck(bind=deck_tf)
-    path = "assets\\images\\summoncard"
-    files = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
-    print(files)
-    for i in range(20):
-        card = Transform.getPrefab('Card', parent=deck_tf)
-        img = card.getComponent(Image)
-        img.cache = SharedImage.fetch(f"summoncard\\{random.choice(files)}")
 
 if __name__ == '__main__':
-    pg.init()
-    screen = Game()
-    go = screen.tf
-    Maingame()
-    if ALLOW_DEVELOPER:
-        load_editors()
+    Pytnk.init()
+    # Hardcoded.create_all()    # Tạo prefab, chạy 1 lần cả đời là đủ
 
-    deadline_demo()
+    Pytnk.start()
+    Pytnk.load_intro()
+    # Pytnk.load_maingame()
 
-    while Window.running:
-
-        go.update_logic()   # Cập nhật từng components object
-        go.update_click()   # Theo đúng trình tự load
-        go.update_render()
-
-        screen.windowHandler()  # Xong mới update và handle màn hình
+    while App.running:
+        Pytnk.update()
 
     pg.quit()
+
