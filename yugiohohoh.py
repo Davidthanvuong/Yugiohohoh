@@ -21,12 +21,17 @@ from pytnk.engine import *
 
 
 if __name__ == '__main__':
+    # TODO: Move to runtime data fetcher class?
+    path = "assets\\images\\card"
+    CardDeck.cardImages = [f for f in os.listdir(path) if 
+                            os.path.isfile(os.path.join(path, f))]
+
     Pytnk.init()
-    # Hardcoded.create_all()    # Tạo prefab, chạy 1 lần cả đời là đủ
+    Hardcoded.create_all()    # Tạo prefab, chạy 1 lần cả đời là đủ
 
     Pytnk.start()
-    Pytnk.load_intro()
-    # Pytnk.load_maingame()
+    # Pytnk.load_intro()
+    Pytnk.load_maingame()
 
     while App.running:
         Pytnk.update()

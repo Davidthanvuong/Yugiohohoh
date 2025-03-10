@@ -1,6 +1,7 @@
 from pytnk.engine import *
 
 class Monster(IClickable):
+    '''Triệu hồi từ card, hoặc extra thấm nếu spawn từ Monster khác luôn'''
     e_attackPhase: Event = Event()
     e_defensePhase: Event = Event()
 
@@ -10,12 +11,19 @@ class Monster(IClickable):
         self.attack = 20
         self.deathTime = 0.0
         self.deathFlash = False
+        self.moving = False
+        self.startMoving = False
+
+        # TODO: Có lẽ nên implement class Motion cho đỡ dài dòng phần di chuyển
+        self.targetPos = vec(ZERO)
+        self.oldPos = vec(ZERO)
         Monster.e_attackPhase += self.attack_phase
         Monster.e_defensePhase += self.defense_phase
 
     def start(self):
         self.com_render = self.go.getComponent(Image)
 
+        # Con mej mafy di chuyển qua Hardcode đi
         ui = GameObject("UI", self.go, pos=(-50, 0))
 
         health = GameObject('1', ui, pos=(0, 0)) 
@@ -33,6 +41,17 @@ class Monster(IClickable):
         if self.defense <= 0.0: 
             self.defense = 0.0
             self.on_death()
+
+        if self.moving:
+            if not self.startMoving:
+                self.oldPos = self.transf.pos
+                self.startMoving = True
+                
+            self.transf.pos = self.transf.pos.lerp(self.targetPos, 0.2)
+            if self.transf.pos.distance_squared_to(self.targetPos) < 1:
+                self.moving = False
+                self.startMoving = False
+                self.transf.pos = self.oldPos
 
     def on_startHover(self):
         self.com_img.flashing = True

@@ -30,7 +30,7 @@ class IClickable(Component):
     def update_click(self):
         # Hover None lúc đầu, thằng nào lấy trước thằng đó thắng
         inHitbox = self.is_mouseInHitbox()
-        canHover = self.dragging or (self.hoverable and not Mouse.hoverHost and inHitbox)
+        canHover = self.hoverable and inHitbox and (Mouse.dragHost or not Mouse.hoverHost)
         if canHover:
             if not self.hovering:
                 self.hovering = True
@@ -42,14 +42,17 @@ class IClickable(Component):
             self.on_stopHover()
 
         # Thập cẩm: Click, drag, focus
+        # Đây là code sỏi thận sỏi mật
         canClick = self.dragging or (self.clickable and not Mouse.clickHost and inHitbox)
         if canClick and Mouse.clicked:
             if not self.clicking:
                 self.clicking = True
                 self.wasFocus = True
+                Mouse.focusHost = ref(self)
                 self.on_startClick()
                 if self.draggable:
                     self.dragging = True
+                    Mouse.dragHost = ref(self)
                     self.on_startDrag()
             Mouse.clickHost = self
             self.on_clicking()
@@ -60,6 +63,7 @@ class IClickable(Component):
             self.on_stopClick()
             if self.dragging:
                 self.dragging = False
+                Mouse.dragHost = None
                 self.on_stopDrag()
 
         if self.wasFocus and not self.clicking and Mouse.lastHost is not self:

@@ -26,7 +26,7 @@ from assets.scripts.shader_burning import Shader_BurningCard
 from assets.scripts.summon import Summon
 from assets.scripts.monsterui import MonsterUI
 from assets.scripts.monster import Monster
-from assets.scripts.card import Card, CardDeck, CardPlaceholder
+from assets.scripts.card import Card, CardDeck, CardSpot
 
 from .sequence import Sequence, LoadingSeq, IntroSeq
 

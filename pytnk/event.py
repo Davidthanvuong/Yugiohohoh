@@ -60,6 +60,7 @@ class Mouse:
     clickHost: No[object] = None
     lastHost : No[object] = None
     focusHost: No[ref] = None
+    dragHost: No[ref] = None
 
     @classmethod
     def update_mouse(cls):
@@ -73,3 +74,9 @@ class Mouse:
 
         cls.hoverHost = None # Chuột pygame như gái, thằng nào lấy trước thằng đó thắng
         cls.clickHost = None
+
+        if cls.focusHost and not cls.focusHost():
+            cls.focusHost = None
+
+        if cls.dragHost and not cls.dragHost():
+            cls.dragHost = None

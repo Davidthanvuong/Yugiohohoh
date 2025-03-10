@@ -37,13 +37,6 @@ class App:
     display: pg.Surface
 
 
-class Mouse:
-    pos = vec(1, 0)
-    clicked = False
-    hoverHost = None
-    activeHost = None
-
-
 class Color:
     alpha = (0, 0, 0, 0)
     black:      RGB = (0, 0, 0)

@@ -40,32 +40,72 @@ class Card(IClickable):
             burn += Shader_BurningCard(self.com_img.shared.native, self.com_img.imgsize, 
                 start_count=rint(5, 20), burn_time=rint(2, 4)*0.5)
 
-            parent = self.deck.getSlotPos() if self.deck else ZERO
-            mons = GameObject('Monster', pos=parent, pivot=MIDBOTTOM)
+            slot = self.deck.getSlot() if self.deck else None
+            pos = slot.transf.g_pos if slot else ZERO
+
+            mons = GameObject('Monster', pos=pos, pivot=MIDBOTTOM)
             mons += Image('unknown\\duck.png', (150, 135), overrideHitbox=True)
-            mons += Monster()
+            com_mon = mons.addComponent(Monster)
+
+            if slot: slot.getComponent(CardSpot).bind = ref(com_mon)
             self.go.destroy()
 
 
 
-class CardPlaceholder(IClickable):
+class CardSpot(IClickable):
+    rt_dragId: tuple[No['CardSpot'], int] = (None, -1)
+    rt_selectId: tuple[No['CardSpot'], int] = (None, -1)
+
+    def __init__(self, startId = -1, **kwargs):
+        super().__init__(draggable=True, **kwargs)
+        self.startId = startId
+        self.bind: No[ref[Monster]] = None
+
     def start(self):
         self.com_img = self.go.getComponent(Image)
-        # flash = GameObject("Flashing", self.go, pivot=self.transf.pivot)
-        # size = self.com_render.imgsize
-        # img = Image(self.com_render.path, (size.x, size.y), overrideHitbox = True)
-        # self.com_flashing = flash.addComponent(img)
-        # img.shared.fillColor(Color.white)
-        # img.shared.native.set_alpha(100)
-        # img.enabled = False
+
+    def update_logic(self):
+        selecting = CardSpot.rt_selectId[0] is self
+        dragging = CardSpot.rt_dragId[0] is self
+        self.com_img.flashing = selecting or dragging
     
     def on_startHover(self):
-        self.com_img.flashing = True
+        # if CardSpot.rt_dragId[0] is not self:
+        CardSpot.rt_selectId = (self, self.startId)
 
     def on_stopHover(self):
-        self.com_img.flashing = False
+        if CardSpot.rt_selectId[0] is self:
+            CardSpot.rt_selectId = (None, -2)
 
+    def on_startDrag(self):
+        if CardSpot.rt_dragId[0] is None:
+            CardSpot.rt_dragId = (self, self.startId)
 
+    def on_dragging(self):
+        # Đè lên tính năng drag (không cho phép drag vật, chỉ drag mũi tên)
+        pass
+
+    def on_stopDrag(self):
+        # Check trước khi hủy, tạm thời chỉ in
+        if CardSpot.rt_dragId[0] is self and CardSpot.rt_selectId[0] is not None:
+            print(f"{CardSpot.rt_dragId[1]} --> {CardSpot.rt_selectId[1]}")
+            if self.bind:
+                mons = self.bind()
+                if mons:
+                    mons.moving = True
+                    mons.targetPos = CardSpot.rt_selectId[0].transf.g_pos
+            CardSpot.rt_dragId = (None, -1)
+            CardSpot.rt_selectId = (None, -2)
+
+    def update_render(self):
+        if CardSpot.rt_dragId[0] is not self: return
+        assert CardSpot.rt_dragId[0] is not None # Chắc chắn không thể xảy ra
+
+        pos1 = CardSpot.rt_dragId[0].transf.g_pos
+        if CardSpot.rt_selectId[0] is not None:
+            pos2 = CardSpot.rt_selectId[0].transf.g_pos
+        else: pos2 = Mouse.pos
+        pg.draw.line(App.display, Color.forward, pos1, pos2, 5)
 
 
 class CardDeck(Component):
@@ -81,11 +121,6 @@ class CardDeck(Component):
         self.slots_filled: list[GameObject] = []
 
     def start(self):
-        if len(CardDeck.cardImages) == 0: # Chưa khởi tạo
-            path = "assets\\images\\card"
-            CardDeck.cardImages = [f for f in os.listdir(path) if 
-                                   os.path.isfile(os.path.join(path, f))]
-            
         for i in range(self.startCount):
             card = GameObject.loadPrefab('Card', parent=self.go)
 
@@ -95,16 +130,17 @@ class CardDeck(Component):
                 pos = vec(x * 150 * inverse, y * 120)
                 # slot = GameObject(f"Slot {y*5 + x}", self.slotsGO, pos=pos)
                 slot = GameObject.loadPrefab('Card Placeholder', parent=self.slotsGO, pos=pos)
+                slot.getComponent(CardSpot).startId = y * 5 + x
                 self.slots_empty.append(slot)
 
-    def getSlotPos(self):
+    def getSlot(self):
         if len(self.slots_empty) == 0:
             raise Exception("Empty")
         
         slot = choice(self.slots_empty)
         self.slots_empty.remove(slot)
         self.slots_filled.append(slot)
-        return slot.transf.g_pos
+        return slot
 
     def update_logic(self):
         cards = self.go.childs

@@ -64,6 +64,6 @@ class Hardcoded:
 
         slot = GameObject('Card Placeholder')
         slot += Image("card_back.png", (120, 80), overrideHitbox=True)
-        slot += CardPlaceholder()
+        slot += CardSpot()
 
         slot.savePrefab(delete=True)
