@@ -38,12 +38,12 @@ class Card(IClickable):
         else:
             burn = GameObject('Burn', pos=self.transf.g_pos)
             burn += Shader_BurningCard(self.com_img.shared.native, self.com_img.imgsize, 
-                start_count=rint(5, 20), burn_time=rint(2, 4)*0.5)
+                start_count=rint(5, 20), burn_time=rint(3, 4)*0.5)
 
             slot = self.deck.getSlot() if self.deck else None
             pos = slot.transf.g_pos if slot else ZERO
 
-            mons = GameObject('Monster', pos=pos, pivot=MIDBOTTOM)
+            mons = GameObject('Monster', pos=pos, anchor=MIDBOTTOM)
             mons += Image('unknown\\duck.png', (150, 135), overrideHitbox=True)
             com_mon = mons.addComponent(Monster)
 
@@ -133,11 +133,12 @@ class CardDeck(Component):
                 slot.getComponent(CardSpot).startId = y * 5 + x
                 self.slots_empty.append(slot)
 
-    def getSlot(self):
-        if len(self.slots_empty) == 0:
-            raise Exception("Empty")
+    def getSlot(self) -> GameObject:
+        if CardSpot.rt_selectId[0] is not None:
+            slot = CardSpot.rt_selectId[0].go
+        else:
+            slot = choice(self.slots_empty)
         
-        slot = choice(self.slots_empty)
         self.slots_empty.remove(slot)
         self.slots_filled.append(slot)
         return slot

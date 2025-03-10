@@ -1,3 +1,4 @@
+from typing import Any
 from .engine import *
 
 class Sequence(Component):
@@ -48,13 +49,15 @@ class LoadingSeq(Sequence):
         self.key = self.animTime / (totalDiag - 1 + self.waveLength)
 
     def update_logic(self):
-        self.dt = time() - self.sinceStart
+        self.dt = time() - self.sinceStart - 1.5
+        if self.dt <= 0: return
         if self.dt >= self.animTime:
             print("Start (actual) loading")
             Sequence.e_finished.notify(self)
             self.go.destroy()
 
     def update_render(self):
+        if self.dt <= 0: return
         for y in range(self.grid[1]):
             for x in range(self.grid[0]):
                 self.renderCell(x, y, self.dt / self.key)
@@ -69,3 +72,42 @@ class LoadingSeq(Sequence):
         center = vec(x + 0.5, y + 0.5) * self.cellsize
         topleft = center - vec(size) / 2
         pg.draw.rect(App.display, color, (topleft[0], topleft[1], size, size))
+
+
+class MaingameSeq(Sequence):
+    def __init__(self, plank: GameObject, deck1: GameObject, deck2: GameObject, **kwargs):
+        super().__init__(**kwargs)
+        self.plank = plank
+        self.deck1 = deck1
+        self.deck2 = deck2
+
+    def start(self):
+        super().start()
+        self.ratio = vec(App.native[1] / App.native[0])
+        self.transf.scale = self.ratio
+        
+        self.vertical = vec((App.native[0] - App.native[1]) / 2 / self.ratio.x, App.native[1])
+        self.transf.pos = self.vertical
+        self.transf.rot = 90
+
+    def update_logic(self):
+        self.dt = time() - self.sinceStart - 0.5
+        if self.dt <= 0: return
+        if self.dt >= self.animTime:
+            print("OK")
+            self.transf.rot = 0
+            self.transf.pos = vZERO
+            self.transf.scale = vONE
+            self.plank.transf.scale = vONE
+            self.deck1.enabled = True
+            self.deck2.enabled = True
+            self.enabled = False # Ngưng luôn
+            return
+
+        self.transf.rot = (1 - self.dt / self.animTime) * 90
+        self.transf.pos = self.vertical.lerp(vZERO, self.dt / self.animTime)
+        self.transf.scale = self.ratio.lerp(vONE, self.dt / self.animTime)
+        self.plank.transf.scale.y = self.dt / self.animTime
+
+    def update_render(self):
+        pass

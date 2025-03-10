@@ -1,5 +1,5 @@
 import pickle, os
-from typing import TypeVar, Type, cast
+from typing import Type, cast
 from copy import deepcopy
 from .engine import *
 
@@ -34,11 +34,11 @@ class Component:
 
 
 class Transform(Component):
-    def __init__(self, pos: tff = ZERO, pivot: tff = CENTER, rot = 0.0, scale = 1, hitbox: tff = ZERO, straight = False):
+    def __init__(self, pos: tff = ZERO, anchor: tff = CENTER, rot = 0.0, scale = 1, hitbox: tff = ZERO, straight = False):
         self.pos = vec(pos)
         self.rot = rot
         self.scale = vec(scale)
-        self.pivot = vec(pivot)
+        self.anchor = vec(anchor)
         self.straight = straight
     
         self.l_hitboxSize = vec(hitbox)
@@ -59,7 +59,7 @@ class Transform(Component):
         self.g_scale = self.scale.elementwise() * self.parent.g_scale
         rel = self.pos.elementwise() * self.parent.g_scale
         self.g_rot = self.rot + self.parent.g_rot
-        rel.rotate_ip(self.parent.g_rot)
+        rel.rotate_ip(-self.parent.g_rot)
         self.g_pos = self.parent.g_pos + rel
 
 

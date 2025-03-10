@@ -38,7 +38,7 @@ burnPreset = [
     ColorBlend([
         Blendkey((0, 0, 255, 0), 0),        # Blue alpha
         Blendkey((0, 255, 255, 255), 0.2),  # Cyan
-        Blendkey((0, 0, 255, 255), 0.3),    # Blue
+        Blendkey((0, 0, 255, 255), 0.35),    # Blue
         Blendkey((0, 0, 0, 255), 0.6),      # Black
         Blendkey((0, 0, 0, 255), 0.8),      # Black
         Blendkey((0, 0, 0, 0), 1.0),        # Black alpha
@@ -46,7 +46,7 @@ burnPreset = [
     ColorBlend([
         Blendkey((255, 0, 0, 0), 0),        # Red alpha
         Blendkey((255, 255, 0, 255), 0.2),  # Yellow
-        Blendkey((255, 0, 0, 255), 0.3),    # Red
+        Blendkey((255, 0, 0, 255), 0.35),    # Red
         Blendkey((0, 0, 0, 255), 0.6),      # Black
         Blendkey((0, 0, 0, 255), 0.8),      # Black
         Blendkey((0, 0, 0, 0), 1.0),        # Black alpha
@@ -76,6 +76,8 @@ class Shader_BurningCard(Component):
         bound = scaled * outboundness
         self.bound_size = [int(-bound.x), int(scaled.x + bound.x), 
                            int(-bound.y), int(scaled.y + bound.y)]
+        
+    def start(self):
         self.distMap = self.get_burnNoisemap()
 
     def get_burnNoisemap(self):
@@ -124,7 +126,7 @@ class Shader_BurningCard(Component):
 
     def update_render(self):
         overlay = self.dist2color(self.distMap, self.rel_time)
-        self.targetImg.set_alpha(int((1 - self.rel_time) * 255))
+        self.targetImg.set_alpha(max(0, int((1 - self.rel_time * 1.3) * 255)))
         
         rect = overlay.get_rect(center = self.transf.g_pos)
         App.display.blit(self.targetImg, rect)

@@ -30,8 +30,8 @@ if __name__ == '__main__':
     Hardcoded.create_all()    # Tạo prefab, chạy 1 lần cả đời là đủ
 
     Pytnk.start()
-    # Pytnk.load_intro()
-    Pytnk.load_maingame()
+    Pytnk.load_intro()
+    # Pytnk.load_maingame()
 
     while App.running:
         Pytnk.update()

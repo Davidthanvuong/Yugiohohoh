@@ -11,6 +11,7 @@ from time import time
 from typing import Optional as No
 from weakref import WeakMethod as weak
 from weakref import ref
+from typing import Callable, Generic, TypeVar
 from .data import *
 
 
@@ -28,7 +29,7 @@ from assets.scripts.monsterui import MonsterUI
 from assets.scripts.monster import Monster
 from assets.scripts.card import Card, CardDeck, CardSpot
 
-from .sequence import Sequence, LoadingSeq, IntroSeq
+from .sequence import Sequence, LoadingSeq, IntroSeq, MaingameSeq
 
 from .hardcoded import Hardcoded
 from .pytnk import Pytnk

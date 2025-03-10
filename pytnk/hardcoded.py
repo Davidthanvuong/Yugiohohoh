@@ -34,23 +34,30 @@ class Hardcoded:
         '''Maingame (tạm thời):
         - Carddeck của 2 người chơi
         '''
-        main = GameObject('Maingame Scene', pivot=TOPLEFT)
+        main = GameObject('Maingame Scene', anchor=TOPLEFT)
         main += Image('background\\woodfloor.jpg', (App.native[0], App.native[1] - 200))
-        plank = GameObject('Board', main, pos=(0, App.native[1] - 200), pivot=TOPLEFT)
+
+        human1 = GameObject('Human 1', main, pos=(App.center[0], -250), scale=(3, 3), rot=180) + Image("human.png", size=(500, 180))
+        human2 = GameObject('Human 2', main, pos=(App.center[0], App.native[1] + 250), scale=(3, 3)) + Image("human.png", size=(500, 180))
+        
+        plank = GameObject('Board', main, pos=(0, App.native[1] - 200), anchor=TOPLEFT, scale=(1, 0))
         plank += Image('background\\wood.jpg', (App.native[0], 200))
 
-        my_place = GameObject('My Place', main, pos=(100, 200), pivot=TOPLEFT)
-        oppo_place = GameObject('Opponent Place', main, pos=(App.native[0] - 100, 200), pivot=TOPRIGHT)
+        my_place = GameObject('My Place', main, pos=(100, 200), anchor=TOPLEFT)
+        oppo_place = GameObject('Opponent Place', main, pos=(App.native[0] - 100, 200), anchor=TOPRIGHT)
 
-        deck = GameObject('CardDeck', main, pos=(App.center[0], App.native[1] - 100)) + CardDeck(my_place)
-        oppo_deck = GameObject('CardDeck 2', main, pos=(App.center[0], -50), rot=180) + CardDeck(oppo_place, opponent=True)
+        deck = GameObject('CardDeck', main, pos=(App.center[0], App.native[1] - 100), startEnabled=False) + CardDeck(my_place)
+        oppo_deck = GameObject('CardDeck 2', main, pos=(App.center[0], -50), rot=180, startEnabled=False) + CardDeck(oppo_place, opponent=True)
 
+        main += MaingameSeq(plank, deck, oppo_deck)
         main.savePrefab(delete=True)
 
     @staticmethod
     def create_loadingScene():
         '''Cứ load thôi :v'''
-        loading = GameObject('Loading Scene', pivot=TOPLEFT) + Image('background\\grass2.jpg', App.native) + LoadingSeq(animTime = 1.5)
+        loading = GameObject('Loading Scene', anchor=TOPLEFT)
+        loading += Image('background\\willsmith.png', App.native)
+        loading += LoadingSeq(animTime = 1.5)
 
         loading.savePrefab(delete=True)
 

@@ -16,7 +16,7 @@ class IClickable(Component):
     def is_mouseInHitbox(self):
         '''Thử lấy chuột trong hitbox bằng trick xoay'''
         size = self.transf.l_hitboxSize
-        topleft = size.elementwise() * (- self.transf.pivot)
+        topleft = size.elementwise() * (- self.transf.anchor)
         bottomright = topleft + size
 
         rel = Mouse.pos - self.transf.g_pos

@@ -52,7 +52,7 @@ class Renderer(Component):
         self.c_pixels = vec(ZERO)
         self.c_topleft = vec(ZERO)
 
-    def render_lazy(self, f_getSf, force_update = False):
+    def render_lazy(self, f_getSf: Callable[[], tuple[pg.Surface, vec]], force_update = False):
         lazyImg = not force_update and (self.c_rot == self.transf.g_rot) and (self.c_scale == self.transf.g_scale)
 
         if not lazyImg:
@@ -67,7 +67,8 @@ class Renderer(Component):
             if rotatable: sf = pg.transform.rotate(sf, self.transf.g_rot)
 
             self.c_surface = sf
-            self.c_topleft = (self.c_pixels.elementwise() * (CENTER - self.transf.pivot)).rotate(self.c_rot)
+            offset = (CENTER - self.transf.anchor)
+            self.c_topleft = (self.c_pixels.elementwise() * offset).rotate(-self.c_rot)
             if self.overrideHitbox:
                 self.transf.l_hitboxSize = self.c_pixels
                 #self.transf.l_hitboxTopleft = self.c_topleft
@@ -143,7 +144,7 @@ class Text(Renderer):
 
     def getNew_textRender(self):
         sf = self.font.render(self.text, False, self.color)
-        return sf, sf.get_size()
+        return sf, vec(sf.get_size())
 
     def update_render(self):
         if hash(self.text) != self.old_hash:
