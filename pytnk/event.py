@@ -79,3 +79,22 @@ class Mouse:
 
         if cls.dragHost and not cls.dragHost():
             cls.dragHost = None
+
+
+
+class Motion:
+    def __init__(self, start, stop, duration: float):
+        self.t_start = start
+        self.t_stop = stop
+        self.duration = duration
+        self.vector = (self.t_stop - self.t_start) / self.duration
+
+    def start(self):
+        self.sinceStart = time()
+
+    def lerp(self):
+        delta = time() - self.sinceStart
+        return self.start + self.vector * delta
+    
+    def peak(self):
+        return self.t_stop

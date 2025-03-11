@@ -21,9 +21,9 @@ BOTTOMRIGHT = ONE = (1, 1)
 
 FORWARD = vec(1, 0)
 UPWARD = vec(0, -1)
+DEGREE90 = math.pi / 2
 vZERO = vec(0, 0)
 vONE = vec(1, 1)
-DEGREE90 = math.pi / 2
 
 class App:
     running = True

@@ -7,7 +7,7 @@ TCom = TypeVar("TCom", bound="Component")
 
 
 class Component:
-    e_notStarted: Event['Component'] = Event()
+    # e_notStarted: Event['Component'] = Event()
 
     def _binding(self, go: 'GameObject'):
         self.go = go
@@ -17,7 +17,7 @@ class Component:
 
         # Tránh chạy lúc edit
         if App.gameStarted: self.start()
-        else: Component.e_notStarted *= self.start
+        # else: Component.e_notStarted *= self.start
 
     def start(self): pass
     def update_logic(self): pass
@@ -67,8 +67,8 @@ class Transform(Component):
 class GameObject:
     '''GameObject dùng để chạy các components, hoạt động như Unity'''
     prefabs: dict[str, 'Transform'] = {}
-    e_goCreated: Event['GameObject'] = Event()
-    e_childsChanged: Event['GameObject'] = Event()
+    e_goCreated: Event['GameObject'] = Event()          # Do nothing
+    e_childsChanged: Event['GameObject'] = Event()      # Do nothing
     defaultParent: 'GameObject' = None # type: ignore
 
     def __init__(self, name = "", parent: No['GameObject'] = None, startEnabled = True, **kwargs):
@@ -95,12 +95,12 @@ class GameObject:
         if isinstance(com, type):
             if not self.tryGetComponent(com):
                 obj = com()
-                obj._binding(self)
                 self.coms[com] = obj
+                obj._binding(self)
         elif isinstance(com, Component):
             if not self.tryGetComponent(type(com)):
-                com._binding(self)
                 self.coms[type(com)] = com
+                com._binding(self)
         return self
 
     def __iadd__(self, com: type[TCom] | Component) -> 'GameObject':
@@ -180,7 +180,7 @@ class GameObject:
         self.exist = False
     
     @staticmethod
-    def loadPrefab(name: str, parent: No['GameObject'] = None, pos: No[vec] = None, store = True) -> 'GameObject':
+    def loadPrefab(name: str, parent: No['GameObject'] = None, pos: No[vec] = None, store = True, edit = False) -> 'GameObject':
         '''Chép hoàn toàn prefab từ bộ nhớ (store), không có thì thử mở'''
         obj = GameObject.prefabs.get(name) if store else None
  
@@ -198,10 +198,10 @@ class GameObject:
         else: GameObject.defaultParent.addChildren(deep)
         if pos: deep.transf.pos = pos
 
-        deep.restart()
+        if not edit: deep.restart()
 
         deep.name += f" ({id(deep)})"
-        print(f"Đã tạo {deep.name}")
+        # print(f"Đã tạo {deep.name}")
         return deep
 
 
@@ -210,7 +210,7 @@ class GameObject:
         path = f"assets\\prefabs\\{name if name != '' else self.name}"
         old_parent = self.parent # Không lưu parent ngoài
         if not overwrite and os.path.exists(path): 
-            print("Không thể lưu đè (overwrite = False)")
+            # print("Không thể lưu đè (overwrite = False)")
             return
         
         if self.parent:

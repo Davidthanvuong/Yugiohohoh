@@ -1,6 +1,7 @@
 from typing import Any
 from .engine import *
 
+
 class Sequence(Component):
     e_finished: Event['Sequence'] = Event()
     def __init__(self, animTime = 1.0):
@@ -29,7 +30,7 @@ class IntroSeq(Sequence):
             return
         
         percent = 1 - math.sin(self.dt / self.animTime * DEGREE90)
-        dist = (1 - percent * percent * percent) * self.splitLen
+        dist = (1 - percent ** 3) * self.splitLen
         self.logo.pos = dist * FORWARD
         self.logotext.pos = -dist * FORWARD
 
@@ -75,11 +76,9 @@ class LoadingSeq(Sequence):
 
 
 class MaingameSeq(Sequence):
-    def __init__(self, plank: GameObject, deck1: GameObject, deck2: GameObject, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, plank: GameObject, **kwargs):
+        super().__init__(animTime=0.5, **kwargs)
         self.plank = plank
-        self.deck1 = deck1
-        self.deck2 = deck2
 
     def start(self):
         super().start()
@@ -99,8 +98,7 @@ class MaingameSeq(Sequence):
             self.transf.pos = vZERO
             self.transf.scale = vONE
             self.plank.transf.scale = vONE
-            self.deck1.enabled = True
-            self.deck2.enabled = True
+            self.go.getComponent(BattleController).fight()
             self.enabled = False # Ngưng luôn
             return
 

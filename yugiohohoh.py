@@ -12,10 +12,8 @@ from pytnk.engine import *
 ########## Dành cho developer ##########
 #
 #   Thả card xuống phía dưới để undo việc triệu hồi
-#   Hiện tại chưa có cách đặt đúng quái / bảng triệu hồi của đối phương
-#   Intro vẫn chưa được thống nhất, có ý tưởng nhớ nói (Pytnk.load_intro())
 #
-#   Bug thành chức năng đi: Lá spell cho phép bóc lá của đối phương (nhưng không được nhìn)
+#   Lưu ý: Tên monster có vài cái sai dẫn đến crash
 #
 ########################################
 
@@ -29,9 +27,10 @@ if __name__ == '__main__':
     Pytnk.init()
     Hardcoded.create_all()    # Tạo prefab, chạy 1 lần cả đời là đủ
 
+    print("Started game")
     Pytnk.start()
-    Pytnk.load_intro()
-    # Pytnk.load_maingame()
+    # Pytnk.load_intro()
+    Pytnk.load_maingame()
 
     while App.running:
         Pytnk.update()

@@ -1,8 +1,7 @@
 from pytnk.engine import *
 
 class MonsterUI(Component):
-    def __init__(self, attach: 'Monster', defWidth = 100):
-        self.attach = attach
+    def __init__(self, defWidth = 100):
         self.barWidth = defWidth
         self.oldRatio = 1
         self.ratio = 1
@@ -10,6 +9,8 @@ class MonsterUI(Component):
     def start(self):
         self.defText = self.go.childs[0].getComponent(Text)
         self.atkText = self.go.childs[1].getComponent(Text)
+        assert self.go.parent
+        self.attach = self.go.parent.getComponent(Monster)
 
     def update_logic(self):
         self.ratio = self.attach.defense / self.attach.maxDefense

@@ -2,19 +2,23 @@ from pytnk.engine import *
 
 
 class Card(IClickable):
+    e_placeCard: Event['Card'] = Event()
+
     def start(self):
         self.targetPos = vec(ZERO)
         deck = self.go.tryGet_parentComponent(CardDeck)
         self.inDeck = deck is not None
         self.opponent = deck.opponent if deck else False
-        self.draggable = self.inDeck and not self.opponent
+        self.draggable = self.inDeck# and not self.opponent
         self.deck = deck
         
         self.com_img = self.go.getComponent(Image)
         if not self.opponent:
-            self.com_img.switchImage(f"card\\{choice(CardDeck.cardImages)}")
+            path = f"card\\{choice(CardDeck.cardImages)}"
+            self.com_img.switchImage(path)
 
     def update_logic(self):
+        # print(self.go.parent, self.transf.g_pos, self.inDeck)
         if self.inDeck:
             self.transf.pos = self.transf.pos.lerp(self.targetPos, 0.2)
 
@@ -36,18 +40,26 @@ class Card(IClickable):
             self.inDeck = True
             self.deck.go.addChildren(self.go)
         else:
-            burn = GameObject('Burn', pos=self.transf.g_pos)
-            burn += Shader_BurningCard(self.com_img.shared.native, self.com_img.imgsize, 
-                start_count=rint(5, 20), burn_time=rint(3, 4)*0.5)
+            burn = GameObject.loadPrefab("Burning Card", pos=self.transf.g_pos, edit=True)
+            burn.getComponent(Shader_BurningCard).bind(self.com_img)
+            burn.restart()
 
             slot = self.deck.getSlot() if self.deck else None
             pos = slot.transf.g_pos if slot else ZERO
 
             mons = GameObject('Monster', pos=pos, anchor=MIDBOTTOM)
-            mons += Image('unknown\\duck.png', (150, 135), overrideHitbox=True)
+
+            newpath = os.path.join(
+                "monster", os.path.splitext(os.path.basename(self.com_img.path))[0] + ".png"
+            )
+
+            mons += Image(newpath, (150, 135), overrideHitbox=True)
             com_mon = mons.addComponent(Monster)
 
+            GameObject.loadPrefab('Monster UI', mons)
+
             if slot: slot.getComponent(CardSpot).bind = ref(com_mon)
+            Card.e_placeCard.notify(self)
             self.go.destroy()
 
 
@@ -121,6 +133,7 @@ class CardDeck(Component):
         self.slots_filled: list[GameObject] = []
 
     def start(self):
+        print(self.go.coms)
         for i in range(self.startCount):
             card = GameObject.loadPrefab('Card', parent=self.go)
 

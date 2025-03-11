@@ -43,8 +43,9 @@ class SharedImg:
     
 
 class Renderer(Component):
-    def __init__(self, overrideHitbox = False):
+    def __init__(self, overrideHitbox = False, notLazy = False):
         self.overrideHitbox = overrideHitbox
+        self.notLazy = notLazy
 
         self.c_surface = pg.Surface((0, 0))
         self.c_rot = 69420.69420
@@ -53,7 +54,8 @@ class Renderer(Component):
         self.c_topleft = vec(ZERO)
 
     def render_lazy(self, f_getSf: Callable[[], tuple[pg.Surface, vec]], force_update = False):
-        lazyImg = not force_update and (self.c_rot == self.transf.g_rot) and (self.c_scale == self.transf.g_scale)
+        lazyImg = not force_update and not self.notLazy
+        lazyImg = lazyImg and (self.c_rot == self.transf.g_rot) and (self.c_scale == self.transf.g_scale)
 
         if not lazyImg:
             # Chỉ update lại ảnh (local) khi thay đổi kích thước hoặc góc xoay
@@ -100,6 +102,7 @@ class Image(Renderer):
         self.c_flash = False
 
     def switchImage(self, path: str, size: No[tff] = None):
+        self.path = path
         self.shared = SharedImg.getImage(path, size if size else (self.imgsize.x, self.imgsize.y))
 
     def getDefaultSf(self):

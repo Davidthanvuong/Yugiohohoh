@@ -1,5 +1,6 @@
 import pygame as pg
 from PIL import Image, ImageSequence
+from time import time
 
 def load_gif(path, size):
     #load gif và chuyển frame để scale size
@@ -16,13 +17,21 @@ def run_animation():
     screen = pg.display.set_mode((800, 600))
     clock = pg.time.Clock()
 
-    aura_path = "D:/GAMEYUGI/Yugiohohoh/assets/Animations/rias/rias_aura.gif"
-    skill_path = "D:/GAMEYUGI/Yugiohohoh/assets/Animations/rias/rias_skill.gif"
+    aura_path = "assets/Animations/rias/rias_aura.gif"
+    skill_path = "assets/Animations/rias/rias_skill.gif"
     aura_size = (300, 300)
     skill_size = (350, 100)
 
-    aura_frames = load_gif(aura_path, aura_size)
-    skill_frames = load_gif(skill_path, skill_size)
+    start = time()
+    n = 30
+    stress_test = [(load_gif(aura_path, aura_size), load_gif(skill_path, skill_size)) for _ in range(n)]
+
+    dt = time() - start
+    print(f"Thời gian load {n} Rias GIF + skills: {dt:.2f}s")
+    print(f"{n} Rias tượng trưng cho {n} con khác nhau (Ultra rare) sẽ load lúc chạy game")
+
+    aura_frames = stress_test[0][0]
+    skill_frames = stress_test[0][1]
 
     x_aura = 50  
     y_aura = 250  

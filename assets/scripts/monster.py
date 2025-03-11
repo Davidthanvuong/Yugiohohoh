@@ -1,6 +1,6 @@
 from pytnk.engine import *
 
-class Monster(IClickable):
+class Monster(Component):
     '''Triệu hồi từ card, hoặc extra thấm nếu spawn từ Monster khác luôn'''
     e_attackPhase: Event = Event()
     e_defensePhase: Event = Event()
@@ -21,20 +21,6 @@ class Monster(IClickable):
         Monster.e_defensePhase += self.defense_phase
 
     def start(self):
-        self.com_render = self.go.getComponent(Image)
-
-        # Con mej mafy di chuyển qua Hardcode đi
-        ui = GameObject("UI", self.go, pos=(-50, 0))
-
-        health = GameObject('1', ui, pos=(0, 0)) 
-        health += Image("icon\\heart.png", (20, 20))
-        health += Text("200", size=16)
-
-        attack = GameObject('2', ui, pos=(20, 20))
-        attack += Image("icon\\sword.png", (40, 40))
-        attack += Text("800", size=16)
-
-        ui += MonsterUI(self)
         self.com_img = self.go.getComponent(Image)
 
     def update_logic(self):
@@ -52,12 +38,6 @@ class Monster(IClickable):
                 self.moving = False
                 self.startMoving = False
                 self.transf.pos = self.oldPos
-
-    def on_startHover(self):
-        self.com_img.flashing = True
-
-    def on_stopHover(self):
-        self.com_img.flashing = False
 
     def on_startClick(self):
         self.attack_phase()

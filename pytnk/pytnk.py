@@ -20,7 +20,8 @@ class Pytnk:
     def start(cls):
         '''Bắt đầu game'''
         App.gameStarted = True
-        Component.e_notStarted.notify()
+        GameObject.defaultParent.restart()
+        # Component.e_notStarted.notify()
 
     @classmethod
     def update(cls):

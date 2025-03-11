@@ -16,6 +16,8 @@ class ColorBlend:
             return k.rgba
         
         keys = self.keys
+        # Bốc key nào phù hợp trong vùng r return
+        # Sắp sai thứ tự ráng chịu
         for i in range(len(self.keys) - 1):
             k1, c1 = keys[i].k, keys[i].rgba
             k2, c2 = keys[i + 1].k, keys[i + 1].rgba
@@ -23,6 +25,7 @@ class ColorBlend:
             if k1 <= t <= k2:
                 if k1 == k2: return c1
                 f = (t - k1) / (k2 - k1)
+                '''For thủ công :))'''
                 return (
                     int(c1[0] + (c2[0] - c1[0]) * f),
                     int(c1[1] + (c2[1] - c1[1]) * f),
@@ -38,7 +41,7 @@ burnPreset = [
     ColorBlend([
         Blendkey((0, 0, 255, 0), 0),        # Blue alpha
         Blendkey((0, 255, 255, 255), 0.2),  # Cyan
-        Blendkey((0, 0, 255, 255), 0.35),    # Blue
+        Blendkey((0, 0, 255, 255), 0.35),   # Blue
         Blendkey((0, 0, 0, 255), 0.6),      # Black
         Blendkey((0, 0, 0, 255), 0.8),      # Black
         Blendkey((0, 0, 0, 0), 1.0),        # Black alpha
@@ -46,7 +49,7 @@ burnPreset = [
     ColorBlend([
         Blendkey((255, 0, 0, 0), 0),        # Red alpha
         Blendkey((255, 255, 0, 255), 0.2),  # Yellow
-        Blendkey((255, 0, 0, 255), 0.35),    # Red
+        Blendkey((255, 0, 0, 255), 0.35),   # Red
         Blendkey((0, 0, 0, 255), 0.6),      # Black
         Blendkey((0, 0, 0, 255), 0.8),      # Black
         Blendkey((0, 0, 0, 0), 1.0),        # Black alpha
@@ -55,10 +58,8 @@ burnPreset = [
 
 
 class Shader_BurningCard(Component):
-    def __init__(self, targetImg: pg.Surface, imgsize: No[vec] = None, start_count = 20, outboundness = 0.2, 
+    def __init__(self, start_count = 20, outboundness = 0.2, 
                  noiseStrength = 3, iv_res = 5, burn_time = 1.5):
-        self.targetImg = targetImg.copy()
-        self.imgsize = imgsize if imgsize else vec(self.targetImg.get_size())
         self.burn_time = burn_time
         self.iv_res = iv_res                    # Inverse resolution - Kích thước mô phỏng. CPU lag lỏ 2 fps
         
@@ -70,14 +71,18 @@ class Shader_BurningCard(Component):
         self.rel_time = 0.0
         self.blend = choice(burnPreset)
 
+        
+    def bind(self, target: Image):
+        self.targetImg = target.shared.native.copy()
+        self.imgsize = target.imgsize
         self.sinceStart = time()
+
         scaled = self.imgsize / self.iv_res
         self.sim_size = (int(scaled.x), int(scaled.y))
-        bound = scaled * outboundness
+        bound = scaled * self.outboundness
         self.bound_size = [int(-bound.x), int(scaled.x + bound.x), 
                            int(-bound.y), int(scaled.y + bound.y)]
         
-    def start(self):
         self.distMap = self.get_burnNoisemap()
 
     def get_burnNoisemap(self):
