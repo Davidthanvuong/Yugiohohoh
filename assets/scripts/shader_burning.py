@@ -58,7 +58,13 @@ burnPreset = [
 
 
 class Shader_BurningCard(Component):
-    def __init__(self, start_count = 20, outboundness = 0.2, 
+    @staticmethod
+    def create_default(pos: vec, img: Image):
+        burn = GameObject("Burning Card", pos=(pos.x, pos.y))
+        burn += Shader_BurningCard(img)
+        return burn
+
+    def __init__(self, target: Image, start_count = 20, outboundness = 0.2, 
                  noiseStrength = 3, iv_res = 5, burn_time = 1.5):
         self.burn_time = burn_time
         self.iv_res = iv_res                    # Inverse resolution - Kích thước mô phỏng. CPU lag lỏ 2 fps
@@ -70,12 +76,10 @@ class Shader_BurningCard(Component):
 
         self.rel_time = 0.0
         self.blend = choice(burnPreset)
-
         
-    def bind(self, target: Image):
         self.targetImg = target.shared.native.copy()
         self.imgsize = target.imgsize
-        self.sinceStart = time()
+        self.sinceStart = now()
 
         scaled = self.imgsize / self.iv_res
         self.sim_size = (int(scaled.x), int(scaled.y))
@@ -123,7 +127,7 @@ class Shader_BurningCard(Component):
         return sf
 
     def update_logic(self):
-        dt = time() - self.sinceStart
+        dt = now() - self.sinceStart
         self.rel_time = dt / self.burn_time
 
         if dt >= self.burn_time:
@@ -134,5 +138,5 @@ class Shader_BurningCard(Component):
         self.targetImg.set_alpha(max(0, int((1 - self.rel_time * 1.3) * 255)))
         
         rect = overlay.get_rect(center = self.transf.g_pos)
-        App.display.blit(self.targetImg, rect)
-        App.display.blit(overlay, rect)
+        App.screen.blit(self.targetImg, rect)
+        App.screen.blit(overlay, rect)

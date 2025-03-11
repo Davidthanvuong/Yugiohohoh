@@ -36,7 +36,8 @@ class App:
     devNative = (native[0] + 500, native[1])
     vNative = vec(native)
     center = (native[0] // 2, native[1] // 2)
-    display: pg.Surface
+    iv_ratio = native[1] / native[0]
+    screen: pg.Surface
 
 
 class Color:

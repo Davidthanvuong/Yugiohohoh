@@ -1,16 +1,30 @@
 from pytnk.engine import *
 
 class MonsterUI(Component):
-    def __init__(self, defWidth = 100):
+    @staticmethod
+    def create_default(attach: 'Monster'):
+        ui = GameObject("Monster UI", attach.go, pos=(-50, 0))
+
+        health = GameObject('1', ui, pos=(0, 0)) 
+        health += Image("icon\\heart.png", (20, 20))
+        health += Text("200", size=16)
+
+        attack = GameObject('2', ui, pos=(20, 20))
+        attack += Image("icon\\sword.png", (40, 40))
+        attack += Text("800", size=16)
+
+        ui += MonsterUI(attach)
+        return ui
+
+    def __init__(self, attach: 'Monster', defWidth = 100):
         self.barWidth = defWidth
         self.oldRatio = 1
         self.ratio = 1
+        self.attach = attach
 
-    def start(self):
+    def after_init(self):
         self.defText = self.go.childs[0].getComponent(Text)
         self.atkText = self.go.childs[1].getComponent(Text)
-        assert self.go.parent
-        self.attach = self.go.parent.getComponent(Monster)
 
     def update_logic(self):
         self.ratio = self.attach.defense / self.attach.maxDefense
@@ -19,8 +33,8 @@ class MonsterUI(Component):
 
     def update_render(self):
         # Blit primitive shape
-        pg.draw.rect(App.display, Color.white,      (self.transf.g_pos, (self.barWidth * self.oldRatio, 10)))
-        pg.draw.rect(App.display, Color.freedom,    (self.transf.g_pos, (self.barWidth * self.ratio, 10)))
-        pg.draw.rect(App.display, Color.black,      (self.transf.g_pos, (self.barWidth, 10)), 2)
+        pg.draw.rect(App.screen, Color.white,      (self.transf.g_pos, (self.barWidth * self.oldRatio, 10)))
+        pg.draw.rect(App.screen, Color.freedom,    (self.transf.g_pos, (self.barWidth * self.ratio, 10)))
+        pg.draw.rect(App.screen, Color.black,      (self.transf.g_pos, (self.barWidth, 10)), 2)
 
         self.oldRatio = (self.oldRatio * 10 + self.ratio) / (10 + 1)

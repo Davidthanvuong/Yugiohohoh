@@ -76,7 +76,7 @@ class Renderer(Component):
                 #self.transf.l_hitboxTopleft = self.c_topleft
 
         rect = self.c_surface.get_rect(center = self.transf.g_pos + self.c_topleft)
-        App.display.blit(self.c_surface, rect)
+        App.screen.blit(self.c_surface, rect)
     
     def __getstate__(self):
         state = super().__getstate__()

@@ -1,37 +1,36 @@
 from .engine import *
 
 class Pytnk:
-    root: 'GameObject'
     clock = pg.time.Clock()
     heldEsc = False
 
     @classmethod
-    def init(cls):
+    def start(cls):
         '''Bắt đầu pygame như bth thôi'''
         pg.init()
-        App.display = pg.display.set_mode(App.native)
+        App.screen = pg.display.set_mode(App.native)
         pg.display.set_caption("PyTNK @ Yugiohohoh (09/03)")
-        GameObject.defaultParent = cls.root = GameObject('Root')
+        App.gameStarted = True
+        root = GameObject('Root')
 
-        Sequence.e_finished += cls.sequenceHandler
+        # root.restart()
+
+        # Sequence.e_finished += cls.sequenceHandler
         #cls.root += FPSCounter()
 
-    @classmethod
-    def start(cls):
-        '''Bắt đầu game'''
-        App.gameStarted = True
-        GameObject.defaultParent.restart()
-        # Component.e_notStarted.notify()
+    # @classmethod
+    # def start(cls):
+    #     '''Bắt đầu game'''
+    #     # Component.e_notStarted.notify()
 
     @classmethod
     def update(cls):
         if cls.input_handler(): return
-        cls.event_handler()
-        cls.root.update_logic()
-        cls.root.update_click()
-        cls.root.update_render()
+        GameObject.root.update_logic()
+        GameObject.root.update_click()
+        GameObject.root.update_render()
         pg.display.update()
-        App.display.fill(Color.black)
+        App.screen.fill(Color.black)
 
         cls.clock.tick(App.targetFPS)
 
@@ -39,22 +38,18 @@ class Pytnk:
     def input_handler(cls):
         if pgpeek(pg.QUIT):
             App.running = False
-            return False
+            return True
 
         cls.try_toggleDev()
         Mouse.update_mouse()
-        
-    @classmethod
-    def event_handler(cls):
-        pass#
 
-    @classmethod
-    def sequenceHandler(cls, seq: Sequence):
-        if isinstance(seq, IntroSeq): 
-            cls.load_loadingScreen()
+    # @classmethod
+    # def sequenceHandler(cls, seq: Sequence):
+    #     if isinstance(seq, IntroSeq): 
+    #         cls.load_loadingScreen()
 
-        elif isinstance(seq, LoadingSeq): 
-            cls.load_maingame()
+    #     elif isinstance(seq, LoadingSeq): 
+    #         cls.load_maingame()
 
     @classmethod
     def try_toggleDev(cls):

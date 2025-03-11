@@ -14,6 +14,10 @@ from pytnk.engine import *
 #   Thả card xuống phía dưới để undo việc triệu hồi
 #
 #   Lưu ý: Tên monster có vài cái sai dẫn đến crash
+#   - Bug: Drag thẻ bài đối phương sẽ báo lỗi (đang sửa cho skill đó)
+#   - Bug: Click CardSlot lâu lâu bị giữ lại và không nhả ra được
+# 
+#   - Vẫn chưa sinh thêm thẻ hay cho opponent tấn công
 #
 ########################################
 
@@ -24,13 +28,9 @@ if __name__ == '__main__':
     CardDeck.cardImages = [f for f in os.listdir(path) if 
                             os.path.isfile(os.path.join(path, f))]
 
-    Pytnk.init()
-    Hardcoded.create_all()    # Tạo prefab, chạy 1 lần cả đời là đủ
-
-    print("Started game")
     Pytnk.start()
-    # Pytnk.load_intro()
-    Pytnk.load_maingame()
+    IntroSeq.create_default()
+    # Maingame_beginSeq.create_default()
 
     while App.running:
         Pytnk.update()

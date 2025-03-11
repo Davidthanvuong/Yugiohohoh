@@ -8,18 +8,18 @@ TCom = TypeVar("TCom", bound="Component")
 
 class Component:
     # e_notStarted: Event['Component'] = Event()
+    @staticmethod
+    def create_default() -> 'GameObject':
+        raise NotImplementedError("Nah bro.")
 
     def _binding(self, go: 'GameObject'):
-        self.go = go
         if not isinstance(self, Transform): # Tự nó reference chính nó :skull_emoji:
             self.transf = go.transf
-        self.enabled = True
+        self.go = go
+        self.activated = True
+        if App.gameStarted: self.after_init()
 
-        # Tránh chạy lúc edit
-        if App.gameStarted: self.start()
-        # else: Component.e_notStarted *= self.start
-
-    def start(self): pass
+    def after_init(self): pass
     def update_logic(self): pass
     def update_click(self): pass
     def update_render(self): pass
@@ -47,7 +47,7 @@ class Transform(Component):
         self.g_rot = rot
         self.g_scale = vec(scale)
 
-    def start(self):
+    def after_init(self):
         self.parent = self.go.parent.transf if self.go.parent else None
 
     def update_logic(self):
@@ -66,29 +66,32 @@ class Transform(Component):
 
 class GameObject:
     '''GameObject dùng để chạy các components, hoạt động như Unity'''
+    
     prefabs: dict[str, 'Transform'] = {}
-    e_goCreated: Event['GameObject'] = Event()          # Do nothing
-    e_childsChanged: Event['GameObject'] = Event()      # Do nothing
-    defaultParent: 'GameObject' = None # type: ignore
+    root: 'GameObject' = None # type: ignore
+    scope: No['GameObject'] = None
 
-    def __init__(self, name = "", parent: No['GameObject'] = None, startEnabled = True, **kwargs):
+    def __init__(self, name: str = "", parent: No['GameObject'] = None, startEnabled = True, toScope = False, **kwargs):
         self.name = name if name != "" else f"Object {id(self)}"
-        
         self.childs: list['GameObject'] = []
         self.coms: dict[type[Component], Component] = {}
+
         self.parent = parent
 
         self.transf: 'Transform'
         self += Transform(**kwargs)
         self.transf = self.getComponent(Transform)
 
-        if parent: parent.childs.append(self)
-        elif GameObject.defaultParent:
-            GameObject.defaultParent.addChildren(self)
+        if parent:              parent.childs.append(self)
+        elif GameObject.scope:  GameObject.scope.addChildren(self)
+        elif GameObject.root:   GameObject.root.addChildren(self)
+        else:                   GameObject.root = self
+
+        if toScope: GameObject.scope = self
 
         self.enabled = startEnabled
         self.exist = True
-        GameObject.e_goCreated(self)
+        # GameObject.e_goCreated(self)
 
     def __add__(self, com: type[TCom] | Component) -> 'GameObject':
         '''Tạo liên tiếp các components'''
@@ -124,26 +127,29 @@ class GameObject:
     def removeParent(self):
         if self.parent:
             self.parent.removeChildren(self)
-            GameObject.e_childsChanged(self)
+            # GameObject.e_childsChanged(self)
 
     def addChildren(self, go: 'GameObject'):
         '''Nhận nuôi GameObject, kết nối parent <---> children'''
         self.childs.append(go)
         go.parent = self
         go.transf.parent = self.transf
-        GameObject.e_childsChanged(self)
+        # GameObject.e_childsChanged(self)
 
     def removeChildren(self, go: 'GameObject'):
         '''Jack bỏ con'''
         self.childs.remove(go)
-        GameObject.defaultParent.addChildren(go)
-        go.transf.parent = GameObject.defaultParent.transf
-        GameObject.e_childsChanged(self)
+        GameObject.root.addChildren(go)
+        go.transf.parent = GameObject.root.transf
+        # GameObject.e_childsChanged(self)
+
+    def unscope(self):
+        GameObject.scope = None
 
     def update_logic(self):
         if not self.enabled: return
         for com in self.coms.values():
-            if com.enabled: com.update_logic()
+            if com.activated: com.update_logic()
 
         for child in self.childs:
             child.update_logic()
@@ -151,7 +157,7 @@ class GameObject:
     def update_click(self):
         if not self.enabled: return
         for com in reversed(self.coms.values()):
-            if com.enabled: com.update_click()
+            if com.activated: com.update_click()
 
         for child in reversed(self.childs):
             child.update_click()
@@ -159,7 +165,7 @@ class GameObject:
     def update_render(self):
         if not self.enabled: return
         for com in self.coms.values():
-            if com.enabled: com.update_render()
+            if com.activated: com.update_render()
 
         for child in self.childs:
             child.update_render()
@@ -167,7 +173,7 @@ class GameObject:
     def restart(self):
         '''Khuyên chỉ dùng sau khi tạo prefab'''
         for com in self.coms.values():
-            com.start()
+            com.after_init()
 
         for child in self.childs:
             child.restart()
@@ -195,7 +201,7 @@ class GameObject:
         
         deep = deepcopy(cast('GameObject', obj))
         if parent: parent.addChildren(deep)
-        else: GameObject.defaultParent.addChildren(deep)
+        else: GameObject.root.addChildren(deep)
         if pos: deep.transf.pos = pos
 
         if not edit: deep.restart()
