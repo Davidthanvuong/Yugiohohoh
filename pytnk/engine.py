@@ -6,8 +6,7 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from enum import Enum
 from random import randint as rint
-from random import uniform
-from random import choice
+from random import uniform, choice, choices, shuffle
 from time import time as now
 from typing import Optional as No
 from weakref import WeakMethod as weak
@@ -29,8 +28,10 @@ from assets.scripts.shader_burning import Shader_BurningCard, ColorBlend, Blendk
 from assets.scripts.shader_popupText import Shader_PopupText
 
 # Code
+from assets.scripts.monsterdata import MonsterData
 from assets.scripts.monsterui import MonsterUI
 from assets.scripts.monster import Monster
+# from assets.scripts.card_old import Card, CardDeck, CardSlot
 from assets.scripts.card import Card, CardDeck, CardSlot
 
 # Manager

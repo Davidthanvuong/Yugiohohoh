@@ -1,213 +1,224 @@
 from pytnk.engine import *
 
-
 class Card(IClickable):
     e_placeCard: Event['Card'] = Event()
 
     @staticmethod
-    def create_default(parent: No[GameObject] = None, opponent = False):
+    def create(deck: No['CardDeck'] = None):
+        parent = deck.go if deck else None
         card = GameObject('Card', parent, pos=(0, 300))
         card += Image(f"card_back.png", (150, 240), overrideHitbox=True)
-        card += Card(opponent)
+        card += Card(deck)
 
-    def __init__(self, opponent = False, **kw):
-        super().__init__(draggable=True, **kw)
-        self.opponent = opponent
+        return card
+
+    def __init__(self, deck: No['CardDeck'] = None):
+        self.inDeck = deck is not None
+        super().__init__(draggable=self.inDeck) # type: ignore
+        self.deck = deck
+        self.user = deck.user if deck else None
+        self.isOpponent = self.user.isOpponent if self.user else False
+        self.glidePos = vec(ZERO)
+        self.oldIndex = -1
 
     def after_init(self):
-        self.targetPos = vec(ZERO)
-        deck = self.go.tryGet_parentComponent(CardDeck)
-        self.inDeck = deck is not None
-        self.opponent = deck.opponent if deck else False
-        self.draggable = self.inDeck# and not self.opponent
-        self.deck = deck
-        
+        self.data = MonsterData.getRandom()
+
         self.com_img = self.go.getComponent(Image)
-        if not self.opponent:
-            path = f"card\\{choice(CardDeck.cardImages)}"
+        if not self.isOpponent:
+            path = f"card\\{self.data.card_path}"
             self.com_img.switchImage(path)
 
     def update_logic(self):
-        # print(self.go.parent, self.transf.g_pos, self.inDeck)
+        self.draggable = (self.user is not None) and self.user.turn_cardPlaceLeft > 0
         if self.inDeck:
-            self.transf.pos = self.transf.pos.lerp(self.targetPos, 0.2)
+            self.transf.pos = self.transf.pos.lerp(self.glidePos, 0.1)
 
-    def on_startHover(self):
-        self.transf.scale *= 1.1
-
-    def on_stopHover(self):
-        self.transf.scale /= 1.1
+    def on_startHover(self): self.transf.scale *= 1.1
+    def on_stopHover(self):  self.transf.scale /= 1.1
 
     def on_startDrag(self, controlled = False):
         self.transf.rot = 0.0
         self.inDeck = False
-        self.go.removeParent()
+        self.oldIndex = self.go.removeParent()
         if not controlled:
             super().on_startDrag()
 
     def on_stopDrag(self):
-        if self.opponent:
-            dist = self.transf.g_pos.y
+        if not self.deck: return
+        if self.isOpponent:
+              dist = self.transf.g_pos.y + 100
         else: dist = App.native[1] - self.transf.g_pos.y
-        if self.deck and dist <= 200:
-            self.inDeck = True
-            self.deck.go.addChildren(self.go)
+
+        if dist > 200:
+            slot = CardSlot.getHoveredSlot(self.isOpponent)
+            if slot:
+                burn = Shader_BurningCard.create(self.transf.g_pos, self.com_img)
+                Monster.create(slot.transf.g_pos, self.data, slot)
+                Card.e_placeCard.notify(self)
+                self.deck.user.turn_cardPlaceLeft -= 1
+                return self.go.destroy()
         else:
-            burn = Shader_BurningCard.create_default(self.transf.g_pos, self.com_img)
-            slot = CardSlot.ownHoveredSlot(self.opponent)
-            mon = Monster.create_default(slot.transf.g_pos, slot)
-
-            # slot = self.deck.getSlot() if self.deck else None
-            # pos = slot.transf.g_pos if slot else ZERO
-
-            # mons = GameObject('Monster', pos=pos, anchor=MIDBOTTOM)
-
-            # newpath = os.path.join(
-            #     "monster", os.path.splitext(os.path.basename(self.com_img.path))[0] + ".png"
-            # )
-
-            # mons += Image(newpath, (150, 135), overrideHitbox=True)
-            # com_mon = mons.addComponent(Monster)
-
-            # GameObject.loadPrefab('Monster UI', mons)
-
-            # if slot: slot.getComponent(CardSlot).bind = ref(com_mon)
-            Card.e_placeCard.notify(self)
-            self.go.destroy()
+            self.oldIndex = -1 # Muốn sắp xếp thì làm vậy
+            
+        # Undo về deck cũ
+        self.inDeck = True
+        self.deck.go.insertChildren(self.go, self.oldIndex)
+        self.transf.pos -= self.deck.transf.g_pos
 
 
 
 class CardSlot(IClickable):
-    rt_dragId: tuple[No['CardSlot'], int] = (None, -1)
-    rt_selectId: tuple[No['CardSlot'], int] = (None, -1)
-    slots_empty: list['CardSlot'] = []
-    slots_filled: list['CardSlot'] = []
-    free_count: list[int] = [0, 0]
+    my_slots  : list['CardSlot'] = []
+    oppo_slots: list['CardSlot'] = []
+
+    dragging  : No['CardSlot'] = None
+    selecting : No['CardSlot'] = None
+    
+    @staticmethod
+    def getHoveredSlot(isOpponent: bool, bothSide = False) -> 'CardSlot | None':
+        select = CardSlot.selecting
+        if not select: return None
+        if not bothSide and (select.isOpponent != isOpponent): return None
+        return select
 
     @staticmethod
-    def create_default(parent: No['GameObject'] = None, x = 0, y = 0, opponent = False, **kw):
-        forward = -1 if opponent else 1
-        slot = GameObject('Card Slot', parent, pos=(forward * x * 150, y * 120), **kw)
+    def getAvailableSlot(mySide: bool, oppoSide: bool, searchOccupied = False) -> 'CardSlot':
+        total: list[CardSlot] = []
+        if mySide: total += CardSlot.my_slots
+        if oppoSide: total += CardSlot.oppo_slots
+        shuffle(total)
+
+        print("[WARNING] getAvailableSlot bay game nếu không có slot trống")
+        for slot in total:
+            occupied = slot.isOccupied()
+            if occupied == searchOccupied: return slot
+        raise Exception("Full")
+    
+    @staticmethod
+    def getState(allEmpty: bool, isOpponent: bool) -> bool:
+        slots = CardSlot.oppo_slots if isOpponent else CardSlot.my_slots
+
+        if allEmpty: # Ngưng khi có 1 cái không rỗng
+            for slot in slots:
+                if slot.isOccupied(): return False
+            return True
+        
+        # Ngưng khi có 1 cái rỗng
+        for slot in slots:
+            if not slot.isOccupied(): return False
+        return True
+
+    @staticmethod
+    def create(slots: 'GameObject', user: 'UserControl', x = 0, y = 0, **kw):
+        forward = -1 if user.isOpponent else 1
+        slotId = (x * 5 + y) + (user.isOpponent * 100)
+        slot = GameObject('Card Slot', slots, pos=(forward * x * 150, y * 120), **kw)
         slot += Image("card_back.png", (120, 80), overrideHitbox=True)
-        slot += CardSlot(x + y * 5, opponent)
+        slot += CardSlot(user, slotId)
 
-    @staticmethod
-    def ownHoveredSlot(opponent = False, includeOpposite = False):
-        select = CardSlot.rt_selectId[0]
-        if select is not None and select.side == opponent and not select.occupied:
-            slot = select
-        elif CardSlot.free_count[opponent] != 0:
-            slot = CardSlot.slots_empty[0]
-            # Chỉ search có trùng phe hay không khi includeOpposite = True
-            while (not includeOpposite) and (slot.side != opponent):
-                slot = choice(CardSlot.slots_empty)
-        else:
-            raise ValueError("Không chỗ nào phù hợp cả")
-
-        CardSlot.slots_empty.remove(slot)
-        CardSlot.slots_filled.append(slot)
-        CardSlot.free_count[opponent] -= 1
-        slot.occupied = True
-        return slot
-
-    def __init__(self, startId = -1, opponent = False, **kwargs):
-        super().__init__(draggable=True, **kwargs)
-        self.startId = startId
-        self.side = opponent
-        self.occupied = False
-        self.bind: No[ref[Monster]] = None
-        CardSlot.free_count[opponent] += 1
-        CardSlot.slots_empty.append(self)
+    def __init__(self, user: 'UserControl', myId = -1):
+        super().__init__(draggable=True)
+        self.myId = myId
+        self.user = user
+        self.isOpponent = user.isOpponent
+        self.occupy: No[ref[Monster]] = None
+        if self.isOpponent:
+              CardSlot.oppo_slots.append(self)
+        else: CardSlot.my_slots.append(self)
 
     def after_init(self):
         self.com_img = self.go.getComponent(Image)
 
     def update_logic(self):
-        selecting = CardSlot.rt_selectId[0] is self
-        dragging = CardSlot.rt_dragId[0] is self
+        selecting = CardSlot.selecting is self
+        dragging = CardSlot.dragging is self
         self.com_img.flashing = selecting or dragging
     
     def on_startHover(self):
-        # if CardSlot.rt_dragId[0] is not self:
-        CardSlot.rt_selectId = (self, self.startId)
+        CardSlot.selecting = self
 
     def on_stopHover(self):
-        if CardSlot.rt_selectId[0] is self:
-            CardSlot.rt_selectId = (None, -2)
+        if CardSlot.selecting is self:
+            CardSlot.selecting = None
 
     def on_startDrag(self):
-        if CardSlot.rt_dragId[0] is None:
-            CardSlot.rt_dragId = (self, self.startId)
+        if CardSlot.dragging is None:
+            CardSlot.dragging = self
 
     def on_dragging(self):
-        # Đè lên tính năng drag (không cho phép drag vật, chỉ drag mũi tên)
-        pass
+        pass # Đè lên tính năng drag (không cho phép drag vật, chỉ drag mũi tên)
 
     def on_stopDrag(self):
-        # Check trước khi hủy, tạm thời chỉ in
-        if CardSlot.rt_dragId[0] is self and CardSlot.rt_selectId[0] is not None:
-            print(f"{CardSlot.rt_dragId[1]} --> {CardSlot.rt_selectId[1]}")
-            if self.bind:
-                mons = self.bind()
-                if mons:
-                    mons.moving = True
-                    mons.targetPos = CardSlot.rt_selectId[0].transf.g_pos
-            CardSlot.rt_dragId = (None, -1)
-            CardSlot.rt_selectId = (None, -2)
+        drag = CardSlot.dragging
+        select = CardSlot.selecting
+        if (drag is None) or (select is None):
+           CardSlot.dragging = None
+           return 
+        if (drag is not self): return
+        print(f"{drag.myId} --> {select.myId}")
+        CardSlot.dragging = None
+        CardSlot.selecting = None
+
+        if (self.user.turn_heroActionLeft <= 0) or (not select.isOccupied()): 
+            print(f"[{self.myId} {self.user.go.name}] Hết lượt, hết cứu. Khỏi đánh")
+            return
+        if not self.occupy: return
+        mon = self.occupy() # Test weakref và di chuyển monster đến vị trí slot
+        if not mon: return
+
+        if mon.isOpponent != select.isOpponent: # Khác phe thì đánh
+              mon.trigger_attack(select)
+        else: mon.trigger_support(select)
 
     def update_render(self):
-        if CardSlot.rt_dragId[0] is not self: return
-        assert CardSlot.rt_dragId[0] is not None # Chắc chắn không thể xảy ra
+        if (not CardSlot.dragging) or (CardSlot.dragging is not self): return
 
-        pos1 = CardSlot.rt_dragId[0].transf.g_pos
-        if CardSlot.rt_selectId[0] is not None:
-            pos2 = CardSlot.rt_selectId[0].transf.g_pos
-        else: pos2 = Mouse.pos
+        pos1 = CardSlot.dragging.transf.g_pos
+        select = CardSlot.selecting
+        pos2 = select.transf.g_pos if select else Mouse.pos
         pg.draw.line(App.screen, Color.forward, pos1, pos2, 5)
 
+    def getOccupy(self) -> 'Monster':
+        '''Dám làm thì cho làm'''
+        return self.occupy() # type: ignore
+    
+    def tryGetOccupy(self) -> 'Monster | None':
+        return self.occupy() if self.occupy else None
+
+    def isOccupied(self) -> bool:
+        return (self.occupy is not None) and (self.occupy() is not None)
 
 class CardDeck(Component):
-    cardImages: list[str] = []
-
     @staticmethod
-    def create_default(parent: No[GameObject] = None, opponent = False, **kw):
-        if opponent:
-            deck = GameObject('CardDeck', parent, pos=(App.center[0], 0), rot=180)
-        else: deck = GameObject('CardDeck', parent, pos=(App.center[0], App.native[1] - 100))
-        deck += CardDeck(deck, opponent, **kw)
+    def create(sync: 'UserControl', **kw):
+        if sync.isOpponent:
+            deck = GameObject('CardDeck', sync.go, pos=(App.center[0], -50), rot=180)
+        else: deck = GameObject('CardDeck', sync.go, pos=(App.center[0], App.native[1] - 100))
+        deck += CardDeck(sync, **kw)
 
-        for i in range(8): # TODO: Start count
-            Card.create_default(deck, opponent)
         return deck
-
-    def __init__(self, slotsGO: GameObject, opponent = False, arc = 50, height = 1200, startCount = 12):
+    
+    def __init__(self, sync: 'UserControl', arc = 48, height = 1200, maxFrac = 6, initialCount = 8):
+        self.user = sync
         self.arc = arc
-        self.slotsGO = slotsGO
         self.height = height
-        self.opponent = opponent
-        self.startCount = startCount
-        # self.slots_empty: list[GameObject] = []
-        # self.slots_filled: list[GameObject] = []
+        self.user = sync
+        self.maxFrac = maxFrac
+        self.initialCount = initialCount
+        sync.deck = self
 
-    # def after_init(self):
-        
-            # card = GameObject.loadPrefab('Card', parent=self.go)
-
-    #     for y in range(5):
-    #         for x in range(3):
-    #             inverse = -1 if self.opponent else 1
-    #             pos = vec(x * 150 * inverse, y * 120)
-    #             # slot = GameObject(f"Slot {y*5 + x}", self.slotsGO, pos=pos)
-    #             slot = GameObject.loadPrefab('Card Placeholder', parent=self.slotsGO, pos=pos)
-    #             slot.getComponent(CardSlot).startId = y * 5 + x
-    #             self.slots_empty.append(slot)
+    def after_init(self):
+        for _ in range(self.initialCount):
+            Card.create(self)
 
     def update_logic(self):
         cards = self.go.childs
         n = len(cards)
 
         center = - UPWARD * self.height
+        spanning = min(self.arc, self.maxFrac * n)
         for i, card in enumerate(cards):
-            frac = (i - n / 2 + 0.5) / n * self.arc
-            card.getComponent(Card).targetPos = center + (UPWARD * self.height).rotate(frac)
+            frac = (i - n / 2 + 0.5) / n * spanning
+            card.getComponent(Card).glidePos = center + (UPWARD * self.height).rotate(frac)
             card.transf.rot = -frac

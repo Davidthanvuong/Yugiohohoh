@@ -2,16 +2,16 @@ from pytnk.engine import *
 
 class MonsterUI(Component):
     @staticmethod
-    def create_default(attach: 'Monster'):
+    def create(attach: 'Monster'):
         ui = GameObject("Monster UI", attach.go, pos=(-50, 0))
 
-        health = GameObject('1', ui, pos=(0, 0)) 
+        health = GameObject('1', ui, pos=(0, 0), anchor=MIDLEFT) 
         health += Image("icon\\heart.png", (20, 20))
-        health += Text("200", size=16)
+        health += Text("0?", size=16)
 
-        attack = GameObject('2', ui, pos=(20, 20))
+        attack = GameObject('2', ui, pos=(20, 20), anchor=MIDLEFT)
         attack += Image("icon\\sword.png", (40, 40))
-        attack += Text("800", size=16)
+        attack += Text("0?", size=16)
 
         ui += MonsterUI(attach)
         return ui
@@ -29,7 +29,7 @@ class MonsterUI(Component):
     def update_logic(self):
         self.ratio = self.attach.defense / self.attach.maxDefense
         self.defText.text = str("%.0f" % self.attach.defense)
-        # self.atkText.text = str(self.attach.attack)
+        self.atkText.text = str(self.attach.attack)
 
     def update_render(self):
         # Blit primitive shape

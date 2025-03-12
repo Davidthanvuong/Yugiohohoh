@@ -2,7 +2,7 @@ from .engine import *
 
 class IntroSeq(Component):
     @staticmethod
-    def create_default(**kw):
+    def create(**kw):
         intro = GameObject("Intro", pos=App.center, toScope=True)
         intro += Image('background\\yugioh_bg.jpg', App.native)
 
@@ -26,7 +26,7 @@ class IntroSeq(Component):
 
     def update_logic(self):
         if self.motion.completed:
-            StartMenu.create_default()
+            StartMenu.create()
             return self.go.destroy()
 
         dist = self.motion.value
@@ -37,33 +37,33 @@ class IntroSeq(Component):
 
 class StartMenu(Component):
     @staticmethod
-    def create_default(**kw):
+    def create(**kw):
         menu = GameObject('Start Menu', anchor=TOPLEFT)
         menu += Image('background\\willsmith.png', App.native)
         menu += StartMenu(**kw)
 
         button = GameObject('Start Button', menu, pos=App.center, anchor=CENTER)
         button += Image('icon\\pytnk.png', (200, 100))
-        button += Text('Start Game', color=Color.black, size=40)
+        button += Text('Start Game', size=40)
 
         return menu
 
     def update_logic(self):
         if Mouse.clicked:
-            LoadingSeq.create_default()
+            LoadingSeq.create()
             return self.go.destroy()
 
 
 
 class LoadingSeq(Component):
     @staticmethod
-    def create_default(**kw):
+    def create(**kw):
         loading = GameObject('Loading Scene', anchor=TOPLEFT)
         loading += Image('background\\willsmith.png', App.native)
         loading += LoadingSeq(**kw)
         return loading
 
-    def __init__(self, cellsize = 50, waveLength = 10, animTime = 1.5):
+    def __init__(self, cellsize = 50, waveLength = 15, animTime = 1.2):
         self.cellsize = cellsize
         self.waveLength = max(waveLength, 1)
         self.grid = (App.native[0] // cellsize, App.native[1] // cellsize)
@@ -72,7 +72,7 @@ class LoadingSeq(Component):
 
     def update_logic(self):
         if self.motion.completed:
-            Maingame_beginSeq.create_default()
+            Maingame_beginSeq.create()
             return self.go.destroy()
 
     def update_render(self):
@@ -94,7 +94,7 @@ class LoadingSeq(Component):
 
 class Maingame_beginSeq(Component):
     @staticmethod
-    def create_default():
+    def create():
         vertical_pos = vec((App.center[0] - App.center[1]) / App.iv_ratio, App.native[1])
 
         main = GameObject('Maingame Scene', anchor=TOPLEFT, toScope=True,
@@ -107,8 +107,8 @@ class Maingame_beginSeq(Component):
         plank = GameObject('Board', pos=(0, App.native[1] - 200), anchor=TOPLEFT)
         plank += Image('background\\wood.jpg', (App.native[0], 200))
 
-        coin = GameObject('Coin', pos=(App.center[0], App.center[1] // 2), anchor=CENTER)
-        coin += Image('doge.png', (256, 256), notLazy=True)
+        coin = GameObject('Coin', pos=(App.center[0], App.center[1] - 100), anchor=CENTER, startEnabled=False)
+        coin += Image('doge.png', (256, 256), notLazy=True, flippable=True)
 
         main += Maingame_beginSeq(human1, human2, coin)
         # main += BattleController()
@@ -116,7 +116,7 @@ class Maingame_beginSeq(Component):
         return main
 
     def __init__(self, human1: GameObject, human2: GameObject, coin: GameObject, 
-                 zoomTime = 1.0, walkTime = 0.8, tossTime = 0.6):
+                 zoomTime = 1.0, walkTime = 0.8, tossTime = 0.2):
         self.human1 = human1.transf
         self.human2 = human2.transf
         self.coin = coin.transf
@@ -130,6 +130,7 @@ class Maingame_beginSeq(Component):
         self.startedZoom = False
         self.finishedZoom = False
         self.finishedToss = False
+        self.oppo_startFirst = False
         self.walking = Motion.ease_out(250, 600, walkTime)
 
     def update_logic(self):
@@ -167,7 +168,9 @@ class Maingame_beginSeq(Component):
             self.transf.pos = vZERO
             self.transf.scale = vONE
             self.finishedZoom = True
-            self.toss = Motion.linear(0, rint(5, 6), self.tossTime)
+            self.oppo_startFirst = True if rint(0, 1) else False
+            self.toss = Motion.linear(0, 5 + self.oppo_startFirst, self.tossTime)
+            self.coin.go.enabled = True
 
             print("[TODO] Start game text here")
             print(f"Zoom completed {now()}")
@@ -180,15 +183,13 @@ class Maingame_beginSeq(Component):
 
     def toss_coin(self):
         if self.toss.completed:
-            opponent_startFirst = self.coin.rot == 180
-            print(opponent_startFirst)
-            Maingame.create_default(opponent_startFirst)
-            self.fadeMotion = Motion.ease_in(255, 0, 1.0)
+            Maingame.create(self.oppo_startFirst)
+            self.coin.scale.y = 1 - (self.oppo_startFirst * 2)
+            self.fadeMotion = Motion.ease_in(255, 0, 1.5)
             self.finishedToss = True
             return
         
-        self.coin.scale.y = self.toss.value % 1
-        self.coin.rot = (int(self.toss.value) % 2) * 180
+        self.coin.scale.y = (self.toss.value % 2) - 1
 
     def toss_fading(self):
         if self.fadeMotion.completed:

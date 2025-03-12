@@ -97,7 +97,7 @@ class Shader_PopupText(Text):
 
     def playText(self, text: str):
         self.playing = True
-        self.sinceStart = time()
+        self.sinceStart = now()
         self.text = text
         print("start running")
 
@@ -106,7 +106,7 @@ class Shader_PopupText(Text):
 
     def update_logic(self):
         if not self.playing: return
-        self.ratio = (time() - self.sinceStart) / self.animTime
+        self.ratio = (now() - self.sinceStart) / self.animTime
         if self.ratio >= 1:
             self.playing = False
             print("Disabled")

@@ -12,25 +12,25 @@ from pytnk.engine import *
 ########## Dành cho developer ##########
 #
 #   Thả card xuống phía dưới để undo việc triệu hồi
+#   Thả lên trên ô của mình bên trái mới triệu hồi được
 #
-#   Lưu ý: Tên monster có vài cái sai dẫn đến crash
-#   - Bug: Drag thẻ bài đối phương sẽ báo lỗi (đang sửa cho skill đó)
-#   - Bug: Click CardSlot lâu lâu bị giữ lại và không nhả ra được
-# 
-#   - Vẫn chưa sinh thêm thẻ hay cho opponent tấn công
+#   Hiện tại chưa implement Spell card hay Trap card
+#   Bot thực hiện được 2 chức năng nếu có thể:
+#   - Đánh đối phương
+#   - Đặt lá xuống bàn
+#
+#   Bug: Game bắt đầu từ đối phương bị bug thẻ bài 
+#        từ đâu xuất hiện không đúng chỗ
+#
+#   Sẽ implement sau mấy thằng đệ tự động đánh
 #
 ########################################
 
 
 if __name__ == '__main__':
-    # TODO: Move to runtime data fetcher class?
-    path = "assets\\images\\card"
-    CardDeck.cardImages = [f for f in os.listdir(path) if 
-                            os.path.isfile(os.path.join(path, f))]
-
     Pytnk.start()
-    IntroSeq.create_default()
-    # Maingame_beginSeq.create_default()
+    IntroSeq.create()
+    # Maingame_beginSeq.create()
 
     while App.running:
         Pytnk.update()

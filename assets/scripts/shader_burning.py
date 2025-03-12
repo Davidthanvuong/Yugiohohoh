@@ -59,7 +59,7 @@ burnPreset = [
 
 class Shader_BurningCard(Component):
     @staticmethod
-    def create_default(pos: vec, img: Image):
+    def create(pos: vec, img: Image):
         burn = GameObject("Burning Card", pos=(pos.x, pos.y))
         burn += Shader_BurningCard(img)
         return burn

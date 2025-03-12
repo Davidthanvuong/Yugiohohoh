@@ -15,13 +15,13 @@ class IClickable(Component):
 
     def is_mouseInHitbox(self):
         '''Thử lấy chuột trong hitbox bằng trick xoay'''
-        size = self.transf.l_hitboxSize
+        size = self.transf.l_hitboxSize.elementwise() * self.transf.g_scale
         topleft = size.elementwise() * (- self.transf.anchor)
         bottomright = topleft + size
 
         rel = Mouse.pos - self.transf.g_pos
         if not self.transf.straight:
-            rel.rotate_ip(-self.transf.rot)
+            rel.rotate_ip(-self.transf.g_rot)
 
         #print(topleft.x, rel.x, bottomright.x, "and", topleft.y, rel.y, bottomright.y)
         return (topleft.x <= rel.x <= bottomright.x) and \

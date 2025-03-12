@@ -9,7 +9,7 @@ TCom = TypeVar("TCom", bound="Component")
 class Component:
     # e_notStarted: Event['Component'] = Event()
     @staticmethod
-    def create_default() -> 'GameObject':
+    def create() -> 'GameObject':
         raise NotImplementedError("Nah bro.")
 
     def _binding(self, go: 'GameObject'):
@@ -83,8 +83,8 @@ class GameObject:
         self.transf = self.getComponent(Transform)
 
         if parent:              parent.childs.append(self)
-        elif GameObject.scope:  GameObject.scope.addChildren(self)
-        elif GameObject.root:   GameObject.root.addChildren(self)
+        elif GameObject.scope:  GameObject.scope.insertChildren(self)
+        elif GameObject.root:   GameObject.root.insertChildren(self)
         else:                   GameObject.root = self
 
         if toScope: GameObject.scope = self
@@ -124,14 +124,18 @@ class GameObject:
         '''Tìm component từ parent'''
         return self.parent.tryGetComponent(com) if self.parent else None
 
-    def removeParent(self):
+    def removeParent(self) -> int:
         if self.parent:
+            index = self.parent.childs.index(self)
             self.parent.removeChildren(self)
+            return index
+        return -1
             # GameObject.e_childsChanged(self)
 
-    def addChildren(self, go: 'GameObject'):
+    def insertChildren(self, go: 'GameObject', index = -1):
         '''Nhận nuôi GameObject, kết nối parent <---> children'''
-        self.childs.append(go)
+        if index == -1: self.childs.append(go)
+        else: self.childs.insert(index, go)
         go.parent = self
         go.transf.parent = self.transf
         # GameObject.e_childsChanged(self)
@@ -139,7 +143,7 @@ class GameObject:
     def removeChildren(self, go: 'GameObject'):
         '''Jack bỏ con'''
         self.childs.remove(go)
-        GameObject.root.addChildren(go)
+        GameObject.root.insertChildren(go)
         go.transf.parent = GameObject.root.transf
         # GameObject.e_childsChanged(self)
 
@@ -179,11 +183,11 @@ class GameObject:
             child.restart()
 
     def destroy(self):
-        print(f"Destroy {self.name}")
         if self.parent:
             self.parent.childs.remove(self)
         self.enabled = False
         self.exist = False
+        # print(f"Destroyed {self.name}")
     
     @staticmethod
     def loadPrefab(name: str, parent: No['GameObject'] = None, pos: No[vec] = None, store = True, edit = False) -> 'GameObject':
@@ -200,8 +204,8 @@ class GameObject:
             raise FileNotFoundError(f"Không tìm thấy prefab {name}")
         
         deep = deepcopy(cast('GameObject', obj))
-        if parent: parent.addChildren(deep)
-        else: GameObject.root.addChildren(deep)
+        if parent: parent.insertChildren(deep)
+        else: GameObject.root.insertChildren(deep)
         if pos: deep.transf.pos = pos
 
         if not edit: deep.restart()
@@ -228,5 +232,5 @@ class GameObject:
         
         print(f"Đã lưu {path}")
         if not delete and old_parent: 
-            old_parent.addChildren(self)
+            old_parent.insertChildren(self)
         if delete: self.destroy()

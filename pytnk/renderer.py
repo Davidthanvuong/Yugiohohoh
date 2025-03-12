@@ -43,9 +43,10 @@ class SharedImg:
     
 
 class Renderer(Component):
-    def __init__(self, overrideHitbox = False, notLazy = False):
+    def __init__(self, overrideHitbox = False, flippable = False, notLazy = False):
         self.overrideHitbox = overrideHitbox
         self.notLazy = notLazy
+        self.flippable = flippable
 
         self.c_surface = pg.Surface((0, 0))
         self.c_rot = 69420.69420
@@ -59,13 +60,21 @@ class Renderer(Component):
 
         if not lazyImg:
             # Chỉ update lại ảnh (local) khi thay đổi kích thước hoặc góc xoay
-            oldSf, imgsize = f_getSf()
+            sf, imgsize = f_getSf()
             self.c_rot = self.transf.g_rot
             self.c_scale = self.transf.g_scale.copy()
             self.c_pixels = self.c_scale.elementwise() * imgsize
+            if self.flippable:
+                if self.c_scale.x < 0: 
+                    sf = pg.transform.flip(sf, True, False)
+                    self.c_pixels.x = abs(self.c_pixels.x)
+                if self.c_scale.y < 0:
+                    sf = pg.transform.flip(sf, False, True)
+                    self.c_pixels.y = abs(self.c_pixels.y)
+
             rotatable = not self.transf.straight and not (-1.0 <= self.c_rot <= 1.0)
 
-            sf = pg.transform.scale(oldSf, self.c_pixels)
+            sf = pg.transform.scale(sf, self.c_pixels)
             if rotatable: sf = pg.transform.rotate(sf, self.transf.g_rot)
 
             self.c_surface = sf
