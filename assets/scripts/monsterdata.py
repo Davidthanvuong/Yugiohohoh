@@ -7,13 +7,14 @@ weights: list[float] = []
 @dataclass
 class MonsterData:
     '''Thông tin và dữ liệu của mấy thằng triệu hồi'''
-    name: str           # Thông tin chung
+    name: str
     description: str
     drop_rate: float
-    card_path: str      # Thông tin thẻ
+    card_path: str
     # placing_effect
     baseATK: int
     baseDEF: int
+    _monsterClass: No[type['Monster']] = None
 
     def __post_init__(self):
         database[self.name] = self
@@ -24,36 +25,11 @@ class MonsterData:
         return os.path.join("monster", os.path.splitext(
             os.path.basename(self.card_path))[0] + ".png")
 
+    @property
+    def monster(self):
+        assert self._monsterClass is not None
+        return self._monsterClass
+
     @staticmethod
     def getRandom():
         return choices(listed, weights, k=1)[0]
-
-
-
-Rias = MonsterData(
-    name = 'Rias',
-    description = 'Một con quỷ đẹp',
-    drop_rate = 0.0001,
-    card_path = 'rias.jpg',
-    baseATK = 20000,
-    baseDEF = 7000
-)
-
-Akeno = MonsterData(
-    name = 'Akeno',
-    description = 'Một con quỷ xinh',
-    drop_rate = 0.0002,
-    card_path = 'akeno.jpg',
-    baseATK = 15000,
-    baseDEF = 8000
-)
-
-Dragon = MonsterData(
-    name = 'Dragon',
-    description = 'Con rồng',
-    drop_rate = 0.009,
-    card_path = 'dragon.jpg',
-    baseATK = 10000,
-    baseDEF = 10000
-)
-

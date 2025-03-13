@@ -17,7 +17,7 @@ class Monster(Component):
         mon = GameObject('Monster', pos=(pos.x, pos.y), anchor=MIDBOTTOM)
         mon += Image(data.get_monsterPath(), (150, 135), overrideHitbox=True)
         user = slot.user if slot else None
-        com = mon.addComponent(Monster(data, user, slot))
+        com = mon.addComponent(data.monster(data, user, slot))
 
         MonsterUI.create(com)
         return mon
@@ -173,12 +173,19 @@ class Monster(Component):
     
 
 
-# '''Gà code, ghét hướng đối tượng? Đừng lo. 
-# Đã có hàm thập cẩm. Cân mọi loại nhu cầu cho quái common'''
-# class Dragon(Monster): pass
+'''Gà code, ghét hướng đối tượng? Đừng lo. 
+Đã có hàm thập cẩm. Cân mọi loại nhu cầu cho quái common'''
+class Dragon(Monster): pass
 
-# def dragon_attack(self: Dragon):
-#     target = self.getTarget()
-#     self.moveToward(target.transf.g_pos, 0.5)
+def dragon_attack(self: Dragon):
+    self.isAttacking = True # TODO: Refactor lại OpponentControl để loại luôn biến này
 
-# Dragon.on_attack = dragon_attack
+    yield from self.moveTo_target(self.getTarget(), 0.4)
+    yield from self.anim_attack(1)
+    self.dealDamage()
+    yield from self.moveBack(0.4)
+
+    self.isAttacking = False
+    if self.user: self.user.turn_heroActionLeft -= 1
+
+Dragon.action_attack = dragon_attack

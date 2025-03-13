@@ -54,7 +54,7 @@ class Card(IClickable):
             slot = CardSlot.getHoveredSlot(self.isOpponent)
             if slot:
                 burn = Shader_BurningCard.create(self.transf.g_pos, self.com_img)
-                Monster.create(slot.transf.g_pos, self.data, slot)
+                self.data.monster.create(slot.transf.g_pos, self.data, slot)
                 Card.e_placeCard.notify(self)
                 self.deck.user.turn_cardPlaceLeft -= 1
                 return self.go.destroy()

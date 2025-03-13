@@ -34,6 +34,7 @@ from assets.scripts.monsterui import MonsterUI
 from assets.scripts.monster import Monster
 from assets.scripts.card import Card, CardDeck
 
+from assets.scripts.data_implement import *
 # Manager
 # from assets.scripts.battlemanager import BattleManager
 from assets.scripts.playercontrol import UserControl, PlayerControl
