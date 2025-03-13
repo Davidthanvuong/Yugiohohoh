@@ -37,4 +37,4 @@ class MonsterUI(Component):
         pg.draw.rect(App.screen, Color.freedom,    (self.transf.g_pos, (self.barWidth * self.ratio, 10)))
         pg.draw.rect(App.screen, Color.black,      (self.transf.g_pos, (self.barWidth, 10)), 2)
 
-        self.oldRatio = (self.oldRatio * 10 + self.ratio) / (10 + 1)
+        self.oldRatio = (self.oldRatio * 20 + self.ratio) / (20 + 1)

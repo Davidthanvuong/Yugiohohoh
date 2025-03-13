@@ -10,10 +10,8 @@ class MonsterData:
     name: str           # Thông tin chung
     description: str
     drop_rate: float
-
     card_path: str      # Thông tin thẻ
     # placing_effect
-
     baseATK: int
     baseDEF: int
 

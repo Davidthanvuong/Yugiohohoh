@@ -1,6 +1,5 @@
 from pytnk.engine import *
 
-
 #   _   _        _  _                                  _      _  _ 
 #  | | | |      | || |                                | |    | || |
 #  | |_| |  ___ | || |  ___     __      __ ___   _ __ | |  __| || |
@@ -19,10 +18,10 @@ from pytnk.engine import *
 #   - Đánh đối phương
 #   - Đặt lá xuống bàn
 #
-#   Bug: Game bắt đầu từ đối phương bị bug thẻ bài 
+#   Bug: 
+#   - Game bắt đầu từ đối phương bị bug thẻ bài 
 #        từ đâu xuất hiện không đúng chỗ
-#
-#   Sẽ implement sau mấy thằng đệ tự động đánh
+#   - Đổi action lúc chết dẫn đến quái bất tử
 #
 ########################################
 

@@ -45,8 +45,8 @@ class OpponentControl(UserControl):
             print("[Opponent] Pick card có khả năng")
 
         if (self.turn_heroActionLeft > 0):
-            attackSide_notEmpty = not CardSlot.getState(allEmpty=True, isOpponent=True)
-            defendSide_notEmpty = not CardSlot.getState(allEmpty=True, isOpponent=False)
+            attackSide_notEmpty = not CardSlot.getState(allEmpty=True, search=True)
+            defendSide_notEmpty = not CardSlot.getState(allEmpty=True, search=False)
             if attackSide_notEmpty and defendSide_notEmpty:
                 actions.append((self.act_start_heroAction, self.act_doing_heroAction))
                 minmax.append(self.act_point_heroAction())
@@ -94,10 +94,12 @@ class OpponentControl(UserControl):
 
     def act_start_heroAction(self):
         print("[Opponent] Selecting attack...")
-        self.attacker = CardSlot.getAvailableSlot(False, True, True).getOccupy()
+        atk = self.attacker = CardSlot.getAvailableSlot(False, True, True).occupy
         targetSlot = CardSlot.getAvailableSlot(True, False, True)
-        self.attacker.trigger_attack(targetSlot)
+        atk.setTarget(targetSlot)
+        atk.action = atk.action_attack()
 
     def act_doing_heroAction(self):
-        if not self.attacker.attacking:
+        if not self.attacker.isAttacking:
             self.inAction = None
+            print("EHHHE")

@@ -26,7 +26,8 @@ class Motion:
     def completed(self):
         return now() - self.sinceStart >= self.duration
     
+    def sleep(*a: Any):                 return Motion(lambda t: t, 0, 1, *a)
     def linear(*a: Any):                return Motion(lambda t: t, *a)
     def ease_out(*a: Any):              return Motion(lambda t: 1 - math.sin(t * DEGREE90), *a)
-    def ease_in(*a: Any):              return Motion(lambda t: 1 - math.cos(t * DEGREE90), *a)
+    def ease_in(*a: Any):               return Motion(lambda t: 1 - math.cos(t * DEGREE90), *a)
     def ease_out_cubic(*a: Any):        return Motion(lambda t: 1 - (1 - math.sin(t * DEGREE90)) ** 3, *a)

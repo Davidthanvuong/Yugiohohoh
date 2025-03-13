@@ -28,11 +28,11 @@ from assets.scripts.shader_burning import Shader_BurningCard, ColorBlend, Blendk
 from assets.scripts.shader_popupText import Shader_PopupText
 
 # Code
+from assets.scripts.cardslot import CardSlot
 from assets.scripts.monsterdata import MonsterData
 from assets.scripts.monsterui import MonsterUI
 from assets.scripts.monster import Monster
-# from assets.scripts.card_old import Card, CardDeck, CardSlot
-from assets.scripts.card import Card, CardDeck, CardSlot
+from assets.scripts.card import Card, CardDeck
 
 # Manager
 # from assets.scripts.battlemanager import BattleManager
