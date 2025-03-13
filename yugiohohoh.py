@@ -29,8 +29,8 @@ from pytnk.engine import *
 
 if __name__ == '__main__':
     Pytnk.start()
-    IntroSeq.create()
-    # Maingame_beginSeq.create()
+    # IntroSeq.create()
+    Maingame_beginSeq.create()
 
     while App.running:
         Pytnk.update()

@@ -1,5 +1,7 @@
 from pytnk.engine import *
 
+from pytnk.engine import *
+
 class Monster(Component):
     '''Triệu hồi từ card, hoặc extra thấm nếu spawn từ Monster khác luôn'''
 
@@ -89,3 +91,74 @@ class Monster(Component):
             if self.slot:
                 self.slot.occupy = None
             self.go.destroy()
+
+# class Monster2(Component):
+#     '''Triệu hồi từ card, hoặc extra thấm nếu spawn từ Monster khác luôn'''
+
+#     @staticmethod
+#     def create(pos: vec, data: MonsterData, slot: No['CardSlot'] = None):
+#         mon = GameObject('Monster', pos=(pos.x, pos.y), anchor=MIDBOTTOM)
+#         mon += Image(data.get_monsterPath(), overrideHitbox=True)
+#         user = slot.user if slot else None
+#         com = mon.addComponent(Monster2(data, user, slot))
+
+#         MonsterUI.create(com)
+
+#         return mon
+
+#     def __init__(self, data: MonsterData, user: No['UserControl'] = None, slot: No['CardSlot'] = None):
+#         self.isOpponent = user.isOpponent if user else False
+#         self.data = data
+#         self.slot = slot
+#         self.user = user
+#         if slot: slot.occupy = ref(self)
+
+#         self.monsterName = data.name
+#         self.defense = self.maxDefense = data.baseDEF
+#         self.attack = data.baseATK
+
+#         self.deathTime = 0.0
+#         self.deathFlash = False
+
+#         self.targetSlot: No['CardSlot'] = None
+#         self.controlledTarget: No['CardSlot'] = None    # Đè lên target gốc
+
+#     def after_init(self):
+#         self.com_img = self.go.getComponent(Image)
+
+#     def update_logic(self):
+#         pass
+
+#     # Yield yield yield
+#     def on_attack(self): pass
+#     def on_defend(self): pass
+#     def on_support(self): pass
+#     def on_death(self): pass
+#     def on_useSkill(self): pass
+#     def on_chargeSkill(self): pass
+
+#     # Hàm hỗ trợ
+#     def bot_evaluate(self):
+#         return 1.0
+#     def receiveDamage(self, source: 'Monster', damage: float): pass
+#     def previewAttack(self): pass
+#     def moveToward(self, dest: vec, time: float): pass
+#     def setTarget(self, slot: 'CardSlot'): pass
+#     def getTarget(self) -> 'CardSlot':
+#         '''Bốc target, không có thì lấy random'''
+#         if self.controlledTarget:
+#             return self.controlledTarget
+#         if not self.targetSlot:
+#             self.targetSlot = CardSlot.getAvailableSlot(self.isOpponent, not self.isOpponent, True)
+#         return self.targetSlot
+
+
+# '''Gà code, ghét hướng đối tượng? Đừng lo. 
+# Đã có hàm thập cẩm. Cân mọi loại nhu cầu cho quái common'''
+# class Dragon(Monster): pass
+
+# def dragon_attack(self: Dragon):
+#     target = self.getTarget()
+#     self.moveToward(target.transf.g_pos, 0.5)
+
+# Dragon.on_attack = dragon_attack

@@ -88,8 +88,8 @@ class EndPhaseButton(IClickable):
         bottom = (App.native[0] - 20, App.native[1] - 50) 
 
         button = GameObject('End Phase Button', user.go, pos=bottom, anchor=BOTTOMRIGHT, startEnabled=False)
-        button += Image("icon\\white.png", (150, 40), overrideHitbox=True)
-        button += Text("End Phase", size=20, color=Color.black)
+        button += Image("icon\\white.png", (200, 40), overrideHitbox=True)
+        button += Text("End", size=20, color=Color.black)
         button += EndPhaseButton(user)
         return button
 
