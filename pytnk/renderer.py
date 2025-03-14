@@ -12,21 +12,6 @@ class SharedImg:
 
         self.whiteImg = None
 
-    # def fillColor(self, color: RGB):
-        img = self.native
-        
-           
-    def getWhiteImage(self):
-        if not self.whiteImg:
-            img = self.whiteImg = self.native.copy()
-            for y in range(img.get_height()):
-                for x in range(img.get_width()):
-                    imgcolor = img.get_at((x, y))
-                    if imgcolor.a > 0:
-                        img.set_at((x, y), Color.white)
-
-        return self.whiteImg
-
     @classmethod
     def getImage(cls, path: str, size: tff = ZERO):
         sh = cls.img_db.get(path)
@@ -43,10 +28,14 @@ class SharedImg:
     
 
 class Renderer(Component):
-    def __init__(self, overrideHitbox = False, flippable = False, notLazy = False):
+    def __init__(self, overrideHitbox = False, support_overlay = False, support_flip = False, notLazy = False):
         self.overrideHitbox = overrideHitbox
         self.notLazy = notLazy
-        self.flippable = flippable
+        self.support_flip = support_flip
+        self.support_overlay = support_overlay
+
+        self.overlay_opacity = 0
+        self.overlay_color: RGB = Color.white
 
         self.c_surface = pg.Surface((0, 0))
         self.c_rot = 69420.69420
@@ -54,6 +43,15 @@ class Renderer(Component):
         self.c_pixels = vec(ZERO)
         self.c_topleft = vec(ZERO)
 
+    def try_flipping(self, sf: pg.Surface):
+        if self.c_scale.x < 0: 
+            sf = pg.transform.flip(sf, True, False)
+            self.c_pixels.x = abs(self.c_pixels.x)
+        if self.c_scale.y < 0:
+            sf = pg.transform.flip(sf, False, True)
+            self.c_pixels.y = abs(self.c_pixels.y)
+        return sf
+    
     def render_lazy(self, f_getSf: Callable[[], tuple[pg.Surface, vec]], force_update = False):
         lazyImg = not force_update and not self.notLazy
         lazyImg = lazyImg and (self.c_rot == self.transf.g_rot) and (self.c_scale == self.transf.g_scale)
@@ -64,38 +62,41 @@ class Renderer(Component):
             self.c_rot = self.transf.g_rot
             self.c_scale = self.transf.g_scale.copy()
             self.c_pixels = self.c_scale.elementwise() * imgsize
-            if self.flippable:
-                if self.c_scale.x < 0: 
-                    sf = pg.transform.flip(sf, True, False)
-                    self.c_pixels.x = abs(self.c_pixels.x)
-                if self.c_scale.y < 0:
-                    sf = pg.transform.flip(sf, False, True)
-                    self.c_pixels.y = abs(self.c_pixels.y)
-
-            rotatable = not self.transf.straight and not (-1.0 <= self.c_rot <= 1.0)
+            if self.support_flip:
+                self.try_flipping(sf)
 
             sf = pg.transform.scale(sf, self.c_pixels)
-            if rotatable: sf = pg.transform.rotate(sf, self.transf.g_rot)
+            
+            rotatable = not self.transf.straight and not (-0.5 <= self.c_rot <= 0.5)
+            if rotatable: sf = pg.transform.rotate(sf, self.c_rot)
 
-            self.c_surface = sf
             offset = (CENTER - self.transf.anchor)
+            self.c_surface = sf
+            if self.support_overlay:
+                ov = self.c_overlay = sf.copy()
+                ov.fill(self.overlay_color, special_flags=pg.BLEND_ADD)
             self.c_topleft = (self.c_pixels.elementwise() * offset).rotate(-self.c_rot)
+
             if self.overrideHitbox:
                 self.transf.l_hitboxSize = self.c_pixels
-                #self.transf.l_hitboxTopleft = self.c_topleft
 
         rect = self.c_surface.get_rect(center = self.transf.g_pos + self.c_topleft)
         App.screen.blit(self.c_surface, rect)
+
+        if self.support_overlay and self.overlay_opacity != 0:
+            self.c_overlay.set_alpha(self.overlay_opacity)
+            App.screen.blit(self.c_overlay, rect)
+        
+
+    # def __getstate__(self):
+    #     state = super().__getstate__()
+    #     state.pop("c_surface", None)
+    #     return state
     
-    def __getstate__(self):
-        state = super().__getstate__()
-        state.pop("c_surface", None)
-        return state
-    
-    def __setstate__(self, state):
-        super().__setstate__(state)
-        self.c_lazy = False
-        self.c_surface = pg.Surface((0, 0))
+    # def __setstate__(self, state):
+    #     super().__setstate__(state)
+    #     self.c_lazy = False
+    #     self.c_surface = pg.Surface((0, 0))
 
 
 
@@ -107,30 +108,27 @@ class Image(Renderer):
         self.path = path
         self.shared = SharedImg.getImage(path, size)
         self.imgsize = vec(size if size != ZERO else self.shared.native.get_size())
-        self.flashing = False
-        self.c_flash = False
 
     def switchImage(self, path: str, size: No[tff] = None):
         self.path = path
         self.shared = SharedImg.getImage(path, size if size else (self.imgsize.x, self.imgsize.y))
 
     def getDefaultSf(self):
-        sf = self.shared.getWhiteImage() if self.flashing else self.shared.native
+        sf = self.shared.native
         return sf, self.imgsize
 
     def update_render(self):
-        self.render_lazy(self.getDefaultSf, self.flashing != self.c_flash)
-        self.c_flash = self.flashing
+        self.render_lazy(self.getDefaultSf)
     
-    def __getstate__(self):
-        state = super().__getstate__()
-        state.pop("shared", None)
-        return state
+    # def __getstate__(self):
+    #     state = super().__getstate__()
+    #     state.pop("shared", None)
+    #     return state
     
-    def __setstate__(self, state):
-        super().__setstate__(state)
-        self.c_updated = False
-        self.shared = SharedImg.getImage(self.path)
+    # def __setstate__(self, state):
+    #     super().__setstate__(state)
+    #     self.c_updated = False
+    #     self.shared = SharedImg.getImage(self.path)
 
 
 
@@ -145,15 +143,6 @@ class Text(Renderer):
         self.old_hash = hash(text)
         self.color = color
 
-    def __getstate__(self):
-        state = super().__getstate__()
-        state.pop("font", None)
-        return state
-    
-    def __setstate__(self, state):
-        super().__setstate__(state)
-        self.font = SharedImg.getFont(self.fontdir[0], self.fontdir[1])
-
     def getNew_textRender(self):
         sf = self.font.render(self.text, False, self.color)
         return sf, vec(sf.get_size())
@@ -164,6 +153,16 @@ class Text(Renderer):
             self.old_hash = hash(self.text)
         else: force = False
         self.render_lazy(self.getNew_textRender, force)
+    
+    # def __getstate__(self):
+    #     state = super().__getstate__()
+    #     state.pop("font", None)
+    #     return state
+    
+    # def __setstate__(self, state):
+    #     super().__setstate__(state)
+    #     self.font = SharedImg.getFont(self.fontdir[0], self.fontdir[1])
+
 
 # class Text(Renderer):
 #     '''Ghi chữ có tiện ích ở đây'''

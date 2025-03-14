@@ -29,12 +29,12 @@ from assets.scripts.shader_popupText import Shader_PopupText
 
 # Code
 from assets.scripts.cardslot import CardSlot
-from assets.scripts.monsterdata import MonsterData
+from assets.scripts.carddata import MonsterData, SpellData, TrapData
 from assets.scripts.monsterui import MonsterUI
-from assets.scripts.monster import Monster
+from assets.scripts.monster import Monster, Spell, Trap
 from assets.scripts.card import Card, CardDeck
 
-from assets.scripts.data_implement import *
+from assets.scripts.carddata_implement import *
 # Manager
 # from assets.scripts.battlemanager import BattleManager
 from assets.scripts.playercontrol import UserControl, PlayerControl

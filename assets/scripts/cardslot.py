@@ -1,64 +1,112 @@
 from pytnk.engine import *
+from itertools import chain
 
 class CardSlot(IClickable):
-    my_slots  : list['CardSlot'] = []
-    oppo_slots: list['CardSlot'] = []
-
     dragging  : No['CardSlot'] = None
     selecting : No['CardSlot'] = None
+    sides: tuple[list['CardSlot'], list['CardSlot']] = ([], [])
+    
+    # Generator và dãy hỗ trợ
+    @staticmethod
+    def getSide(side: int):
+        if side == BOTH:
+              slots = list(chain(CardSlot.sides[PLAYER], CardSlot.sides[OPPONENT]))
+        else: slots = list(CardSlot.sides[side])
+        shuffle(slots)
+        yield from slots
+
+    @staticmethod
+    def get_occupiedSlots(side: int):
+        yield from (slot for slot in CardSlot.getSide(side) if slot.isOccupied())
+
+    @staticmethod
+    def get_emptySlots(side: int):
+        yield from (slot for slot in CardSlot.getSide(side) if not slot.isOccupied())
+
+    @staticmethod
+    def getAny_occupiedSlot(side: int):
+        return next(CardSlot.get_occupiedSlots(side))
+
+    @staticmethod
+    def getAny_emptySlot(side: int):
+        return next(CardSlot.get_emptySlots(side))
+
+    @staticmethod
+    def getAny_occupiedFrontSlot(side: int):
+        assert side != BOTH
+        frontline = [10, 11, 12, 13, 14]
+        shuffle(frontline)
+        for slot in frontline:
+            slot = CardSlot.sides[side][slot]
+            if slot.isOccupied(): return slot
+            
+        return CardSlot.getAny_occupiedSlot(side)
+
+    @staticmethod
+    def isEmpty(side: int):
+        return not any(slot.isOccupied() for slot in CardSlot.getSide(side))
     
     @staticmethod
-    def getHoveredSlot(isOpponent: bool, bothSide = False) -> 'CardSlot | None':
+    def isAnySideEmpty():
+        return CardSlot.isEmpty(PLAYER) or CardSlot.isEmpty(OPPONENT)
+
+    @staticmethod
+    def isFull(side: int):
+        return all(slot.isOccupied() for slot in CardSlot.getSide(side))
+
+    @staticmethod
+    def get_hoveredSlot(side: int) -> 'CardSlot | None':
         select = CardSlot.selecting
         if not select: return None
-        if not bothSide and (select.isOpponent != isOpponent): return None
+        if (side != BOTH) and (select.side != side): return None
         return select
 
-    @staticmethod
-    def getAvailableSlot(mySide: bool, oppoSide: bool, searchOccupied = False, getAny = False) -> 'CardSlot':
-        total: list[CardSlot] = []
-        if mySide: total += CardSlot.my_slots
-        if oppoSide: total += CardSlot.oppo_slots
-        if getAny: return choice(total)
-        shuffle(total)
+    # @staticmethod
+    # def getAvailableSlot(mySide: bool, oppoSide: bool, searchOccupied = False, getAny = False) -> 'CardSlot':
+    #     total: list[CardSlot] = []
+    #     if mySide: total += CardSlot.my_slots
+    #     if oppoSide: total += CardSlot.oppo_slots
+    #     if getAny: return choice(total)
+    #     shuffle(total)
 
-        print("[WARNING] getAvailableSlot bay game nếu không có slot trống")
-        for slot in total:
-            occupied = slot.isOccupied()
-            if occupied == searchOccupied: return slot
-        raise Exception("Full")
+    #     print("[WARNING] getAvailableSlot bay game nếu không có slot trống")
+    #     for slot in total:
+    #         occupied = slot.isOccupied()
+    #         if occupied == searchOccupied: return slot
+    #     raise Exception("Full")
     
-    @staticmethod
-    def getState(allEmpty: bool, search: bool) -> bool:
-        slots = CardSlot.oppo_slots if search else CardSlot.my_slots
+    # @staticmethod
+    # def getState(allEmpty: bool, search: bool) -> bool:
+    #     slots = CardSlot.oppo_slots if search else CardSlot.my_slots
 
-        if allEmpty: # Ngưng khi có 1 cái không rỗng
-            for slot in slots:
-                if slot.isOccupied(): return False
-            return True
+    #     if allEmpty: # Ngưng khi có 1 cái không rỗng
+    #         for slot in slots:
+    #             if slot.isOccupied(): return False
+    #         return True
         
-        # Ngưng khi có 1 cái rỗng
-        for slot in slots:
-            if not slot.isOccupied(): return False
-        return True
+    #     # Ngưng khi có 1 cái rỗng
+    #     for slot in slots:
+    #         if not slot.isOccupied(): return False
+    #     return True
+
+    
 
     @staticmethod
     def create(slots: 'GameObject', user: 'UserControl', x = 0, y = 0, **kw):
-        forward = -1 if user.isOpponent else 1
-        slotId = (x * 5 + y) + (user.isOpponent * 100)
+        forward = -1 if user.side else 1
+        slotId = (x * 5 + y) + (user.side * 100)
         slot = GameObject('Card Slot', slots, pos=(forward * x * 150, y * 120), **kw)
-        slot += Image("card_back.png", (120, 80), overrideHitbox=True)
+        slot += Image("card_back.png", (120, 80), support_overlay=True, overrideHitbox=True)
         slot += CardSlot(user, slotId)
 
     def __init__(self, user: 'UserControl', myId = -1):
         super().__init__(draggable=True)
         self.myId = myId
         self.user = user
-        self.isOpponent = user.isOpponent
+        self.side = user.side
         self._occupy: No[ref[Monster]] = None
-        if self.isOpponent:
-              CardSlot.oppo_slots.append(self)
-        else: CardSlot.my_slots.append(self)
+        self.selectMotion = Motion.linear(0, 150, 0.3, True, True)
+        CardSlot.sides[self.side].append(self)
 
     def after_init(self):
         self.com_img = self.go.getComponent(Image)
@@ -66,7 +114,6 @@ class CardSlot(IClickable):
     def update_logic(self):
         selecting = CardSlot.selecting is self
         dragging = CardSlot.dragging is self
-        self.com_img.flashing = selecting or dragging
     
     def on_startHover(self):
         CardSlot.selecting = self
@@ -75,14 +122,19 @@ class CardSlot(IClickable):
         if CardSlot.selecting is self:
             CardSlot.selecting = None
 
+
     def on_startDrag(self):
         if CardSlot.dragging is None:
             CardSlot.dragging = self
+            self.selectMotion.start()
 
     def on_dragging(self):
-        pass # Đè lên tính năng drag (không cho phép drag vật, chỉ drag mũi tên)
+        # Đè lên tính năng drag (không cho phép drag vật, chỉ drag mũi tên)
+        if CardSlot.dragging is self:
+            self.com_img.overlay_opacity = self.selectMotion.value
 
     def on_stopDrag(self):
+        self.com_img.overlay_opacity = 0
         drag = CardSlot.dragging
         select = CardSlot.selecting
         if (drag is None) or (select is None):
@@ -101,8 +153,8 @@ class CardSlot(IClickable):
         if not mon: return
 
         mon.setTarget(select)
-        if mon.isOpponent != select.isOpponent: # Khác phe thì đánh
-              mon.action = mon.action_attack()
+        if mon.side != select.side: # Khác phe thì đánh
+              mon.actions.append(mon.action_attack())
         # else: mon.start_action(mon.action_support())
 
     def update_render(self):

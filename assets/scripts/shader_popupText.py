@@ -21,6 +21,12 @@ bgPreset = [
 class Shader_PopupText(Text):
     '''Text ngầu lòi ultra pro max plus'''
     
+    @staticmethod
+    def create(**kw):
+        txt = GameObject('Popup Text', anchor=CENTER, pos=App.center)
+        txt += Shader_PopupText(**kw)
+        return txt
+
     def __init__(self, seed_count = 10, seed_spanX = 0.1, seed_outbound = 0.2, random_strength = 0,
                  iv_res = 5, manhattan_stretchX = 3, border_start = 0.8, boxSize: tff = (500, 100),
                  animTime = 1.0, **kwargs):

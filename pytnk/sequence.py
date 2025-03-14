@@ -97,7 +97,7 @@ class Maingame_beginSeq(Component):
     def create():
         vertical_pos = vec((App.center[0] - App.center[1]) / App.iv_ratio, App.native[1])
 
-        main = GameObject('Maingame Scene', anchor=TOPLEFT, toScope=True,
+        main = GameObject('Maingame Begin Sequence', anchor=TOPLEFT, toScope=True,
                           pos=vertical_pos, scale=(App.iv_ratio, App.iv_ratio), rot=90)
         main += Image('background\\woodfloor.jpg', (App.native[0], App.native[1] - 200))
 
@@ -108,7 +108,7 @@ class Maingame_beginSeq(Component):
         plank += Image('background\\wood.jpg', (App.native[0], 200))
 
         coin = GameObject('Coin', pos=(App.center[0], App.center[1] - 100), anchor=CENTER, startEnabled=False)
-        coin += Image('doge.png', (256, 256), notLazy=True, flippable=True)
+        coin += Image('doge.png', (256, 256), notLazy=True, support_flip=True)
 
         main += Maingame_beginSeq(human1, human2, coin)
         # main += BattleController()

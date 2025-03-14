@@ -16,12 +16,12 @@ class IClickable(Component):
     def is_mouseInHitbox(self):
         '''Thử lấy chuột trong hitbox bằng trick xoay'''
         size = self.transf.l_hitboxSize.elementwise() * self.transf.g_scale
-        topleft = size.elementwise() * (- self.transf.anchor)
+        topleft = size.elementwise() * (-self.transf.anchor)
         bottomright = topleft + size
 
         rel = Mouse.pos - self.transf.g_pos
         if not self.transf.straight:
-            rel.rotate_ip(-self.transf.g_rot)
+            rel.rotate_ip(self.transf.g_rot)
 
         #print(topleft.x, rel.x, bottomright.x, "and", topleft.y, rel.y, bottomright.y)
         return (topleft.x <= rel.x <= bottomright.x) and \
@@ -32,10 +32,10 @@ class IClickable(Component):
         inHitbox = self.is_mouseInHitbox()
         canHover = self.hoverable and inHitbox and (Mouse.dragHost or not Mouse.hoverHost)
         if canHover:
+            Mouse.hoverHost = self
             if not self.hovering:
                 self.hovering = True
                 self.on_startHover()
-            Mouse.hoverHost = self
             self.on_hovering()
         elif self.hovering:
             self.hovering = False

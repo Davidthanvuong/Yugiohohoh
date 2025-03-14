@@ -8,7 +8,7 @@ class UserControl(Component):
         self.turn_cardPlaceLeft = 0
         self.turn_heroActionLeft = 0
         self.myTurn = False
-        self.isOpponent = isOpponent
+        self.side = isOpponent
         self.deck: CardDeck
         UserControl.e_endPhase += self.listen_endPhase
 
@@ -25,7 +25,7 @@ class UserControl(Component):
         UserControl.e_endPhase.notify(self)
 
     def listen_endPhase(self, user: 'UserControl'):
-        if user.isOpponent != self.isOpponent:
+        if user.side != self.side:
             print(f"Someone stopped and {self.go.name} starting")
             self.startPhase()
 

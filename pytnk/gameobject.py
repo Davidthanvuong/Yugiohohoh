@@ -124,10 +124,10 @@ class GameObject:
         '''Tìm component từ parent'''
         return self.parent.tryGetComponent(com) if self.parent else None
 
-    def removeParent(self) -> int:
+    def removeParent(self, reroot = True) -> int:
         if self.parent:
             index = self.parent.childs.index(self)
-            self.parent.removeChildren(self)
+            self.parent.removeChildren(self, reroot)
             return index
         return -1
             # GameObject.e_childsChanged(self)
@@ -140,11 +140,10 @@ class GameObject:
         go.transf.parent = self.transf
         # GameObject.e_childsChanged(self)
 
-    def removeChildren(self, go: 'GameObject'):
+    def removeChildren(self, go: 'GameObject', reroot = True):
         '''Jack bỏ con'''
         self.childs.remove(go)
-        GameObject.root.insertChildren(go)
-        go.transf.parent = GameObject.root.transf
+        if reroot: GameObject.root.insertChildren(go)
         # GameObject.e_childsChanged(self)
 
     def unscope(self):

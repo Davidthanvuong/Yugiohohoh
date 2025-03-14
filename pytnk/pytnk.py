@@ -8,6 +8,9 @@ class Pytnk:
     def start(cls):
         '''Bắt đầu pygame như bth thôi'''
         pg.init()
+        pg.mixer.init()
+        Card.load_sound()
+        Monster.load_sound()
         App.screen = pg.display.set_mode(App.native)
         pg.display.set_caption("PyTNK @ Yugiohohoh (09/03)")
         App.gameStarted = True
@@ -67,14 +70,14 @@ class Pytnk:
 
     
 
-    @classmethod
-    def load_intro(cls):
-        GameObject.loadPrefab("Intro Scene")
+    # @classmethod
+    # def load_intro(cls):
+    #     GameObject.loadPrefab("Intro Scene")
 
-    @classmethod
-    def load_loadingScreen(cls):
-        GameObject.loadPrefab("Loading Scene")
+    # @classmethod
+    # def load_loadingScreen(cls):
+    #     GameObject.loadPrefab("Loading Scene")
 
-    @classmethod
-    def load_maingame(cls):
-        GameObject.loadPrefab("Maingame Scene")
+    # @classmethod
+    # def load_maingame(cls):
+    #     GameObject.loadPrefab("Maingame Scene")

@@ -21,11 +21,18 @@ class OpponentControl(UserControl):
         super().__init__(True)
         self.selecting = None
         self.placingSlot = None
+        self.warmup = False
+        self.warmup_motion = Motion.linear(0, 1, 1.0) # Cho nó 1 giây để fix lỗi bốc card
         self.attacker: Monster
         self.inAction: No[Callable] = None
 
     def update_logic(self):
         if not self.myTurn: return
+        if not self.warmup:
+            if self.warmup_motion.completed:
+                self.warmup = True
+            return
+        
         if not self.inAction:
             self.pick_action()
         else: self.inAction()
@@ -44,13 +51,11 @@ class OpponentControl(UserControl):
             minmax.append(self.act_point_pickCard())
             print("[Opponent] Pick card có khả năng")
 
-        if (self.turn_heroActionLeft > 0):
-            attackSide_notEmpty = not CardSlot.getState(allEmpty=True, search=True)
-            defendSide_notEmpty = not CardSlot.getState(allEmpty=True, search=False)
-            if attackSide_notEmpty and defendSide_notEmpty:
-                actions.append((self.act_start_heroAction, self.act_doing_heroAction))
-                minmax.append(self.act_point_heroAction())
-                print("[Opponent] Hero attack có khả năng")
+        if (self.turn_heroActionLeft > 0) and not CardSlot.isAnySideEmpty():
+            print(CardSlot.isAnySideEmpty(), CardSlot.isEmpty(PLAYER), CardSlot.isEmpty(OPPONENT))
+            actions.append((self.act_start_heroAction, self.act_doing_heroAction))
+            minmax.append(self.act_point_heroAction())
+            print("[Opponent] Hero attack có khả năng")
 
         if len(actions) == 0:
             print("[Opponent] Hết cứu. Hết nước đi. T thua mày")
@@ -71,8 +76,8 @@ class OpponentControl(UserControl):
         
         print("[Opponent] Selecting card...")
         card.on_startDrag(controlled=True)  # Drag nhưng kiểm soát bởi *Artificial Stupidity*
-        self.slot = CardSlot.getAvailableSlot(False, True, False)
-        slot_pos = self.slot.transf.g_pos
+        self.placingSlot = CardSlot.getAny_emptySlot(self.side)
+        slot_pos = self.placingSlot.transf.g_pos
 
         self.selecting = card
         self.selMotion = Motion.ease_in(card.transf.g_pos, slot_pos, 0.6)
@@ -81,7 +86,7 @@ class OpponentControl(UserControl):
         assert self.selecting is not None
 
         self.selecting.transf.pos = self.selMotion.value
-        CardSlot.selecting = self.slot
+        CardSlot.selecting = self.placingSlot
         if self.selMotion.completed:
             self.selecting.on_stopDrag()
             self.selecting = None
@@ -94,10 +99,10 @@ class OpponentControl(UserControl):
 
     def act_start_heroAction(self):
         print("[Opponent] Selecting attack...")
-        atk = self.attacker = CardSlot.getAvailableSlot(False, True, True).occupy
-        targetSlot = CardSlot.getAvailableSlot(True, False, True)
+        atk = self.attacker = CardSlot.getAny_occupiedSlot(self.side).occupy
+        targetSlot = CardSlot.getAny_occupiedSlot(not self.side)
         atk.setTarget(targetSlot)
-        atk.action = atk.action_attack()
+        atk.actions.append(atk.action_attack())
 
     def act_doing_heroAction(self):
         if not self.attacker.isAttacking:

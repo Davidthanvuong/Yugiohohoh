@@ -25,6 +25,10 @@ DEGREE90 = math.pi / 2
 vZERO = vec(0, 0)
 vONE = vec(1, 1)
 
+BOTH = 2
+OPPONENT = 1
+PLAYER = 0
+
 class App:
     running = True
     targetFPS = 60
@@ -54,3 +58,11 @@ class Color:
     
     relation:   RGB = (50, 150, 150)
     pivot:      RGB = (0, 255, 0)
+
+
+# def play_sound(name):
+#     pg.mixer.music.load(f"assets\\sounds\\{name}.mp3")
+#     pg.mixer.music.play()
+
+def get_sound(name):
+    return pg.mixer.Sound(f"assets\\sounds\\{name}.mp3")

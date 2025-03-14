@@ -13,14 +13,7 @@ from pytnk.engine import *
 #   Thả card xuống phía dưới để undo việc triệu hồi
 #   Thả lên trên ô của mình bên trái mới triệu hồi được
 #
-#   Hiện tại chưa implement Spell card hay Trap card
-#   Bot thực hiện được 2 chức năng nếu có thể:
-#   - Đánh đối phương
-#   - Đặt lá xuống bàn
-#
-#   Bug: 
-#   - Game bắt đầu từ đối phương bị bug thẻ bài 
-#        từ đâu xuất hiện không đúng chỗ
+#   Bug:
 #   - Đổi action lúc chết dẫn đến quái bất tử
 #
 ########################################
@@ -28,8 +21,8 @@ from pytnk.engine import *
 
 if __name__ == '__main__':
     Pytnk.start()
-    # IntroSeq.create()
-    Maingame_beginSeq.create()
+    IntroSeq.create()
+    # Maingame_beginSeq.create()
 
     while App.running:
         Pytnk.update()

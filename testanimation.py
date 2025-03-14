@@ -5,17 +5,15 @@ from time import time
 def load_gif(path, size):
     #load gif và chuyển frame để scale size
     gif = Image.open(path)
-    frames = [
-        pg.image.fromstring(frame.convert("RGBA").tobytes(), frame.size, "RGBA") 
-        for frame in ImageSequence.Iterator(gif)
-    ]
+    frames = []
+    for i, frame in enumerate(ImageSequence.Iterator(gif)):
+        img = pg.image.fromstring(frame.convert("RGBA").tobytes(), frame.size, "RGBA") 
+        frames.append(img)
+        print(f"Frame {i} completed")
     frames = [pg.transform.scale(frame, size) for frame in frames]
     return frames
 
 def run_animation():
-    pg.init()
-    screen = pg.display.set_mode((800, 600))
-    clock = pg.time.Clock()
 
     aura_path = "assets/Animations/rias/rias_aura.gif"
     skill_path = "assets/Animations/rias/rias_skill.gif"
@@ -23,12 +21,16 @@ def run_animation():
     skill_size = (350, 100)
 
     start = time()
-    n = 30
+    n = 1
     stress_test = [(load_gif(aura_path, aura_size), load_gif(skill_path, skill_size)) for _ in range(n)]
 
     dt = time() - start
     print(f"Thời gian load {n} Rias GIF + skills: {dt:.2f}s")
     print(f"{n} Rias tượng trưng cho {n} con khác nhau (Ultra rare) sẽ load lúc chạy game")
+
+    pg.init()
+    screen = pg.display.set_mode((800, 600))
+    clock = pg.time.Clock()
 
     aura_frames = stress_test[0][0]
     skill_frames = stress_test[0][1]
@@ -65,7 +67,7 @@ def run_animation():
                 skill_active = False
 
         pg.display.flip()
-        clock.tick(10)
+        clock.tick(60)
 
     pg.quit()
 
