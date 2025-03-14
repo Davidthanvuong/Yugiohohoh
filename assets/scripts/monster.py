@@ -86,6 +86,7 @@ class Trap(Component):
         self.action: No[Generator] = None
 
 
+
 class Monster(Component):
     '''Triệu hồi từ card, hoặc extra thấm nếu spawn từ Monster khác luôn'''
     sfx_death: pg.mixer.Sound
@@ -274,3 +275,12 @@ def dragon_attack(self: Dragon, speed = 1.0):
     if self.user: self.user.turn_heroActionLeft -= 1
 
 Dragon.action_attack = dragon_attack
+
+
+
+class King(Monster):
+    e_onDeath: Event['King'] = Event()
+
+    def action_death(self):
+        King.e_onDeath(self)
+        yield from super().action_death()

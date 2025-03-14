@@ -21,8 +21,6 @@ from .gameobject import Component, Transform, GameObject
 from .renderer import Renderer, Image, Text
 from .iclickable import IClickable
 
-from .particlesystem import ParticleSystem
-
 # Shader
 from assets.scripts.shader_burning import Shader_BurningCard, ColorBlend, Blendkey
 from assets.scripts.shader_popupText import Shader_PopupText
@@ -31,7 +29,7 @@ from assets.scripts.shader_popupText import Shader_PopupText
 from assets.scripts.cardslot import CardSlot
 from assets.scripts.carddata import MonsterData, SpellData, TrapData
 from assets.scripts.monsterui import MonsterUI
-from assets.scripts.monster import Monster, Spell, Trap
+from assets.scripts.monster import Monster, Spell, Trap, King
 from assets.scripts.card import Card, CardDeck
 
 from assets.scripts.carddata_implement import *

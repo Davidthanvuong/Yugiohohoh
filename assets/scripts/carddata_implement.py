@@ -1,6 +1,6 @@
 from .carddata import MonsterData, SpellData, TrapData
 from .monster import Monster, Spell, Trap
-from .monster import Dragon
+from .monster import Dragon, King
 
 
 # # Monster
@@ -54,6 +54,16 @@ troll = SpellData(
     img_path = 'troll.jpg',
     globalUse = False,
     _class = Spell
+)
+
+king = MonsterData(
+    name = 'King',
+    description = 'King of the game',
+    drop_rate = 0,
+    img_path = 'king.jpg',
+    baseATK = 100,
+    baseDEF = 10000,
+    _class = King
 )
 
 

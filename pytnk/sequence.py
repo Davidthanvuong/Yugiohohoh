@@ -116,7 +116,7 @@ class Maingame_beginSeq(Component):
         return main
 
     def __init__(self, human1: GameObject, human2: GameObject, coin: GameObject, 
-                 zoomTime = 1.0, walkTime = 0.8, tossTime = 0.2):
+                 zoomTime = 1.0, walkTime = 0.8, tossTime = 1.0, tossTurns = 20):
         self.human1 = human1.transf
         self.human2 = human2.transf
         self.coin = coin.transf
@@ -125,6 +125,7 @@ class Maingame_beginSeq(Component):
         self.walkTime = walkTime
         self.zoomTime = zoomTime
         self.tossTime = tossTime
+        self.tossTurns = tossTurns
 
         self.finishedWalk = False
         self.startedZoom = False
@@ -169,7 +170,9 @@ class Maingame_beginSeq(Component):
             self.transf.scale = vONE
             self.finishedZoom = True
             self.oppo_startFirst = True if rint(0, 1) else False
-            self.toss = Motion.linear(0, 5 + self.oppo_startFirst, self.tossTime)
+            cposy = self.coin_old_posy = self.coin.pos.y
+            self.toss = Motion.linear(0, self.tossTurns + self.oppo_startFirst, self.tossTime)
+            self.tossUp = Motion.ease_out(cposy, cposy + 200.0, self.tossTime * 0.5)
             self.coin.go.enabled = True
 
             print("[TODO] Start game text here")
@@ -182,6 +185,9 @@ class Maingame_beginSeq(Component):
         self.transf.scale = self.scaling.value
 
     def toss_coin(self):
+        if self.tossUp.completed:
+            self.tossUp = Motion.ease_out(self.coin_old_posy + 200, self.coin_old_posy, self.tossTime * 0.5)
+
         if self.toss.completed:
             Maingame.create(self.oppo_startFirst)
             self.coin.scale.y = 1 - (self.oppo_startFirst * 2)
@@ -190,6 +196,7 @@ class Maingame_beginSeq(Component):
             return
         
         self.coin.scale.y = (self.toss.value % 2) - 1
+        self.coin.pos.y = self.tossUp.value
 
     def toss_fading(self):
         if self.fadeMotion.completed:

@@ -1,5 +1,6 @@
 from pytnk.engine import *
 from itertools import chain
+from typing import cast
 
 class CardSlot(IClickable):
     dragging  : No['CardSlot'] = None
@@ -114,7 +115,7 @@ class CardSlot(IClickable):
     def update_logic(self):
         selecting = CardSlot.selecting is self
         dragging = CardSlot.dragging is self
-    
+
     def on_startHover(self):
         CardSlot.selecting = self
 
