@@ -1,6 +1,4 @@
 from pytnk.engine import *
-from pytnk.pytnk import Pytnk
-from scripts.sequence import IntroSeq, Maingame_beginSeq
 
 #   _   _        _  _                                  _      _  _ 
 #  | | | |      | || |                                | |    | || |
@@ -14,11 +12,11 @@ from scripts.sequence import IntroSeq, Maingame_beginSeq
 
 if __name__ == '__main__':
     Pytnk.start()
-    IntroSeq().build()
-    # Maingame_beginSeq().build()
-    # Maingame().build(startID=0)
+    # IntroSeq.create()
+    Maingame_beginSeq.create()
 
     while App.running:
         Pytnk.update()
 
     pg.quit()
+

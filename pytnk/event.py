@@ -1,53 +1,50 @@
 from .engine import *
 
 T = TypeVar('T')
+Call = Callable[..., None]
 
 class Event(Generic[T]):
     '''Nghe, nhận, thông báo về các event. Dùng cho cập nhật lười'''
 
-    def __init__(self):
-        self.listeners: dict[Callable[..., None], tuple[weak[Callable[..., None]], bool]] = {}
+    def __init__(self, initials: No[Call] = None):
+        self.listeners: list[weak[Call]] = []
+        self.listeners_once: list[weak[Call]] = []
 
-    def listen(self, listener: Callable[..., None], once: bool = False):
-        self.listeners[listener] = (weak(listener), once)
+        if initials: self += initials
 
-    def listen_once(self, listener: Callable[..., None]):
-        self.listen(listener, True)
+    def listen(self, listener: Call):
+        self.listeners.append(weak(listener))
+        return self
 
-    def unsubscribe(self, listener: Callable[..., None]):
-        self.listeners.pop(listener)
+    def listen_once(self, listener: Call):
+        self.listeners_once.append(weak(listener))
+        return self
+
+    def unsubscribe(self, listener: Call):
+        self.listeners.remove(weak(listener))
+        self.listeners_once.remove(weak(listener))
+        return self
 
     def notify(self, arg: No[T] = None):
-        not_exist = []
-        to_remove = []
-        old_listeners = self.listeners.items() # Tránh bị lỗi khi tạo vật lúc start
-        for key, (weak_lis, once) in list(old_listeners):
-            lis = weak_lis()
-            if lis:
-                if arg is not None:
-                    lis(arg)
-                else: lis()
-                if once: to_remove.append(key)
-            else: not_exist.append(key)
+        i = 0
+        while i < len(self.listeners):
+            lis = self.listeners[i]()   # Còn tồn tại không?
+            if not lis: 
+                self.listeners.pop(i)
+                continue
 
-        for key in (not_exist + to_remove):
-            self.listeners.pop(key)
+            lis() if arg is None else lis(arg)
+            i += 1
 
-    def __iadd__(self, listener: Callable[..., None]):
-        self.listen(listener)
-        return self
 
-    def __isub__(self, listener: Callable[..., None]):
-        self.unsubscribe(listener)
-        return self
+    def __iadd__(self, listener: Call):
+        return self.listen(listener)
 
-    def __imul__(self, listener: Callable[..., None]):
-        self.listen(listener, True)
-        return self
+    def __isub__(self, listener: Call):
+        return self.unsubscribe(listener)
 
-    def __call__(self, arg: No[T] = None):
-        self.notify(arg)
-        return self
+    def __imul__(self, listener: Call):
+        return self.listen_once(listener)
     
 
 
@@ -58,8 +55,7 @@ class Mouse:
     hoverHost: No[object] = None
     clickHost: No[object] = None
     lastHost : No[object] = None
-    focusHost: No[ref] = None
-    dragHost: No[ref] = None
+    dragHost:  No[ref[object]] = None
 
     @classmethod
     def update_mouse(cls):
@@ -73,9 +69,6 @@ class Mouse:
 
         cls.hoverHost = None # Chuột pygame như gái, thằng nào lấy trước thằng đó thắng
         cls.clickHost = None
-
-        if cls.focusHost and not cls.focusHost():
-            cls.focusHost = None
 
         if cls.dragHost and not cls.dragHost():
             cls.dragHost = None

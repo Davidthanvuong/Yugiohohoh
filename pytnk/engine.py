@@ -1,45 +1,40 @@
-import pygame as pg
-import os
-from pygame.event import peek as pgpeek
-from pygame.font import Font
-from abc import abstractmethod
-from dataclasses import dataclass
-from enum import Enum
-from random import randint as rint
-from random import uniform, choice, choices, shuffle
-from time import time as now
 from typing import Optional as No
+from typing import Callable, Generic, TypeVar, Generator, cast
+import random, os, math
+from dataclasses import dataclass
+from random import randint as rint
+from random import uniform as rfloat
 from weakref import WeakMethod as weak
 from weakref import ref
-from typing import Callable, Generic, TypeVar
-from .data import *
+from time import time as now
+from pygame.event import peek as pgpeek
 
-# Engine
+# Standalone
+from .data import *
 from .event import Event, Mouse
 from .motion import Motion
+from .sound import Sounds, Volume
+# from .sound import Sound
+
+# Component System
 from .gameobject import Component, Transform, GameObject
-from .renderer import Renderer, Image, Text
 from .iclickable import IClickable
 
-# Shader
-from assets.scripts.shader_burning import Shader_BurningCard, ColorBlend, Blendkey
-from assets.scripts.shader_popupText import Shader_PopupText
 
-# Code
-from assets.scripts.cardslot import CardSlot
-from assets.scripts.carddata import MonsterData, SpellData, TrapData
-from assets.scripts.monsterui import MonsterUI
-from assets.scripts.monster import Monster, Spell, Trap, King
-from assets.scripts.card import Card, CardDeck
+# Renderer
+from .renderer import LazySurface, LoadedImage, Image, Text, Blendkey, ColorBlend
+from .anim import Animation
+from scripts.shader_burning import Shader_BurningCard
 
-from assets.scripts.carddata_implement import *
-# Manager
-# from assets.scripts.battlemanager import BattleManager
-from assets.scripts.playercontrol import UserControl, PlayerControl
-from assets.scripts.opponentcontrol import OpponentControl
+# Data
+from scripts.carddata import card_database, CardData, MonsterData, SpellData, TrapData
 
-# Engine 2
-from .maingame import Maingame
-from .sequence import IntroSeq, StartMenu, LoadingSeq, Maingame_beginSeq
-# from .hardcoded import Hardcoded
-from .pytnk import Pytnk
+# Final
+from scripts.monster import Summon, Monster, Spell, Trap
+from scripts.card import Card, CardDeck, CardSlot
+from scripts.controller import Controller
+from scripts.playercontroller import PlayerController, My_EndPhaseButton
+from scripts.botcontroller import BotController
+from scripts.maingame import Maingame
+
+from scripts.carddata_implement import *

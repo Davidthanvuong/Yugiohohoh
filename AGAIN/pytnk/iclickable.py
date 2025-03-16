@@ -15,12 +15,12 @@ class IClickable(Component):
 
     def is_mouseInHitbox(self):
         '''Thử lấy chuột trong hitbox bằng trick xoay'''
-        size = self.transf.hitbox.elementwise() * self.transf.g_scale
+        size = self.transf.l_hitboxSize.elementwise() * self.transf.g_scale
         topleft = size.elementwise() * (-self.transf.anchor)
         bottomright = topleft + size
 
         rel = Mouse.pos - self.transf.g_pos
-        if self.transf.enable_rotation:
+        if not self.transf.straight:
             rel.rotate_ip(self.transf.g_rot)
 
         #print(topleft.x, rel.x, bottomright.x, "and", topleft.y, rel.y, bottomright.y)
@@ -48,6 +48,7 @@ class IClickable(Component):
             if not self.clicking:
                 self.clicking = True
                 self.wasFocus = True
+                Mouse.focusHost = ref(self)
                 self.on_startClick()
                 if self.draggable:
                     self.dragging = True
@@ -69,6 +70,30 @@ class IClickable(Component):
             self.wasFocus = False
             self.on_stopFocus()
         
+        # if canClick and Mouse.clicked:
+        #     Mouse.clickHost = ref(self.go)
+        #     Mouse.focusHost = Mouse.clickHost
+
+        # if Mouse.clickHost and Mouse.clickHost() == self.go:
+        #     if not self.clicking:
+        #         self.clicking = True
+        #         self.on_startClick()
+        #         if self.draggable:
+        #             self.on_startDrag()
+        #     self.on_clicking()
+        #     if self.draggable:
+        #         self.on_dragging()
+        # else:
+        #     if self.clicking:
+        #         self.clicking = False
+        #         self.on_stopClick()
+
+        # # Focus logic: Retain focus until another object is clicked
+        # prev_wasFocus = self.wasFocus
+        # self.wasFocus = (Mouse.focusHost and Mouse.focusHost() == self.go)
+        # if prev_wasFocus and not self.wasFocus:
+        #     self.on_stopFocus()
+
     def on_startHover(self):    pass#print('start hover')
     def on_hovering(self):      pass#print('hovering')
     def on_stopHover(self):     pass#print('stop hover')
@@ -84,4 +109,6 @@ class IClickable(Component):
         self.clickDelta = self.transf.g_pos - Mouse.pos
 
     def on_dragging(self):
+        #print('dragging')
+        #print(self.transf.parent.go.name)
         self.transf.pos = Mouse.pos + self.clickDelta
