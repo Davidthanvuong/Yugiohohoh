@@ -25,6 +25,7 @@ from .iclickable import IClickable
 from .renderer import LazySurface, LoadedImage, Image, Text, Blendkey, ColorBlend
 from .anim import Animation
 from scripts.shader_burning import Shader_BurningCard
+from scripts.damageindicator import DamagePooling
 
 # Data
 from scripts.carddata import card_database, CardData, MonsterData, SpellData, TrapData

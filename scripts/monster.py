@@ -53,12 +53,14 @@ class Monster(Summon):
         occupy.receiveDamage(self.attack)
 
     def receiveDamage(self, dmg: float):
+        oldDef = self.defense
         self.defense -= dmg
         if (self.defense <= 0.0):
             self.defense = 0.0
             if self.isDead: return
             self.isDead = True
             self.actions.append(self.action_death())
+        DamagePooling.spawn_number(int(oldDef - self.defense), self.transf.g_pos)
 
     def setTarget(self, slot: 'CardSlot'):
         self.targetSlot = slot
@@ -67,7 +69,7 @@ class Monster(Summon):
         if self.targetSlot and self.targetSlot.occupy: 
             return self.targetSlot
         
-        self.targetSlot = self.user.opponent.getAny_frontFirstSlot()
+        self.targetSlot = self.user.opponent.choose_frontSlot(OCCUPIED)
         return self.targetSlot
 
     def interact(self, target: No['CardSlot']):
@@ -78,7 +80,7 @@ class Monster(Summon):
         self.actions.append(self.action_attack())
 
     def start_attack(self):
-        if self.user.opponent.isEmpty(): return
+        if self.user.opponent.isEmpty(FRONT): return
         self.actions.append(self.action_attack())
 
     # Yield yield yield
@@ -162,9 +164,10 @@ class MonsterUI(Component):
     def update_logic(self):
         self.health.text = str("%.0f" % self.attach.defense)
         self.attack.text = str(self.attach.attack)
-        if self.oldDefense != self.attach.maxDefense:
-            self.oldDefense = self.attach.maxDefense
-            self.ratioMotion = Motion.linear(1, self.attach.maxDefense / self.attach.defense, self.easeTime)
+        if self.oldDefense != self.attach.defense:
+            self.oldDefense = self.attach.defense
+            self.ratio = self.attach.defense / self.attach.maxDefense
+            self.ratioMotion = Motion.linear(self.oldRatio, self.ratio, self.easeTime)
 
     def update_render(self):
         pg.draw.rect(App.screen, Color.white,   (self.transf.g_pos, (self.barWidth * self.oldRatio, 10)))
@@ -201,7 +204,7 @@ class Spell(Summon):
 
     def activate(self):
         if self.data.globalUse:
-            for slot in self.user.get_occupiedSlots():
+            for slot in self.user.get_frontSlots(OCCUPIED):
                 self.effect_on(slot.force_occupy)
         elif self.slot.occupy:
             self.effect_on(self.slot.occupy)
@@ -298,7 +301,7 @@ class Rias(Monster):
         yield from self.anim_attack(0.2)
         yield from self.indian_explosion(speed)
 
-        for slot in self.user.opponent.get_occupiedSlots():
+        for slot in self.user.opponent.get_frontSlots(OCCUPIED):
             if not isinstance(slot.occupy, Monster): continue
             slot.occupy.receiveDamage(self.attack)
 

@@ -62,7 +62,7 @@ class BotController(Controller):
         
         card.on_startDrag(controlled=True)  # Drag nhưng kiểm soát bởi *Artificial Stupidity*
         cardtf = card.transf
-        placeSlot = self.getAny_emptySlot()
+        placeSlot = self.choose_frontSlot(EMPTY)
         motion = Motion.ease_in(card.transf.g_pos, placeSlot.transf.g_pos, 0.8)
 
         while not motion.completed:
@@ -75,7 +75,7 @@ class BotController(Controller):
         self.placeCard_left -= 1
 
     def eval_quickAttack(self):
-        anyEmpty = (self.isEmpty()) or (self.opponent.isEmpty())
+        anyEmpty = (self.isEmpty(FRONT)) or (self.isEmpty(FRONT))
         if (self.quickAction_left <= 0) or anyEmpty:
             return 0
         return 1
@@ -83,8 +83,8 @@ class BotController(Controller):
     def act_quickAttack(self):
         print("[Opponent] Selecting attack...")
         self.attacking = True
-        atk = cast(Monster, self.getAny_occupiedSlot().occupy)
-        targetSlot = self.opponent.getAny_frontFirstSlot()
+        atk = cast(Monster, self.choose_frontSlot(OCCUPIED).occupy)
+        targetSlot = self.opponent.choose_frontSlot(OCCUPIED)
 
         atk.setTarget(targetSlot)
         atk.actions.append(atk.action_attack())

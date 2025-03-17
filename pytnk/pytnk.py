@@ -11,6 +11,8 @@ class Pytnk:
         App.screen = pg.display.set_mode(App.native)
         pg.display.set_caption("PyTNK @ Yugiohohoh (09/03)")
         GameObject('Root')
+        
+        DamagePooling.init()
 
     @classmethod
     def update(cls):
@@ -23,6 +25,7 @@ class Pytnk:
         GameObject.root.update_logic()
         GameObject.root.update_click()
         GameObject.root.update_render()
+        DamagePooling.update_pool()
         pg.display.update()
         App.screen.fill(Color.black)
 

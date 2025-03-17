@@ -14,9 +14,9 @@ from scripts.sequence import IntroSeq, Maingame_beginSeq
 
 if __name__ == '__main__':
     Pytnk.start()
-    IntroSeq().build()
+    # IntroSeq().build()
     # Maingame_beginSeq().build()
-    # Maingame().build(startID=0)
+    Maingame().build(startID=0)
 
     while App.running:
         Pytnk.update()

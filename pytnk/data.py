@@ -22,6 +22,8 @@ HALF_RADIAN = 1.57
 vZERO = vec(0, 0)
 vONE = vec(1, 1)
 
+EMPTY = BACK = False
+OCCUPIED = FRONT = True
 
 class App:
     running = True

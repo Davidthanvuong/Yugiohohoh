@@ -56,35 +56,34 @@ class Controller(Component):
     def draw_time(self):
         print("Added card to self")
         Card(self).build()
-    
+        Card(self).build()
+        Card(self).build()
 
-    def get_occupiedSlots(self):
-        slots = self.slots
+
+    def choose_frontSlot(self, occupied: bool):
+        return next(self.get_frontSlots(occupied))
+
+    def get_frontSlots(self, occupied: bool):
+        slots = self.slots[5:15]
         random.shuffle(slots)
-        yield from (slot for slot in slots if (slot.occupy) and (slot.myId >= 5))
+        for slot in slots:
+            if (slot.occupy is not None) == occupied:
+                yield slot
 
-    def get_emptySlots(self):
-        slots = self.slots
+    def isEmpty(self, front: bool) -> bool:
+        slots = self.slots[5:15] if front else self.slots[0:5]
+        return not any(slot.occupy for slot in slots)
+
+    def isFull(self, front: bool) -> bool:
+        slots = self.slots[5:15] if front else self.slots[0:5]
+        return all(slot.occupy for slot in slots)
+
+    def choose_trapSlot(self, occupied: bool):
+        next(self.get_trapSlots(occupied))
+    
+    def get_trapSlots(self, occupied: bool):
+        slots = self.slots[0:5]
         random.shuffle(slots)
-        yield from (slot for slot in slots if (not slot.occupy) and (slot.myId >= 5))
-
-    def getAny_occupiedSlot(self):
-        return next(self.get_occupiedSlots())
-
-    def getAny_emptySlot(self):
-        return next(self.get_emptySlots())
-
-    def get_frontFirstSlot(self):
-        rows = list(range(5))
-        random.shuffle(rows)
-        slots = (self.slots[row * 3 + col] for col in range(2, -1, -1) for row in rows if self.slots[row * 3 + col].occupy)
-        return slots
-    
-    def getAny_frontFirstSlot(self):
-        return next(self.get_frontFirstSlot())
-    
-    def isEmpty(self):
-        return not any(slot.occupy for slot in self.slots)
-    
-    def isFull(self):
-        return all(slot.occupy for slot in self.slots)
+        for slot in slots:
+            if (slot.occupy is not None) == occupied:
+                yield slot
