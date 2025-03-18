@@ -11,9 +11,9 @@ class PlayerController(Controller):
         super().__init__(*a)
         self.rightSide = False
         self.isPlayer = True
+        self.drawState.e_begin += self.hear_start_drawPhase
 
     def hear_start_drawPhase(self):
-        super().hear_start_drawPhase()
         print("[Player] MY TURN")
 
 
@@ -29,7 +29,7 @@ class My_EndPhaseButton(IClickable):
     def __init__(self, user: Controller):
         super().__init__()
         self.user = user
-        user.e_start_drawPhase += self.reEnable
+        user.mainState.e_begin += self.reEnable
 
     def reEnable(self):
         self.go.enabled = True
@@ -43,5 +43,5 @@ class My_EndPhaseButton(IClickable):
         self.com_text.text = "End Phase " + additional
 
     def on_startClick(self):
-        self.user.e_end_drawPhase.notify()
+        StateMachine.next_state()
         self.go.enabled = False

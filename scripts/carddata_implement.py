@@ -1,6 +1,6 @@
 from .carddata import MonsterData, SpellData, TrapData
 from .monster import Monster, Spell, Trap
-import scripts.monster as mons
+import scripts.custom_monster as mons
 
 uno = SpellData(
     name = 'Uno',
@@ -33,12 +33,12 @@ king = MonsterData(
 
 sung_jin_woo = MonsterData(
     name = 'Sung Jin Woo',
-    description = 'Last Stand: When this card’s HP drops below 10%, its power surges, increasing its DMG by 10× for 1 turn before resetting its evolution stacks.',
-    drop_rate = 0.6,
+    description = 'Last Stand: When this card\'s HP drops below 10%, its power surges, increasing its DMG by 10x for 1 turn before resetting its evolution stacks.',
+    drop_rate = 6, #0.6, #!!!!
     img_path = 'sung jin woo.jpg',
     baseATK = 1000,
     baseDEF = 1000,
-    _class = Monster
+    _class = mons.SungJinWoo
 )
 
 

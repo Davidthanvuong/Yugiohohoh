@@ -142,6 +142,8 @@ class Card(IClickable):
             self.user.placeCard_left -= 1
             self.activated = False
             self.go += Shader_BurningCard(self.com_img)
+            self.go += Animation("common/spawn", playtime=1.0, looping=False)
+
             Sounds.play("placing.mp3", Volume.effects)
             return #self.go.destroy() # Giữ lại cho burning shader
         

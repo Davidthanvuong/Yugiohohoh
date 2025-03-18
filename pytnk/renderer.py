@@ -6,7 +6,6 @@ class LazySurface:
     def __init__(self, transf: Transform, enable_overlay = False):
         self.transf = transf
         self.enable_overlay = enable_overlay
-        self.overlay_color: RGB = Color.white
 
         self.c_surface = pg.Surface((0, 0))
         self.c_pos = vZERO
@@ -19,7 +18,7 @@ class LazySurface:
     def unchanged(self):
         return (self.c_rot == self.transf.g_rot) and (self.c_scale == self.transf.g_scale)
 
-    def recreate(self, img: pg.Surface, imgsize: vec):
+    def recreate(self, img: pg.Surface, imgsize: vec, overlay_color: RGB = Color.white):
         tf = self.transf
         rotatable = tf.enable_rotation and not (-0.5 <= self.transf.g_rot <= 0.5)
         px = tf.g_scale.elementwise() * imgsize
@@ -28,12 +27,12 @@ class LazySurface:
             img = Img.flip(img, px.x < 0, px.y < 0)
             px.x, px.y = abs(px.x), abs(px.y)
 
-        img = Img.scale(img, px)
+        if img.get_size() != (px.x, px.y): img = Img.scale(img, px)
         if rotatable: img = Img.rotate(img, tf.g_rot)
 
         if self.enable_overlay:
             overlay = self.c_overlay = img.copy()
-            overlay.fill(self.overlay_color, special_flags=pg.BLEND_ADD)
+            overlay.fill(overlay_color, special_flags=pg.BLEND_ADD)
 
         # if App.debugMode:
         #     print("E")
@@ -91,6 +90,7 @@ class Image(Component):
         self.enable_overlay = enable_overlay
         self.override_hitbox = override_hitbox
         self.overlay_alpha = 0
+        self.overlay_color = Color.white
         self.alpha = 255
     
     def after_init(self):
@@ -102,10 +102,10 @@ class Image(Component):
 
     def update_render(self):
         if not self.lazy.unchanged:
-            self.lazy.recreate(self.image.native, self.size)
+            self.lazy.recreate(self.image.native, self.size, self.overlay_color)
             if self.override_hitbox: self.transf.hitbox = self.size
 
-        self.lazy.render(self.alpha, int(self.overlay_alpha))
+        self.lazy.render(self.alpha, self.overlay_alpha)
 
 
 

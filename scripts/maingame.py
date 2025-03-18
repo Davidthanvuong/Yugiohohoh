@@ -13,23 +13,25 @@ class Maingame(Component):
 
         self.ended = 0
         self.users: list[Controller] = []
-        for i in range(0, self.userCount):
-            self.users.append(self.userType[i](self).build(i))
+        for i in range(startID, startID + self.userCount):
+            j = i % self.userCount
+            self.users.append(self.userType[j](self).build(j))
 
         self.users[0].opponent = self.users[1]
         self.users[1].opponent = self.users[0]
 
         self.notif = PhaseIndicator().build()
 
-        self.users[startID].e_start_drawPhase.notify()
+        StateMachine.start()
         return mg + self
     
     def __init__(self, scopeZoom = 2.0):
-        self.zooming: No[Generator] = None
+        self.shaking: No[Motion] = None
         self.scopeZoom = scopeZoom
         self.scopeIn = False
     
     def update_logic(self):
+        # print(f"{StateMachine.current_state.user.go.name} --> {StateMachine.current_state.__class__.__name__}")
         if CardSlot.dragging:
             if not self.scopeIn:
                 self.transf.scale = vec(self.scopeZoom)
@@ -44,10 +46,23 @@ class Maingame(Component):
             self.mgImg.activated = True
             self.plankImg.activated = True
 
-    def drawCard_time(self):
-        for user in self.users:
-            user.draw_time()
+        if self.shaking:
+            v = int(self.shaking.value)
+            self.transf.pos = vec(
+                rint(-v, v),
+                rint(-v, v)
+            )
+            if self.shaking.completed:
+                self.shaking = None
+
+    # def drawCard_time(self):
+    #     for user in self.users:
+    #         user.draw_time()
         
+    def shake_screen(self, strength = 20):
+        self.shaking = Motion.linear(strength, 0, 1.0)
+
+
 
 class PhaseIndicator(Component):
     def build(self):

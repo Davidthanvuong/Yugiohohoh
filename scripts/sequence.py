@@ -26,6 +26,8 @@ class IntroSeq(Component):
 
 class StartMenu(Component):
     def build(self):
+        GameObject.root.childs.clear()
+        GameObject.parents_stack.clear()
         menu = Image('background\\willsmith.png', App.native).build(pos=App.center).scope()
         st = Image('pytnk.png', (200, 100)).build() + Text('Start Game', Color.white, 40)
         return menu.unscope() + self
@@ -114,5 +116,6 @@ class Maingame_beginSeq(Component):
         opacity = Motion.ease_out(255, 0, 0.5).bind(img, 'overlay_alpha')
         while not opacity.completed: yield
 
+        from .maingame import Maingame
         Maingame().build(notmyluck)
         self.go.destroy()

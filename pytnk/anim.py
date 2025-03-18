@@ -40,7 +40,6 @@ class Animation(Component):
         if lazyFrame is None: 
             # POV: 4 format khác nhau
             # GIF -> PIL Image -> Binary -> Pygame Image
-            time = now()
             lazyFrame = LazySurface(self.transf, self.enable_overlay)
             self.gif.pil.seek(i_frame)
             pil_img = self.gif.pil.copy()
@@ -49,12 +48,8 @@ class Animation(Component):
 
             self.gif.frames[i_frame] = lazyFrame
             self.gif.surfaces[i_frame] = pygame_img
-
-            dt = now() - time
-            print(f"Latency: {dt * 1000:.2f}")
         
         if not lazyFrame.unchanged:
-            print("!!!! Rerender !!!!")
             lazyFrame.recreate(self.gif.surfaces[i_frame], self.size)
             if self.override_hitbox: self.transf.hitbox = self.size
 

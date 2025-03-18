@@ -16,8 +16,8 @@ class DamagePooling:
 
     i_free: int = 0
     i_range: int = 0        # Thay vì xử lí từ 0 -> n, thì chỉ một đoạn từ i_range -> i_free
-    allocated: int = 20001
-    max_number: int = 10
+    allocated: int = 2001
+    max_number: int = 50
 
     lazy_max: pg.Surface
     numberFont: pg.font.Font

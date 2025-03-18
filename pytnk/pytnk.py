@@ -26,6 +26,13 @@ class Pytnk:
         GameObject.root.update_click()
         GameObject.root.update_render()
         DamagePooling.update_pool()
+
+        if App.blackwhiteFilter:
+            bw_surface = pg.Surface(App.screen.get_size())
+            bw_surface.blit(App.screen, (0, 0))
+            pg.transform.threshold(bw_surface, bw_surface, (0, 0, 0), (100, 100, 100), (200, 0, 0), 1)
+            App.screen.blit(bw_surface, ZERO)
+
         pg.display.update()
         App.screen.fill(Color.black)
 

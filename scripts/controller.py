@@ -1,5 +1,42 @@
 from pytnk.engine import *
-from .monster import King
+import scripts.carddata_implement as cards
+from .custom_monster import King
+
+class MainState(FiniteState):
+    def begin(self, user: 'Controller'):
+        print("MainState begin")
+        user.placeCard_left = 3
+        user.quickAction_left = 1
+        user.main.notif.startNotif(user.rightSide, user.go.name)
+
+    def end(self, user: 'Controller'):
+        print("MainState end")
+        user.placeCard_left = 0
+        user.quickAction_left = 0
+
+
+
+class BattleState(FiniteState):
+    def begin(self, user: 'Controller'):
+        print(f"{user.go.name}: BattleState begin")
+        user.fightTime = Motion.linear(0, 1, 2.0)
+        user.wasFighting = False
+
+    def end(self, user: 'Controller'):
+        print("BattleState end")
+
+
+
+class DrawState(FiniteState):
+    def begin(self, user: 'Controller'):
+        print("DrawState begin")
+        Card(user).build()
+        Card(user).build()
+        StateMachine.next_state()
+
+    def end(self, user: 'Controller'):
+        print("DrawState end")
+
 
 class Controller(Component):
     def build(self, id: int, name: str = ""):
@@ -9,10 +46,15 @@ class Controller(Component):
         self.slots = [CardSlot(self, x*5 + y).build(x, y) for x in range(3) for y in range(5)]
         self.deck = CardDeck(self).build()
         self.myId = id
-        [Card(self).build() for _ in range(self.start_cardCount)]
 
-        # slot = self.slots[2]
-        # King(card_database['King'], self, slot).build(slot.transf.pos + self.slotsParent.transf.pos) # type: ignore
+        initial_datas = [cards.sung_jin_woo] # Custom here
+        for i in range(self.start_cardCount):
+            data = initial_datas[i] if (i < len(initial_datas)) else None
+            Card(self, data).build()
+
+        slot = self.slots[2]
+        kingdata = cast(MonsterData, card_database['King'])
+        King(kingdata, self, slot).build(slot.transf.pos + self.slotsParent.transf.pos)
 
         return user.unscope().addComponent(self)
 
@@ -27,38 +69,48 @@ class Controller(Component):
         self.opponent: 'Controller'
         self.deck: 'CardDeck'
         self.slots: list['CardSlot']
+        self.fightTime: No[Motion] = None
+        self.wasFighting = False
 
-        self.e_start_drawPhase  : Event = Event(self.hear_start_drawPhase)
-        self.e_end_drawPhase    : Event = Event(self.hear_end_drawPhase)
-        self.e_start_battlePhase: Event = Event()
-        self.e_end_battlePhase  : Event = Event()
-        self.e_king_die         : Event = Event()
+        self.mainState   = MainState  (self, Phase.MAIN)
+        self.battleState = BattleState(self, Phase.BATTLE)
+        self.drawState   = DrawState  (self, Phase.DRAW)
+
+        # self.e_start_drawPhase  : Event = Event()
+        # self.e_end_drawPhase    : Event = Event()
+        # self.e_start_battlePhase: Event = Event()
+        # self.e_end_battlePhase  : Event = Event()
 
         self.start_cardCount: int = 8
         self.placeCard_left: int = 0
         self.quickAction_left: int = 0
 
-    def hear_end_drawPhase(self):
-        self.placeCard_left = 0
-        self.quickAction_left = 0
-        self.main.ended ^= (1 << self.myId)
-        print(self.main.ended)
-        if self.main.ended == (1 << self.main.userCount) - 1:
-            self.main.drawCard_time()
+    def update_logic(self):
+        if self.fightTime:
+            if not self.wasFighting:
+                self.wasFighting = True
+                self.main.notif.startNotif(self.rightSide, "Fighting")
 
-        self.opponent.e_start_drawPhase.notify()
+            if self.fightTime.completed:
+                self.wasFighting = False
+                self.fightTime = None
+                StateMachine.next_state()
+    # def hear_end_drawPhase(self):
+    #     self.placeCard_left = 0
+    #     self.quickAction_left = 0
+    #     self.main.ended ^= (1 << self.myId)
+    #     print(self.main.ended)
+    #     if self.main.ended == (1 << self.main.userCount) - 1:
+    #         self.main.drawCard_time()
 
-    def hear_start_drawPhase(self):
-        self.placeCard_left = 3
-        self.quickAction_left = 1
-        self.main.notif.startNotif(self.rightSide, self.go.name)
+    #     self.opponent.e_start_drawPhase.notify()
 
-    def draw_time(self):
-        print("Added card to self")
-        Card(self).build()
-        Card(self).build()
-        Card(self).build()
+    # def hear_start_drawPhase(self):
+    #     self.placeCard_left = 3
+    #     self.quickAction_left = 1
 
+    # def draw_time(self):
+    #     print("Added card to self")
 
     def choose_frontSlot(self, occupied: bool):
         return next(self.get_frontSlots(occupied))

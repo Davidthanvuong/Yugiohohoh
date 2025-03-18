@@ -15,6 +15,8 @@ class Summon(Component):
 
     def interact(self, target: No['CardSlot']): pass
 
+
+
 class Monster(Summon):
     @staticmethod
     def tryPlace(card: 'Card', data: MonsterData, slot: No['CardSlot']):
@@ -24,8 +26,11 @@ class Monster(Summon):
         return True
 
     def build(self, pos: vec):
-        mon = Image(self.data.get_placedPath(), (150, 135), True, True).build(pos=pos, anchor=MIDBOTTOM) + self
+        forward = -1 if self.user.rightSide else 1
+        mon = Image(self.data.get_placedPath(), (150, 135), True, True).build(pos=pos, anchor=MIDBOTTOM, scale=(forward, 1)) + self
         self.img = mon.getComponent(Image)
+        self.img.overlay_color = Color.red if self.user.rightSide else Color.blue
+        self.img.overlay_alpha = 100
 
         MonsterUI(self).build()
         return self
@@ -41,7 +46,7 @@ class Monster(Summon):
 
         self.isDead = False
         self.targetSlot: No[CardSlot] = None
-        self.user.e_end_drawPhase += self.start_attack
+        self.user.battleState.e_begin += self.start_attack
 
     def after_init(self):
         self.oldPos = self.transf.pos
@@ -52,14 +57,18 @@ class Monster(Summon):
         if (not occupy) or not isinstance(occupy, Monster): return
         occupy.receiveDamage(self.attack)
 
-    def receiveDamage(self, dmg: float):
+    def deathCheck(self):
+        if (self.defense > 0.0): return
+        self.defense = 0.0
+        if self.isDead: return
+        self.isDead = True
+        self.e_attackFinished.notify()
+        self.actions.append(self.action_death())
+
+    def receiveDamage(self, dmg: float, checkDeath = True):
         oldDef = self.defense
         self.defense -= dmg
-        if (self.defense <= 0.0):
-            self.defense = 0.0
-            if self.isDead: return
-            self.isDead = True
-            self.actions.append(self.action_death())
+        if checkDeath: self.deathCheck()
         DamagePooling.spawn_number(int(oldDef - self.defense), self.transf.g_pos)
 
     def setTarget(self, slot: 'CardSlot'):
@@ -80,6 +89,7 @@ class Monster(Summon):
         self.actions.append(self.action_attack())
 
     def start_attack(self):
+        print(f"{self.data.name}: {self.user.myId} bắt đầu tấn công")
         if self.user.opponent.isEmpty(FRONT): return
         self.actions.append(self.action_attack())
 
@@ -123,7 +133,7 @@ class Monster(Summon):
             self.transf.rot = rotate.value
             yield
 
-        self.transf.rot = rotate.dest
+        self.transf.rot = oldRot
         afk = Motion.sleep(time * 0.5)
         while not afk.completed: yield
 
@@ -142,12 +152,12 @@ class Monster(Summon):
 
 class MonsterUI(Component):
     def build(self):
-        ui = GameObject("Monster UI", self.attach.go, pos=(-50, 0), enable_scale = False)
+        ui = GameObject("Monster UI", self.attach.go, pos=(0, 0), enable_scale = False)
 
-        self.health = Image("icon\\heart.png", (20, 20)).build(parent=ui)\
+        self.health = Image("icon\\heart.png", (20, 20)).build(parent=ui, pos=(-50, 0))\
                         .addComponent(Text("0?", Color.white, 16))
 
-        self.attack = Image("icon\\sword.png", (40, 40)).build(parent=ui, pos=(20, 20))\
+        self.attack = Image("icon\\sword.png", (40, 40)).build(parent=ui, pos=(-30, 20))\
                         .addComponent(Text("0?", Color.white, 16))
 
         return ui.addComponent(self)
@@ -170,9 +180,10 @@ class MonsterUI(Component):
             self.ratioMotion = Motion.linear(self.oldRatio, self.ratio, self.easeTime)
 
     def update_render(self):
-        pg.draw.rect(App.screen, Color.white,   (self.transf.g_pos, (self.barWidth * self.oldRatio, 10)))
-        pg.draw.rect(App.screen, Color.green,   (self.transf.g_pos, (self.barWidth * self.ratio, 10)))
-        pg.draw.rect(App.screen, Color.black,   (self.transf.g_pos, (self.barWidth, 10)), 2)
+        pos = self.transf.g_pos - FORWARD * 50
+        pg.draw.rect(App.screen, Color.white,   (pos, (self.barWidth * self.oldRatio, 10)))
+        pg.draw.rect(App.screen, Color.green,   (pos, (self.barWidth * self.ratio, 10)))
+        pg.draw.rect(App.screen, Color.black,   (pos, (self.barWidth, 10)), 2)
 
         self.oldRatio = self.ratioMotion.value
 
@@ -225,6 +236,8 @@ class Spell(Summon):
         self.activate()
         self.go.destroy()
 
+
+
 class Trap(Summon):
     @staticmethod
     def tryPlace(card: 'Card', data: TrapData, slot: 'CardSlot'):
@@ -242,78 +255,3 @@ class Trap(Summon):
     def __init__(self, data: TrapData, *a):
         super().__init__(*a)
         self.data = data
-
-class King(Monster):
-
-    def after_init(self):
-        super().after_init()
-        self.maxDefense = self.defense = self.data.baseDEF * 10
-
-    def action_death(self):
-        self.user.e_king_die.notify()
-        yield from super().action_death()
-
-
-class Dragon(Monster):
-    pass
-
-class Rias(Monster):
-    def build(self, pos: vec):
-        side = -1 if self.user.rightSide else 1
-        mon = Image(self.data.get_placedPath(), (200, 220), True, True)\
-                    .build(pos=pos, anchor=MIDBOTTOM, scale=(side, 1)) + self
-        self.img = mon.getComponent(Image)
-        # self.anim = mon.addComponent(Animation("akeno/akeno aura", (400, 300), looping=True, playtime=1.0))
-        # self.anim.activated = False # Chỉ bật khi combat
-
-        beam = Animation("rias/rias_skill", (640, 480), True, override_hitbox=True).build(parent=self.go, anchor=MIDLEFT)
-        self.uibeam = beam.getComponent(Animation)
-        self.uibeam.activated = False
-
-        self.boomer = GameObject("Boomer", self.go, startEnabled=False)
-        for y in range(5):
-            for x in range(5):
-                boompos = (x * 150, (y - 1) * 150)
-                Animation("common/fire boom", playtime=1.0).build(parent=self.boomer, pos=boompos, anchor=MIDBOTTOM)
-        MonsterUI(self).build()
-        return self
-    
-    def anim_attack(self, time=1.0):
-        self.uibeam.activated = True
-        # self.uibeam.playtime = time
-        beambeam = Motion.sleep(time)
-        while not beambeam.completed: yield
-
-        self.uibeam.activated = False
-
-    def indian_explosion(self, speed = 1.0):
-        print("Indian explosion")
-        self.boomer.enabled = True
-        boom = Motion.sleep(speed)
-        while not boom.completed: yield
-
-        self.boomer.enabled = False
-
-    def action_attack(self, speed = 1.0):
-        # self.anim.activated = True
-        # self.img.activated = False # Bị bug phần GIF, load GIF ghép 500ms trên khung hình :skull emoji:
-        yield from self.moveTo_pos(App.vCenter, speed * 0.4)
-        yield from self.anim_attack(0.2)
-        yield from self.indian_explosion(speed)
-
-        for slot in self.user.opponent.get_frontSlots(OCCUPIED):
-            if not isinstance(slot.occupy, Monster): continue
-            slot.occupy.receiveDamage(self.attack)
-
-        yield from self.moveBack(speed * 0.4)
-
-        # self.anim.activated = False
-        # self.img.activated = True
-        self.e_attackFinished.notify()
-
-
-
-class NguyenDJ(Monster):
-    def after_init(self):
-        super().after_init()
-        Sounds.play("nguyen dj.mp3", Volume.effects * 0.3)

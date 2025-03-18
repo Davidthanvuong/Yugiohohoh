@@ -30,6 +30,7 @@ class App:
     debugMode = True
     targetFPS = 60
     screen: pg.Surface
+    blackwhiteFilter = False
 
     fpsTrackDur = 1.0
     native = (1400, 1000)

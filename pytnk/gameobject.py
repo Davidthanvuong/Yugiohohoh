@@ -168,4 +168,3 @@ class GameObject:
         if self.parent:
             self.parent.childs.remove(self)
         # self.enabled = False # Test GC
-        # print(f"Destroyed {self.name}")
