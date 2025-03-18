@@ -10,8 +10,9 @@ class King(Monster):
             self.img.alpha = death.value
             yield
 
+        GameObject.root.childs.clear()
+        GameObject.parents_stack.clear()
         StartMenu().build()
-        self.user.main.go.destroy()
 
 class Dragon(Monster):
     pass

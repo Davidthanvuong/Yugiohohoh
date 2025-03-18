@@ -6,7 +6,10 @@ class Phase(Enum):
     BATTLE = 1
     DRAW = 2
 
-class StateMachine:
+class LinearStateMachine:
+    '''Một biến tấu của FSM (máy trạng thái hữu hạn) cho game thẻ bài
+    Chạy luôn tuyến tính theo: Main phase --> Battle phase --> Draw phase
+    '''
     states: list[list['FiniteState']] = [[], [], []]
     current_state: 'FiniteState'
     i_phase: int = 0
@@ -39,7 +42,7 @@ class StateMachine:
 
 class FiniteState:
     def __init__(self, user: 'Controller', phase: Phase):
-        StateMachine.add_state(phase, self)
+        LinearStateMachine.add_state(phase, self)
         self.user = user
         self.e_begin: Event = Event()
         self.e_end: Event = Event()

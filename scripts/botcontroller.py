@@ -41,7 +41,7 @@ class BotController(Controller):
         if sum(weights) == 0:
             # print("[Opponent] Hết cứu. Hết nước đi.")
             self.myTurn = False
-            return StateMachine.next_state()
+            return LinearStateMachine.next_state()
         
         action = random.choices(actions, weights, k=1)[0]
         self.action = action()

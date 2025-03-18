@@ -22,7 +22,7 @@ class Maingame(Component):
 
         self.notif = PhaseIndicator().build()
 
-        StateMachine.start()
+        LinearStateMachine.start()
         return mg + self
     
     def __init__(self, scopeZoom = 2.0):

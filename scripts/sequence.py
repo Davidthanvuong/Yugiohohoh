@@ -26,8 +26,6 @@ class IntroSeq(Component):
 
 class StartMenu(Component):
     def build(self):
-        GameObject.root.childs.clear()
-        GameObject.parents_stack.clear()
         menu = Image('background\\willsmith.png', App.native).build(pos=App.center).scope()
         st = Image('pytnk.png', (200, 100)).build() + Text('Start Game', Color.white, 40)
         return menu.unscope() + self

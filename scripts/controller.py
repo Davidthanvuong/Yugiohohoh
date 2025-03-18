@@ -31,8 +31,8 @@ class DrawState(FiniteState):
     def begin(self, user: 'Controller'):
         print("DrawState begin")
         Card(user).build()
-        Card(user).build()
-        StateMachine.next_state()
+        # Card(user).build() # 1 thẻ thôi đủ rồi
+        LinearStateMachine.next_state()
 
     def end(self, user: 'Controller'):
         print("DrawState end")
@@ -94,7 +94,7 @@ class Controller(Component):
             if self.fightTime.completed:
                 self.wasFighting = False
                 self.fightTime = None
-                StateMachine.next_state()
+                LinearStateMachine.next_state()
     # def hear_end_drawPhase(self):
     #     self.placeCard_left = 0
     #     self.quickAction_left = 0

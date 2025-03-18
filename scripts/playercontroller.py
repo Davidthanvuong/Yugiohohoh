@@ -43,5 +43,5 @@ class My_EndPhaseButton(IClickable):
         self.com_text.text = "End Phase " + additional
 
     def on_startClick(self):
-        StateMachine.next_state()
+        LinearStateMachine.next_state()
         self.go.enabled = False

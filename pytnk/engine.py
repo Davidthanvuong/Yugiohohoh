@@ -14,7 +14,7 @@ from .data import *
 from .event import Event, Mouse
 from .motion import Motion
 from .sound import Sounds, Volume
-from .fsm import Phase, StateMachine, FiniteState
+from .fsm import Phase, LinearStateMachine, FiniteState
 # from .sound import Sound
 
 # Component System
