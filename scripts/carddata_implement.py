@@ -31,6 +31,7 @@ king = MonsterData(
 )
 
 
+# ✅
 sung_jin_woo = MonsterData(
     name = 'Sung Jin Woo',
     description = 'Last Stand: When this card\'s HP drops below 10%, its power surges, increasing its DMG by 10x for 1 turn before resetting its evolution stacks.',
@@ -42,6 +43,7 @@ sung_jin_woo = MonsterData(
 )
 
 
+# 🚧
 Akeno = MonsterData(
     name = 'Akeno',
     description = 'Effect: Boosts team DMG by 15%. Charms enemies, slowing by 45% and stunning for 3 seconds.',
@@ -53,6 +55,7 @@ Akeno = MonsterData(
 )
 
 
+# ✅
 Black_man_crying = MonsterData(
     name = 'Black man crying',
     description = 'Bro is onto smth (he\'s cooked)\nEffect: Nothin (bro just praying)',
@@ -64,6 +67,7 @@ Black_man_crying = MonsterData(
 )
 
 
+# 🚧
 dragon = MonsterData(
     name = 'Dragon-drag',
     description = 'Stun + instantly deal dmg to all enemies.',
@@ -75,6 +79,7 @@ dragon = MonsterData(
 )
 
 
+# 🚧
 Brainrot = MonsterData(
     name = 'Brainrot',
     description = 'Makes the whole opponent’s team braindead.',
@@ -97,6 +102,7 @@ Brainrot = MonsterData(
 # )
 
 
+# ✅
 Amir = MonsterData(
     name = 'Amir',
     description = '"I\'m built different, sir"',
@@ -108,6 +114,8 @@ Amir = MonsterData(
 )
 
 
+
+# 🚧
 AngryKaren = MonsterData(
     name = 'Angry Karen',
     description = 'Boost x2 HP for teammates (only "gay" or "les")',
@@ -119,6 +127,8 @@ AngryKaren = MonsterData(
 )
 
 
+# 🚧 Lồng tiếng bị ăn khi chết :))
+# Tấn công tiếng ba da bing gì đóđó
 ChickenNugget = MonsterData(
     name = 'Chicken Nugget',
     description = 'Bro is weak asf (actually yummy)',
@@ -130,10 +140,12 @@ ChickenNugget = MonsterData(
 )
 
 
+
+# 🚧
 DavidGoggins = MonsterData(
     name = 'David Goggins',
     description = '"Mental toughness is a lifestyle."\nBuff 15% DMG + 15% HP for all male cards, debuff 20% DMG all enemies. (effect overwhelming fear)',
-    drop_rate = 0.04,
+    drop_rate = 0.04, #!!!!
     img_path = 'goggins.jpg',
     baseATK = 4500,
     baseDEF = 5500,

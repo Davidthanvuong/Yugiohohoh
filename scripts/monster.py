@@ -21,6 +21,7 @@ class Monster(Summon):
     @staticmethod
     def tryPlace(card: 'Card', data: MonsterData, slot: No['CardSlot']):
         if (slot is None) or (slot.occupy): return False # Không có khỏi cho để
+        if slot.user.myId != card.user.myId: return False # Đặt nhầm phe kìa?
         if slot.myId < 5: return False # Chỗ cho trap
         data.monster(data, card.user, slot).build(slot.transf.g_pos)
         return True
@@ -94,12 +95,12 @@ class Monster(Summon):
         self.actions.append(self.action_attack())
 
     # Yield yield yield
-    def action_attack(self, speed = 1.0):
+    def action_attack(self, time = 1.0):
         '''Mặc định: đi đến target, animation đánh, đánh target, rồi về chỗ cũ'''
-        yield from self.moveTo_target(self.getTarget(), speed * 0.4)
-        yield from self.anim_attack(0.2)
+        yield from self.moveTo_target(self.getTarget(), time * 0.4)
+        yield from self.anim_attack(time)
         self.dealDamage()
-        yield from self.moveBack(speed * 0.4)
+        yield from self.moveBack(time * 0.4)
 
         self.e_attackFinished.notify()
 
@@ -125,20 +126,27 @@ class Monster(Summon):
             yield
         self.transf.pos = motion.dest
 
-    def anim_attack(self, time = 0.5):
+    def anim_attack(self, time = 1.0):
         '''Xoay 360 độ xong đứng đó nhìn'''
-        oldRot = self.transf.rot
-        rotate = Motion.ease_in(oldRot, oldRot + 360, time)
-        while not rotate.completed:
-            self.transf.rot = rotate.value
+        rotate1 = Motion.ease_in(0, 30, time * 0.25)
+        while not rotate1.completed:
+            self.transf.rot = rotate1.value
             yield
 
-        self.transf.rot = oldRot
-        afk = Motion.sleep(time * 0.5)
+        rotate2 = Motion.ease_out(30, -60, time * 0.25)
+        while not rotate2.completed:
+            self.transf.rot = rotate2.value
+            yield
+
+        rotate3 = Motion.ease_in(-60, 0, time * 0.15)
+        while not rotate3.completed:
+            self.transf.rot = rotate3.value
+            yield
+
+        afk = Motion.sleep(time * 0.35)
         while not afk.completed: yield
 
-        self.transf.rot = oldRot
-
+        self.transf.rot = 0.0
 
 
     # Hàm hỗ trợ bổ sung

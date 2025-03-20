@@ -3,8 +3,10 @@ from pytnk.engine import *
 class IntroSeq(Component):
     def build(self):
         intro = Image('background\\yugioh_bg.jpg', App.native).build(pos=App.center).scope()
-        devsText = Text('~~~ Tác giả ~~~', size=40).build(pos=(0, 200))
-        [Image("white.png", 128).build(pos=((i - 1.5) * 160, 300)) for i in range(4)]
+        devsText = Text('~~~ Tác giả ~~~', Color.white, 40).build(pos=(0, 200))
+
+        authors = ["chad_1.jpg", "anya_2.jpg", "scout_3.png", "monster/amir.png"]
+        [Image(authors[i], 128).build(pos=((i - 1.5) * 160, 300)) for i in range(4)]
 
         self.logo = Image('pytnk.png', 200).build(pos=(400, 0)).transf
         self.brand = Text('PyTNK Game Engine', size=40).build().transf
@@ -12,11 +14,16 @@ class IntroSeq(Component):
 
     def __init__(self, splitLen = 200, animTime = 1.0):
         self.motion = Motion.ease_out_cubic(vZERO, vec(splitLen, 0), animTime)
+        self.waiting: No[Motion] = None
         
     def update_logic(self):
-        if self.motion.completed:
+        if self.waiting and self.waiting.completed:
             StartMenu().build()
             return self.go.destroy()
+        
+        if (not self.waiting) and self.motion.completed:
+            self.waiting = Motion.linear(0, 1, 0.5)
+            return
 
         dist = self.motion.value
         self.logo.pos = dist
@@ -110,6 +117,7 @@ class Maingame_beginSeq(Component):
             self.coin.pos.y = tossUp.value
             yield
 
+        self.coin.scale.y = 1 - notmyluck * 2
         img = self.coin.go.getComponent(Image)
         opacity = Motion.ease_out(255, 0, 0.5).bind(img, 'overlay_alpha')
         while not opacity.completed: yield
