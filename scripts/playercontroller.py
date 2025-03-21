@@ -30,9 +30,13 @@ class My_EndPhaseButton(IClickable):
         super().__init__()
         self.user = user
         user.mainState.e_begin += self.reEnable
+        user.mainState.e_end += self.disabling
 
     def reEnable(self):
         self.go.enabled = True
+
+    def disabling(self):
+        self.go.enabled = False
 
     def after_init(self):
         self.com_image = self.go.getComponent(Image)
@@ -44,4 +48,3 @@ class My_EndPhaseButton(IClickable):
 
     def on_startClick(self):
         LinearStateMachine.next_state()
-        self.go.enabled = False

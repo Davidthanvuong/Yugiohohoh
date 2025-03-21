@@ -312,8 +312,8 @@ rias_gremory = MonsterData(
     description = 'Distribute your power evenly and increase all allies’ lifesteal and defense by 5%.',
     drop_rate = 0.05, #!!!!
     img_path = 'rias.jpg',
-    baseATK = 10000,
-    baseDEF = 7000,
+    baseATK = 10000, # tam thoi
+    baseDEF = 5000,
     _class = mons.Rias
 )
 

@@ -34,6 +34,7 @@ class Maingame(Component):
         self.shaking: No[Motion] = None
         self.scopeZoom = scopeZoom
         self.scopeIn = False
+        self.spaceTab = False
     
     def update_logic(self):
         # print(f"{StateMachine.current_state.user.go.name} --> {StateMachine.current_state.__class__.__name__}")
@@ -59,6 +60,11 @@ class Maingame(Component):
             )
             if self.shaking.completed:
                 self.shaking = None
+
+        key = pg.key.get_pressed()[pg.K_SPACE]
+        if not self.spaceTab and key:
+            LinearStateMachine.next_state()
+        self.spaceTab = key
 
     # def drawCard_time(self):
     #     for user in self.users:

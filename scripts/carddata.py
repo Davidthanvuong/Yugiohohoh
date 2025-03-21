@@ -22,7 +22,7 @@ class CardData:
 
         full = f"assets\\images\\{new_path}"
         if not os.path.exists(full):
-            print(f"[Error] Không tìm thấy ảnh tại {full}")
+            print(f"[Note] Không tìm thấy ảnh tại {full}. Auto lấy mặc định")
             return f"card\\{self.img_path}"
 
         return new_path
