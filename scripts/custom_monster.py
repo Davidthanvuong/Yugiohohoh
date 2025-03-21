@@ -76,7 +76,7 @@ class Rias(Monster):
         yield from self.anim_attack(0.2)
         yield from self.indian_explosion(speed)
 
-        for slot in self.user.opponent.get_frontSlots(OCCUPIED):
+        for slot in self.user.opponent.get_monsterSlots(OCCUPIED):
             if not isinstance(slot.occupy, Monster): continue
             slot.occupy.receiveDamage(self.attack)
 

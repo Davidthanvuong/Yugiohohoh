@@ -58,7 +58,7 @@ class BotController(Controller):
         
         card.on_startDrag(controlled=True)  # Drag nhưng kiểm soát bởi *Artificial Stupidity*
         cardtf = card.transf
-        placeSlot = self.choose_frontSlot(EMPTY)
+        placeSlot = self.choose_monsterSlot(EMPTY)
         motion = Motion.ease_in(card.transf.g_pos, placeSlot.transf.g_pos, 0.8)
 
         while not motion.completed:
@@ -79,8 +79,8 @@ class BotController(Controller):
     def act_quickAttack(self):
         # print("[Opponent] Selecting attack...")
         self.attacking = True
-        atk = cast(Monster, self.choose_frontSlot(OCCUPIED).occupy)
-        targetSlot = self.opponent.choose_frontSlot(OCCUPIED)
+        atk = cast(Monster, self.choose_monsterSlot(OCCUPIED).occupy)
+        targetSlot = self.opponent.choose_monsterSlot(OCCUPIED)
 
         atk.setTarget(targetSlot)
         atk.start_attack()

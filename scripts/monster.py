@@ -79,7 +79,7 @@ class Monster(Summon):
         if self.targetSlot and self.targetSlot.occupy: 
             return self.targetSlot
         
-        self.targetSlot = self.user.opponent.choose_frontSlot(OCCUPIED)
+        self.targetSlot = self.user.opponent.choose_monsterSlot(OCCUPIED)
         return self.targetSlot
 
     def interact(self, target: No['CardSlot']):
@@ -223,7 +223,7 @@ class Spell(Summon):
 
     def activate(self):
         if self.data.globalUse:
-            for slot in self.user.get_frontSlots(OCCUPIED):
+            for slot in self.user.get_monsterSlots(OCCUPIED):
                 self.effect_on(slot.force_occupy)
         elif self.slot.occupy:
             self.effect_on(self.slot.occupy)

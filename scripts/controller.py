@@ -112,11 +112,13 @@ class Controller(Component):
     # def draw_time(self):
     #     print("Added card to self")
 
-    def choose_frontSlot(self, occupied: bool):
-        return next(self.get_frontSlots(occupied))
+    def choose_monsterSlot(self, occupied: bool):
+        return next(self.get_monsterSlots(occupied))
 
-    def get_frontSlots(self, occupied: bool):
+    def get_monsterSlots(self, occupied: bool):
         slots = self.slots[5:15]
+        slots.append(self.slots[2])
+
         random.shuffle(slots)
         for slot in slots:
             if (slot.occupy is not None) == occupied:
@@ -124,10 +126,14 @@ class Controller(Component):
 
     def isEmpty(self, front: bool) -> bool:
         slots = self.slots[5:15] if front else self.slots[0:5]
+        if front: slots.append(self.slots[2])
+        else: slots.remove(self.slots[2])
         return not any(slot.occupy for slot in slots)
 
     def isFull(self, front: bool) -> bool:
         slots = self.slots[5:15] if front else self.slots[0:5]
+        if front: slots.append(self.slots[2])
+        else: slots.remove(self.slots[2])
         return all(slot.occupy for slot in slots)
 
     def choose_trapSlot(self, occupied: bool):
@@ -135,6 +141,7 @@ class Controller(Component):
     
     def get_trapSlots(self, occupied: bool):
         slots = self.slots[0:5]
+        slots.pop(2)
         random.shuffle(slots)
         for slot in slots:
             if (slot.occupy is not None) == occupied:
