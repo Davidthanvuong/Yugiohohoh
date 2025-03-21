@@ -4,8 +4,8 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class Volume:
-    music = 0.5
-    effects = 0.5
+    music = 0.05
+    effects = 0.2
 
 class Sounds:
     database: dict[str, Sound] = {}
@@ -18,3 +18,9 @@ class Sounds:
             sound.set_volume(strength)
             Sounds.database[name] = sound
         sound.play()
+
+    @staticmethod
+    def play_music():
+        pg.mixer.music.load("assets/sounds/tobutobu.mp3")
+        pg.mixer.music.set_volume(Volume.music)
+        pg.mixer.music.play()

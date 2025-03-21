@@ -1,4 +1,5 @@
 from pytnk.engine import *
+from .custom_monster import King
 
 class Maingame(Component):
     userCount = 2
@@ -11,6 +12,9 @@ class Maingame(Component):
         self.mgImg = mg.getComponent(Image)
         self.plankImg = plank.getComponent(Image)
 
+        pg.mixer.stop()
+        Sounds.play_music()
+
         self.ended = 0
         self.users: list[Controller] = []
         for i in range(startID, startID + self.userCount):
@@ -19,6 +23,7 @@ class Maingame(Component):
 
         self.users[0].opponent = self.users[1]
         self.users[1].opponent = self.users[0]
+        King.globally_dead = False
 
         self.notif = PhaseIndicator().build()
 

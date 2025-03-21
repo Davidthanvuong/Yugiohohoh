@@ -47,7 +47,7 @@ class Controller(Component):
         self.deck = CardDeck(self).build()
         self.myId = id
 
-        initial_datas = [cards.sung_jin_woo] # Custom here
+        initial_datas = [] # Custom here
         for i in range(self.start_cardCount):
             data = initial_datas[i] if (i < len(initial_datas)) else None
             Card(self, data).build()

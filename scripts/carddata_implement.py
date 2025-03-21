@@ -310,7 +310,7 @@ bui_dinh_quy = MonsterData(
 rias_gremory = MonsterData(
     name = 'Rias Gremory',
     description = 'Distribute your power evenly and increase all allies’ lifesteal and defense by 5%.',
-    drop_rate = 0.0003, #!!!!
+    drop_rate = 0.05, #!!!!
     img_path = 'rias.jpg',
     baseATK = 10000,
     baseDEF = 7000,
@@ -372,3 +372,55 @@ donal_trump = MonsterData(
     _class = Monster
 )
 
+
+#####################################
+
+zhong_xina = MonsterData(
+    name = 'Zhong Xina',
+    description = 'My bro is sending nukes lol',
+    drop_rate = 0.1,  
+    img_path = 'zhong xina.jpg',
+    baseATK = 3500,
+    baseDEF = 1500,
+    _class = Monster
+)
+
+egg_man = MonsterData(
+    name = 'Egg Man',
+    description = '”Xue Hua Piao Piao”',
+    drop_rate = 0.4,  
+    img_path = 'egg man.jpg',
+    baseATK = 999,
+    baseDEF = 500,
+    _class = Monster
+)
+
+lee_ching_chong = MonsterData(
+    name = 'Lee ching chong',
+    description = '”Ching chong ding dong”',
+    drop_rate = 0.4,  
+    img_path = 'lee ching chong.jpg',
+    baseATK = 2200,
+    baseDEF = 800,
+    _class = Monster
+)
+
+christiano_mcdonal = MonsterData(
+    name = 'Christiano McDonal',
+    description = 'Too fat ngl',
+    drop_rate = 0.4,  
+    img_path = 'christiano mcdonal.jpg',
+    baseATK = 1000,
+    baseDEF = 800,
+    _class = Monster
+)
+
+messi = MonsterData(
+    name = 'Messi',
+    description = 'Bro retired.',
+    drop_rate = 0.4,  
+    img_path = 'messi.jpg',
+    baseATK = 800,
+    baseDEF = 1000,
+    _class = Monster
+)

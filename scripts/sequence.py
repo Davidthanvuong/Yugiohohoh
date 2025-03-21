@@ -1,11 +1,11 @@
 from pytnk.engine import *
 
-class IntroSeq(Component):
+class IntroSequence(Component):
     def build(self):
         intro = Image('background\\yugioh_bg.jpg', App.native).build(pos=App.center).scope()
         devsText = Text('~~~ Tác giả ~~~', Color.white, 40).build(pos=(0, 200))
 
-        authors = ["chad_1.jpg", "anya_2.jpg", "scout_3.png", "monster/amir.png"]
+        authors = ["chad_1.jpg", "anya_2.jpg", "scout_3.png", "despacito.jpg"]
         [Image(authors[i], 128).build(pos=((i - 1.5) * 160, 300)) for i in range(4)]
 
         self.logo = Image('pytnk.png', 200).build(pos=(400, 0)).transf
@@ -37,20 +37,27 @@ class StartMenu(Component):
         st = Image('pytnk.png', (200, 100)).build() + Text('Start Game', Color.white, 40)
         return menu.unscope() + self
     
+    def __init__(self):
+        self.clicked = False
+
     def update_logic(self):
-        if Mouse.clicked:
-            LoadingSeq().build()
-            return self.go.destroy()
+        if (Mouse.clicked) and (not self.clicked):
+            self.clicked = True
+            LoadingSequence(Maingame_beginSequence, self.go).build()
+            return
         
 
 
-class LoadingSeq(Component):
+class LoadingSequence(Component):
     def build(self):
-        loading = Image('background\\willsmith.png', App.native).build(anchor=TOPLEFT)
+        # loading = Image('background\\willsmith.png', App.native).build(anchor=TOPLEFT)
+        loading = GameObject(anchor=TOPLEFT)
         return loading + self
 
-    def __init__(self, cellsize = 50, waveLength = 15, animTime = 1.2):
+    def __init__(self, afterwards: type[Component], overlay: No[GameObject] = None, cellsize = 50, waveLength = 15, animTime = 1.2):
         self.cellsize = cellsize
+        self.afterwards = afterwards
+        self.overlay = overlay
         self.waveLength = max(waveLength, 1)
         self.grid = (App.native[0] // cellsize, App.native[1] // cellsize)
         self.interval = (self.grid[0] + self.grid[1] - 2 + self.waveLength)
@@ -58,7 +65,9 @@ class LoadingSeq(Component):
 
     def update_logic(self):
         if self.motion.completed:
-            Maingame_beginSeq().build()
+            if self.overlay:
+                self.overlay.destroy()
+            self.afterwards().build()
             return self.go.destroy()
 
     def update_render(self):
@@ -78,7 +87,7 @@ class LoadingSeq(Component):
 
 
 
-class Maingame_beginSeq(Component):
+class Maingame_beginSequence(Component):
     def build(self):
         main = GameObject(pos=App.center, scale=(0.4, 0.4), rot=90).scope()
         self.human1 = Image('human.png', size=(500, 300)).build(scale=(2, 2), pos=(0, 1000)).transf

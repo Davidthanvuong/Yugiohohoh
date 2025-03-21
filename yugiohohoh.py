@@ -13,7 +13,7 @@ from pytnk.pytnk import Pytnk
 
 if __name__ == '__main__':
     Pytnk.start()
-    IntroSeq().build()
+    IntroSequence().build()
     # Maingame_beginSeq().build()
     # StartMenu().build()
     # Maingame().build(startID=0)

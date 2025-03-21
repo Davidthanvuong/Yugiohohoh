@@ -16,6 +16,7 @@ class BotController(Controller):
     def update_logic(self):
         super().update_logic()
         if not self.myTurn: return
+        
         if self.action is not None:
             try: next(self.action)
             except StopIteration:
@@ -47,7 +48,7 @@ class BotController(Controller):
         self.action = action()
 
     def eval_pickRandomCard(self):
-        if (self.placeCard_left <= 0) or (len(self.deck.go.childs) == 0):
+        if (self.placeCard_left < 0) or (len(self.deck.go.childs) == 0):
             return 0
         return 0.8
     
@@ -65,9 +66,9 @@ class BotController(Controller):
             yield
 
         CardSlot.selecting = placeSlot
-        card.on_stopDrag()
+        if card.on_stopDrag():
+            self.placeCard_left -= 1
         CardSlot.selecting = None
-        self.placeCard_left -= 1
 
     def eval_quickAttack(self):
         anyEmpty = (self.isEmpty(FRONT)) or (self.opponent.isEmpty(FRONT))

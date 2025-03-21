@@ -1,8 +1,12 @@
 from pytnk.engine import *
 
 class King(Monster):
+    globally_dead: bool = False
+
     def action_death(self):
         print("The king is dead")
+        if self.globally_dead: return
+        self.globally_dead = True
         death = Motion.ease_in_cubic(255, 0, 0.5)
         Sounds.play("die.mp3", Volume.effects)
         while not death.completed:
@@ -12,10 +16,14 @@ class King(Monster):
 
         GameObject.root.childs.clear()
         GameObject.parents_stack.clear()
-        StartMenu().build()
+        LoadingSequence(afterwards=StartMenu).build()
+
+
 
 class Dragon(Monster):
     pass
+
+
 
 class Rias(Monster):
     def build(self, pos: vec):
@@ -84,7 +92,8 @@ class Rias(Monster):
 class NguyenDJ(Monster):
     def after_init(self):
         super().after_init()
-        Sounds.play("nguyen dj.mp3", Volume.effects * 0.3)
+        Sounds.play("nguyen dj.mp3", Volume.effects * 0.5)
+
 
 
 class SungJinWoo(Monster):

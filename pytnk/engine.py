@@ -32,7 +32,7 @@ from scripts.damageindicator import DamagePooling
 from scripts.carddata import card_database, CardData, MonsterData, SpellData, TrapData
 
 # Final
-from scripts.sequence import IntroSeq, StartMenu
+from scripts.sequence import IntroSequence, StartMenu, LoadingSequence, Maingame_beginSequence
 
 from scripts.monster import Summon, Monster, MonsterUI, Spell, Trap
 from scripts.card import Card, CardDeck, CardSlot

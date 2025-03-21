@@ -145,13 +145,14 @@ class Card(IClickable):
             self.go += Animation("common/spawn", playtime=1.0, looping=False)
 
             Sounds.play("placing.mp3", Volume.effects)
-            return #self.go.destroy() # Giữ lại cho burning shader
+            return True #self.go.destroy() # Giữ lại cho burning shader
         
         self.onDeck = True
         self.go.removeParent(reroot=False)
         self.user.deck.go.insertChildren(self.go, self.oldIndex)
         self.transf.pos -= self.user.deck.transf.g_pos
         self.user.deck.updated_childs()
+        return False
         
     def try_placeCard(self, slot: No['CardSlot'] = None):
         print(f"Place card {self.data.name} to {slot.myId if slot else None}")
