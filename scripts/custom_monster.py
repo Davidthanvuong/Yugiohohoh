@@ -92,7 +92,7 @@ class Rias(Monster):
 class NguyenDJ(Monster):
     def after_init(self):
         super().after_init()
-        Sounds.play("nguyen dj.mp3", Volume.effects * 0.5)
+        Sounds.play("nguyen dj.mp3", Volume.effects * 0.7)
 
 
 

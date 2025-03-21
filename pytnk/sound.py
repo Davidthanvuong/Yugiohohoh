@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class Volume:
-    music = 0.05
+    music = 0.02
     effects = 0.2
 
 class Sounds:
