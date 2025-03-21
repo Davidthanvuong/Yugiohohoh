@@ -35,7 +35,7 @@ king = MonsterData(
 sung_jin_woo = MonsterData(
     name = 'Sung Jin Woo',
     description = 'Last Stand: When this card\'s HP drops below 10%, its power surges, increasing its DMG by 10x for 1 turn before resetting its evolution stacks.',
-    drop_rate = 0.6, #!!!!
+    drop_rate = 0.9, #!!!!
     img_path = 'sung jin woo.jpg',
     baseATK = 1000,
     baseDEF = 1000,
@@ -312,7 +312,7 @@ rias_gremory = MonsterData(
     description = 'Distribute your power evenly and increase all allies’ lifesteal and defense by 5%.',
     drop_rate = 0.05, #!!!!
     img_path = 'rias.jpg',
-    baseATK = 10000, # tam thoi
+    baseATK = 9999, # tam thoi
     baseDEF = 5000,
     _class = mons.Rias
 )

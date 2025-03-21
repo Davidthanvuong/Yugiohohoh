@@ -17,7 +17,7 @@ class DamagePooling:
     i_free: int = 0
     i_range: int = 0        # Thay vì xử lí từ 0 -> n, thì chỉ một đoạn từ i_range -> i_free
     allocated: int = 2001
-    max_number: int = 50
+    max_number: int = 20
 
     lazy_max: pg.Surface
     numberFont: pg.font.Font
@@ -45,7 +45,7 @@ class DamagePooling:
             cls.lifetimes[cls.i_free] = cls.start_lifetime
             cls.numbers[cls.i_free] = min(number, cls.max_number)
             cls.positions[cls.i_free] = deviated_pos
-            cls.velocities[cls.i_free] = vec(sign * rint(40, 200), rint(-350, 40))
+            cls.velocities[cls.i_free] = vec(sign * rint(20, 200), rint(-450, 100))
             cls.landed[cls.i_free] = False
             cls.enabled[cls.i_free] = True
             cls.i_free = (cls.i_free + 1) % cls.allocated
