@@ -31,6 +31,7 @@ class App:
     targetFPS = 60
     screen: pg.Surface
     blackwhiteFilter = False
+    whos_dead: int = -1
 
     fpsTrackDur = 1.0
     native = (1400, 1000)

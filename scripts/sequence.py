@@ -80,7 +80,10 @@ class LoadingSequence(Component):
         percent = min(max(0, (dt - (x + y)) / self.waveLength), 1)
 
         size = percent * self.cellsize
-        color = (255, 200, 0) if (x + y) % 2 else (200, 160, 0)
+        match App.whos_dead:
+            case 0: color = (255, 0, 0) if (x + y) % 2 else (200, 50, 50)
+            case 1: color = (0, 0, 255) if (x + y) % 2 else (50, 50, 200)
+            case _: color = (255, 200, 0) if (x + y) % 2 else (200, 160, 0)
         center = vec(x + 0.5, y + 0.5) * self.cellsize
         topleft = center - vec(size) / 2
         pg.draw.rect(App.screen, color, (topleft[0], topleft[1], size, size))

@@ -23,7 +23,7 @@ class Maingame(Component):
 
         self.users[0].opponent = self.users[1]
         self.users[1].opponent = self.users[0]
-        King.globally_dead = False
+        App.whos_dead = -1
 
         self.notif = PhaseIndicator().build()
 
