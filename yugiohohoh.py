@@ -14,6 +14,8 @@ from pytnk.pytnk import Pytnk
 if __name__ == '__main__':
     Pytnk.start()
     IntroSequence().build()
+    # Maingame_beginSeq().build() 
+    # StartMenu().build()
     # Maingame().build(startID=0)
 
     while App.running:
