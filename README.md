@@ -3,12 +3,21 @@
 Tên tiếng Việt: Yu-gi-ồ-ố-ô\
 Game bài nhưng bạn làm bao cát cho đám đệ bạn triệu hồi\
 Giờ đây bạn có thể đi hội đồng, _hoặc là bị hội đồng_\
-Phát triển trên PyTNK Game engine
 
 Game được design đơn giản lúc ban đầu nhưng khi phát triển, \
 thêm bao nhiêu loại thẻ bài vô cũng được
 
-### Installation & Edit game
+### Installation
 Game được phát triển trên Pygame bằng Python 3.13
+> [!note] Có thể cài thêm PIL (optional) để hiện animation: `pip install pillow`
+> Sẽ không báo lỗi nếu không cài 
 
-Hiện tại chưa có manual dành cho developer hay những người hac\*\*\*...*edit* dạo
+Slide thuyết trình
+https://www.canva.com/design/DAGY-zs_GdU/xF2XDL-iRnVfh-FPA5oURA/edit
+
+### Cách chơi
+Mở game lên chỉ việc bấm start, tung đồng xu sẽ xác định ai đi trước
+Đấu với bot, chơi theo lượt:
+- Cả hai đều rút bài, triệu hồi và đánh đặc biệt trước
+- Sau đó cả hai bên tự động đánh hội đồng nhau
+- Vua của bên nào chết trước người đó thua
